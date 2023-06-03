@@ -1,0 +1,40 @@
+# https://jonas.github.io/tig/doc/manual.html
+set mouse = true
+set editor-line-number = yes
+set refresh-mode = auto
+set diff-options = -m --first-parent
+
+# set key '!'
+bind main    !      ?git revert %(commit)
+
+# alt c
+bind generic <Esc>c !git commit --allow-empty
+
+# set key 'C'
+bind generic C      !git commit -v
+bind refs    C      !git switch %(branch)
+bind main    C      !git commit -v
+
+# set key 'F'
+bind generic F      ?git fetch %(remote)
+bind main    F      ?git fetch %(remote)
+
+# set key 'U'
+bind generic U      ?git pull %(remote)
+
+# set key 'P'
+bind generic P      ?git push -u %(remote) %(repo:head)
+
+# set key '%'
+bind main    %      !git rebase -i %(commit)
+bind diff    %      !git rebase -i %(commit)
+
+# copy commit hash
+bind generic Y @sh -c "echo %(commit) | pbcopy"
+bind stage   Y @sh -c "echo %(file) | pbcopy"
+bind status  Y @sh -c "echo %(file) | pbcopy"
+bind tree    Y @sh -c "echo %(file) | pbcopy"
+bind blob    Y @sh -c "echo %(file) | pbcopy"
+
+# browse github
+bind generic ^ @gh browse
