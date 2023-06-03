@@ -5,6 +5,10 @@ brew-bundle-dump:
 brew-bundle:
 	brew bundle --file=Brewfile
 # Setup laptop
-setup:
-	./scripts/init.sh
-	./scripts/link.sh
+setup: init link brew-bundle
+# Init laptop
+init:
+	scripts/init.sh
+# Link dotfiles
+link:
+	scripts/link.sh
