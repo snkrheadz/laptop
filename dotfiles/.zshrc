@@ -58,3 +58,9 @@ function peco-src () {
 }
 zle -N peco-src
 bindkey '^g' peco-src
+
+# print image on iterm2 with its pixelHeight and pixelWidth
+function imginfo() {
+  imgcat $argv[1]
+  sips --getProperty pixelHeight --getProperty pixelWidth $argv[1]
+}
