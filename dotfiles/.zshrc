@@ -176,6 +176,8 @@ if type brew &>/dev/null; then
   compinit
 fi
 
+. /opt/homebrew/opt/asdf/libexec/asdf.sh
+
 # ghq & peco
 function peco-src () {
   local selected_dir=$(ghq list -p | peco --query "$LBUFFER")
