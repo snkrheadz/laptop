@@ -21,5 +21,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Remove aws bin
+        run: |
+          rm '/usr/local/bin/aws'
+          rm '/usr/local/bin/aws_completer'
+
       - name: Setup laptop
         run: make setup
