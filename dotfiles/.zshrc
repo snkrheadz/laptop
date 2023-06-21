@@ -195,3 +195,7 @@ function imginfo() {
   imgcat $argv[1]
   sips --getProperty pixelHeight --getProperty pixelWidth $argv[1]
 }
+
+# go
+export GOPATH=$(go env GOPATH)
+export PATH=$PATH:$GOPATH/bin

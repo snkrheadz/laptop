@@ -12,3 +12,6 @@ init:
 # Link dotfiles
 link:
 	scripts/link.sh
+# Install golang
+install-go:
+	scripts/install-go.sh
