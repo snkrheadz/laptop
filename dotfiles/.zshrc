@@ -197,5 +197,7 @@ function imginfo() {
 }
 
 # go
+export ASDF_GOLANG_MOD_VERSION_ENABLED=true
+export GOROOT=$(go env GOROOT)
 export GOPATH=$(go env GOPATH)
 export PATH=$PATH:$GOPATH/bin
