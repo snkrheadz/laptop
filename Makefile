@@ -15,3 +15,6 @@ link:
 # Install golang
 install-go:
 	scripts/install-go.sh
+# Install python
+install-python:
+	scripts/install-python.sh
