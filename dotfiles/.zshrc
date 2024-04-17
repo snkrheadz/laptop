@@ -177,6 +177,8 @@ if type brew &>/dev/null; then
 fi
 
 . /opt/homebrew/opt/asdf/libexec/asdf.sh
+fpath=(${ASDF_DIR}/completions $fpath)
+autoload -Uz compinit && compinit
 
 # ghq & peco
 function peco-src () {
