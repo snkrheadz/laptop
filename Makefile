@@ -18,3 +18,6 @@ install-go:
 # Install python
 install-python:
 	scripts/install-python.sh
+# Install ruby
+install-ruby:
+	scripts/install-ruby.sh
