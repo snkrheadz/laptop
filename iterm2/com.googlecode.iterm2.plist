@@ -553,7 +553,7 @@
 			<key>Screen</key>
 			<integer>-1</integer>
 			<key>Scrollback Lines</key>
-			<integer>8000</integer>
+			<integer>12000</integer>
 			<key>Selected Text Color</key>
 			<dict>
 				<key>Blue Component</key>
