@@ -1,5 +1,3 @@
-# Amazon Q pre block. Keep at the top of this file.
-[[ -f "${HOME}/Library/Application Support/amazon-q/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/Library/Application Support/amazon-q/shell/zshrc.pre.zsh"
 # load custom executable functions
 for function in ~/.zsh/functions/*; do
   source $function
@@ -207,6 +205,3 @@ export GOPATH=$(go env GOPATH)
 export PATH=$PATH:$GOPATH/bin
 
 [ -r ~/.zshrc_local ] && source ~/.zshrc_local
-
-# Amazon Q post block. Keep at the bottom of this file.
-[[ -f "${HOME}/Library/Application Support/amazon-q/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/Library/Application Support/amazon-q/shell/zshrc.post.zsh"
