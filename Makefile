@@ -21,3 +21,6 @@ install-python:
 # Install ruby
 install-ruby:
 	scripts/install-ruby.sh
+# Install nodejs
+install-nodejs:
+	scripts/install-nodejs.sh
