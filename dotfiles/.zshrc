@@ -205,3 +205,16 @@ export GOPATH=$(go env GOPATH)
 export PATH=$PATH:$GOPATH/bin
 
 [ -r ~/.zshrc_local ] && source ~/.zshrc_local
+
+# Shopify Hydrogen alias to local projects
+alias h2='$(npm prefix -s)/node_modules/.bin/shopify hydrogen'
+
+# bun completions
+[ -s "/Users/snkrheadz/.bun/_bun" ] && source "/Users/snkrheadz/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+# Added by Windsurf
+export PATH="/Users/snkrheadz/.codeium/windsurf/bin:$PATH"

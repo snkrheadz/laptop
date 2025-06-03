@@ -21,3 +21,4 @@ test_config.json
 .devcontainer
 .sql
 public/assets/js/vue
+**/worktrees/**

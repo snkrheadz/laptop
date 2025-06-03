@@ -46,3 +46,5 @@
   email = aki.d.sc@gmail.com
 [ghq]
   root = ~/ghq
+[submodule]
+	recurse = true
