@@ -218,3 +218,25 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 # Added by Windsurf
 export PATH="/Users/snkrheadz/.codeium/windsurf/bin:$PATH"
+
+function cursor-worktree-open() {
+  local selected_line selected_path
+  selected_line=$(git worktree list | \
+    fzf --height=40% --reverse --preview='ls -la $(echo {} | cut -d" " -f1)')
+  selected_path=$(echo "$selected_line" | awk '{print $1}')
+  if [[ -n "$selected_path" ]]; then
+    if command -v cursor >/dev/null 2>&1; then
+      cursor "$selected_path"
+      zle accept-line
+    else
+      echo "cursor not found."
+      zle reset-prompt
+    fi
+  else
+    echo "No worktree selected."
+    zle reset-prompt
+  fi
+}
+
+zle -N cursor-worktree-open
+bindkey '^f' cursor-worktree-open
