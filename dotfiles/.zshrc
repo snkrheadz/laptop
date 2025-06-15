@@ -240,3 +240,4 @@ function cursor-worktree-open() {
 
 zle -N cursor-worktree-open
 bindkey '^f' cursor-worktree-open
+alias claude="/Users/snkrheadz/.claude/local/claude"

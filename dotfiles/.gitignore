@@ -22,4 +22,5 @@ test_config.json
 .sql
 public/assets/js/vue
 worktrees/
-.claude/
+.claude/settings.local.json
+.mcp.json
