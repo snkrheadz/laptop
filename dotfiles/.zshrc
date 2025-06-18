@@ -245,5 +245,5 @@ alias claude="/Users/snkrheadz/.claude/local/claude"
 function copy_claude_sessions() {
   find /Users/snkrheadz/ghq/github.com/snkrdunk/snkrdunk.com/worktrees/ \
     -type f -path "*/.claude/sessions/*.md" \
-    -exec cp {} /Users/snkrheadz/ghq/github.com/snkrdunk/snkrdunk-ai-agent-sessions/.claude/sessions/snkrdunk.com/ \;
+    -exec cp {} /Users/snkrheadz/ghq/github.com/snkrheadz/snkrdunk-ai-agent-sessions/.claude/sessions/snkrdunk.com/ \;
 }
