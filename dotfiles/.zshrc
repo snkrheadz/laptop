@@ -247,3 +247,6 @@ function copy_claude_sessions() {
     -type f -path "*/.claude/sessions/*.md" \
     -exec cp {} /Users/snkrheadz/ghq/github.com/snkrheadz/snkrdunk-ai-agent-sessions/.claude/sessions/snkrdunk.com/ \;
 }
+
+# Claude Code
+export ENABLE_BACKGROUND_TASKS=1
