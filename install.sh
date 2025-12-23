@@ -75,7 +75,8 @@ create_backup() {
 
     for file in "${files_to_backup[@]}"; do
         if [ -e "$file" ] && [ ! -L "$file" ]; then
-            local dest="$BACKUP_DIR/$(basename "$file")"
+            local dest
+            dest="$BACKUP_DIR/$(basename "$file")"
             cp -R "$file" "$dest"
             log_info "Backed up: $file"
         fi

@@ -21,7 +21,7 @@ LAST_BACKUP_FILE="$HOME/.dotfiles_last_backup"
 list_backups() {
     log_info "Available backups:"
     if [ -d "$HOME/.dotfiles_backup" ]; then
-        ls -1 "$HOME/.dotfiles_backup" | while read -r backup; do
+        find "$HOME/.dotfiles_backup" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort | while read -r backup; do
             echo "  - $backup"
         done
     else
@@ -72,7 +72,8 @@ restore_backup() {
 
     for file in "$backup_dir"/*; do
         if [ -e "$file" ]; then
-            local filename=$(basename "$file")
+            local filename
+            filename=$(basename "$file")
             local dest="$HOME/$filename"
 
             cp -R "$file" "$dest"
@@ -127,7 +128,7 @@ main() {
     fi
 
     echo ""
-    read -p "Are you sure you want to rollback? (y/N): " confirm
+    read -rp "Are you sure you want to rollback? (y/N): " confirm
     if [ "$confirm" != "y" ] && [ "$confirm" != "Y" ]; then
         log_info "Rollback cancelled"
         exit 0
