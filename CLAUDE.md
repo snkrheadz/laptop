@@ -37,9 +37,7 @@ make setup-hooks      # Install pre-commit hooks
 ├── tmux/               # Tmux config → ~/.tmux.conf
 ├── tig/                # Tig config → ~/.tigrc
 ├── fzf/                # FZF config → ~/.fzf.zsh, ~/.fzf.bash
-├── asdf/               # asdf config → ~/.asdfrc
 ├── mycli/              # mycli config → ~/.myclirc
-├── alacritty/          # Alacritty config → ~/.config/alacritty/
 │
 ├── .pre-commit-config.yaml   # Pre-commit hooks config
 ├── .gitleaks.toml            # Gitleaks secret scanning config

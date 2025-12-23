@@ -71,7 +71,6 @@ create_backup() {
         "$HOME/.myclirc"
         "$HOME/.fzf.zsh"
         "$HOME/.fzf.bash"
-        "$HOME/.asdfrc"
         "$HOME/.zsh"
         "$HOME/.config/alacritty"
     )
@@ -93,32 +92,38 @@ create_backup() {
 create_symlinks() {
     log_info "Creating symbolic links..."
 
+    # Helper function to safely create symlinks
+    # Removes existing symlink/file before creating new one to avoid nested links
+    safe_ln() {
+        local target="$1"
+        local link_name="$2"
+        rm -rf "$link_name"
+        ln -sf "$target" "$link_name"
+    }
+
     # zsh
-    ln -sf "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc"
-    ln -sf "$DOTFILES_DIR/zsh/.aliases" "$HOME/.aliases"
-    ln -sf "$DOTFILES_DIR/zsh" "$HOME/.zsh"
+    safe_ln "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc"
+    safe_ln "$DOTFILES_DIR/zsh/.aliases" "$HOME/.aliases"
+    safe_ln "$DOTFILES_DIR/zsh" "$HOME/.zsh"
 
     # git
-    ln -sf "$DOTFILES_DIR/git/.gitconfig" "$HOME/.gitconfig"
-    ln -sf "$DOTFILES_DIR/git/.gitmessage" "$HOME/.gitmessage"
-    ln -sf "$DOTFILES_DIR/git/.gitignore" "$HOME/.gitignore"
-    ln -sf "$DOTFILES_DIR/git/.git_template" "$HOME/.git_template"
+    safe_ln "$DOTFILES_DIR/git/.gitconfig" "$HOME/.gitconfig"
+    safe_ln "$DOTFILES_DIR/git/.gitmessage" "$HOME/.gitmessage"
+    safe_ln "$DOTFILES_DIR/git/.gitignore" "$HOME/.gitignore"
+    safe_ln "$DOTFILES_DIR/git/.git_template" "$HOME/.git_template"
 
     # tmux
-    ln -sf "$DOTFILES_DIR/tmux/.tmux.conf" "$HOME/.tmux.conf"
+    safe_ln "$DOTFILES_DIR/tmux/.tmux.conf" "$HOME/.tmux.conf"
 
     # tig
-    ln -sf "$DOTFILES_DIR/tig/.tigrc" "$HOME/.tigrc"
+    safe_ln "$DOTFILES_DIR/tig/.tigrc" "$HOME/.tigrc"
 
     # mycli
-    ln -sf "$DOTFILES_DIR/mycli/.myclirc" "$HOME/.myclirc"
+    safe_ln "$DOTFILES_DIR/mycli/.myclirc" "$HOME/.myclirc"
 
     # fzf
-    ln -sf "$DOTFILES_DIR/fzf/.fzf.zsh" "$HOME/.fzf.zsh"
-    ln -sf "$DOTFILES_DIR/fzf/.fzf.bash" "$HOME/.fzf.bash"
-
-    # asdf
-    ln -sf "$DOTFILES_DIR/asdf/.asdfrc" "$HOME/.asdfrc"
+    safe_ln "$DOTFILES_DIR/fzf/.fzf.zsh" "$HOME/.fzf.zsh"
+    safe_ln "$DOTFILES_DIR/fzf/.fzf.bash" "$HOME/.fzf.bash"
 
     # alacritty
     mkdir -p "$HOME/.config/alacritty"
@@ -126,7 +131,7 @@ create_symlinks() {
         git clone https://github.com/alacritty/alacritty-theme "$HOME/.config/alacritty/themes"
     fi
     if [ -f "$DOTFILES_DIR/alacritty/alacritty.toml" ]; then
-        ln -sf "$DOTFILES_DIR/alacritty/alacritty.toml" "$HOME/.config/alacritty/alacritty.toml"
+        safe_ln "$DOTFILES_DIR/alacritty/alacritty.toml" "$HOME/.config/alacritty/alacritty.toml"
     fi
 
     log_success "Symbolic links created"
