@@ -6,6 +6,8 @@
 	<true/>
 	<key>Default Bookmark Guid</key>
 	<string>050A5626-62E3-4F22-AD78-082654B52B9D</string>
+	<key>Default Browser Profile Guid</key>
+	<string>0B782680-32C0-43AC-BEE1-46990EA9BBF3</string>
 	<key>HapticFeedbackForEsc</key>
 	<false/>
 	<key>HotkeyMigratedFromSingleToMulti</key>

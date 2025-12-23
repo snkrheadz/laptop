@@ -48,3 +48,5 @@
   root = ~/ghq
 [submodule]
 	recurse = true
+[coderabbit]
+	machineId = cli/d886e1a40c00436fba86941132d08098

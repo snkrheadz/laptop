@@ -206,48 +206,25 @@ export PATH=$PATH:$GOPATH/bin
 
 [ -r ~/.zshrc_local ] && source ~/.zshrc_local
 
-# Shopify Hydrogen alias to local projects
-alias h2='$(npm prefix -s)/node_modules/.bin/shopify hydrogen'
-
 # bun completions
-[ -s "/Users/snkrheadz/.bun/_bun" ] && source "/Users/snkrheadz/.bun/_bun"
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
-# Added by Windsurf
-export PATH="/Users/snkrheadz/.codeium/windsurf/bin:$PATH"
-
-function cursor-worktree-open() {
-  local selected_line selected_path
-  selected_line=$(git worktree list | \
-    fzf --height=40% --reverse --preview='ls -la $(echo {} | cut -d" " -f1)')
-  selected_path=$(echo "$selected_line" | awk '{print $1}')
-  if [[ -n "$selected_path" ]]; then
-    if command -v cursor >/dev/null 2>&1; then
-      cursor "$selected_path"
-      zle accept-line
-    else
-      echo "cursor not found."
-      zle reset-prompt
-    fi
-  else
-    echo "No worktree selected."
-    zle reset-prompt
-  fi
-}
-
-zle -N cursor-worktree-open
-bindkey '^f' cursor-worktree-open
-alias claude="/Users/snkrheadz/.claude/local/claude"
-
-function copy_claude_sessions() {
-  find /Users/snkrheadz/ghq/github.com/snkrdunk/snkrdunk.com/ \
-       /Users/snkrheadz/ghq/github.com/snkrdunk/snkrdunk.com/worktrees/ \
-    -type f -path "*/.claude/sessions/*.md" \
-    -exec cp {} /Users/snkrheadz/ghq/github.com/snkrheadz/snkrdunk-ai-agent-sessions/.claude/sessions/snkrdunk.com/ \;
-}
-
 # Claude Code
 export ENABLE_BACKGROUND_TASKS=1
+
+[[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"
+
+# Added by CodeRabbit CLI installer
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
+
+# Added by Antigravity
+export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
+
+# Claude Status Bar Monitor
+alias cs='claude-statusbar'
+alias cstatus='claude-statusbar'

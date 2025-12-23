@@ -15,7 +15,7 @@ log/*.log
 rerun.txt
 tmp/**/*
 /tags
-.vscode
+# .vscode
 config.json
 test_config.json
 .devcontainer
@@ -23,4 +23,3 @@ test_config.json
 public/assets/js/vue
 worktrees/
 .claude/settings.local.json
-.mcp.json
