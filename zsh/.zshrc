@@ -176,10 +176,6 @@ if type brew &>/dev/null; then
   compinit
 fi
 
-export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
-fpath=(${ASDF_DIR}/completions $fpath)
-autoload -Uz compinit && compinit
-
 # ghq & peco
 function peco-src () {
   local selected_dir=$(ghq list -p | peco --query "$LBUFFER")
@@ -197,12 +193,6 @@ function imginfo() {
   imgcat $argv[1]
   sips --getProperty pixelHeight --getProperty pixelWidth $argv[1]
 }
-
-# go
-export ASDF_GOLANG_MOD_VERSION_ENABLED=true
-export GOROOT=$(go env GOROOT)
-export GOPATH=$(go env GOPATH)
-export PATH=$PATH:$GOPATH/bin
 
 [ -r ~/.zshrc_local ] && source ~/.zshrc_local
 

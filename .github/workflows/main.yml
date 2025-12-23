@@ -2,29 +2,27 @@ name: "laptop"
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
 
 permissions:
   contents: read
 
 jobs:
-  laptop:
-    name: "laptop"
+  lint:
+    name: "Lint & Security Check"
     runs-on: macos-latest
-
-    defaults:
-      run:
-        shell: bash
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Remove aws bin
+      - name: Install tools
         run: |
-          rm '/usr/local/bin/aws'
-          rm '/usr/local/bin/aws_completer'
+          brew install gitleaks shellcheck
 
-      - name: Setup laptop
-        run: make setup
+      - name: Run gitleaks
+        run: gitleaks detect --source=. --no-git
+
+      - name: Shellcheck
+        run: shellcheck install.sh rollback.sh scripts/*.sh

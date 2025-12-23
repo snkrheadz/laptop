@@ -1,0 +1,14 @@
+# mise configuration
+# https://mise.jdx.dev/configuration.html
+
+[tools]
+go = "1.24.3"
+node = "25.2.1"
+python = "3.13"
+ruby = "3.4.8"
+
+[settings]
+# Automatically install tools when entering a directory with a mise config
+auto_install = true
+# Trust all config files
+trusted_config_paths = ["~"]

@@ -1,0 +1,16 @@
+# Gitleaks configuration
+# https://github.com/gitleaks/gitleaks
+
+title = "Dotfiles Gitleaks Config"
+
+[extend]
+# Use default rules
+useDefault = true
+
+# Ignore paths
+[allowlist]
+paths = [
+    '''\.git/''',
+    '''\.gitleaks\.toml''',
+    '''Brewfile''',
+]
