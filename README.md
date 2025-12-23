@@ -17,6 +17,7 @@ This repository manages configurations for the following applications:
 | Multiplexer     | tmux            | `~/.tmux.conf`             |
 | Fuzzy Finder    | fzf             | `~/.fzf.zsh`               |
 | Packages        | Homebrew        | `Brewfile`                 |
+| Runtimes        | mise            | `~/.config/mise/config.toml` |
 
 **Brewfile includes:**
 
@@ -70,6 +71,7 @@ laptop/
 ├── tmux/                   # tmux configuration
 ├── tig/                    # Tig (git TUI) config
 ├── fzf/                    # Fuzzy finder config
+├── mise/                   # mise runtime manager config
 │
 ├── scripts/
 │   └── auto-sync.sh        # Hourly auto-sync script
@@ -154,9 +156,10 @@ cd ~/ghq/github.com/snkrheadz/laptop
 3. Creates timestamped backup of existing configs
 4. Creates symlinks to repository configs
 5. Installs all Homebrew packages from Brewfile
-6. Sets up gitleaks + pre-commit hooks
-7. Configures launchd auto-sync agent
-8. Creates `~/.secrets.env` template
+6. Sets up mise and installs runtimes (Go, Node.js, Python, Ruby)
+7. Sets up gitleaks + pre-commit hooks
+8. Configures launchd auto-sync agent
+9. Creates `~/.secrets.env` template
 
 ### Rollback
 
@@ -182,6 +185,47 @@ brew bundle dump --force --file=Brewfile
 
 # Install packages from Brewfile
 brew bundle --file=Brewfile
+```
+
+## Runtime Management (mise)
+
+[mise](https://mise.jdx.dev/) manages programming language runtimes (Go, Node.js, Python, Ruby).
+
+### Installed Runtimes
+
+| Runtime | Version |
+|---------|---------|
+| Go      | 1.24.3  |
+| Node.js | 25.2.1  |
+| Python  | 3.13.x  |
+| Ruby    | 3.4.8   |
+
+### Commands
+
+```bash
+# List installed runtimes
+mise list
+
+# Install all runtimes from config
+mise install
+
+# Install specific runtime
+mise use go@1.23.1
+
+# Update to latest versions
+mise upgrade
+```
+
+### Configuration
+
+Edit `mise/config.toml` to change versions:
+
+```toml
+[tools]
+go = "1.24.3"
+node = "25.2.1"
+python = "3.13"
+ruby = "3.4.8"
 ```
 
 ## Customization

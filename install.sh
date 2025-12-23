@@ -124,6 +124,10 @@ create_symlinks() {
     mkdir -p "$HOME/.config/ghostty"
     safe_ln "$DOTFILES_DIR/ghostty/config" "$HOME/.config/ghostty/config"
 
+    # mise
+    mkdir -p "$HOME/.config/mise"
+    safe_ln "$DOTFILES_DIR/mise/config.toml" "$HOME/.config/mise/config.toml"
+
     log_success "Symbolic links created"
 }
 
@@ -199,6 +203,25 @@ EOF
     log_success "Auto-sync configured (runs every hour)"
 }
 
+# Setup mise and install runtimes
+setup_mise() {
+    log_info "Setting up mise..."
+
+    # Install mise if not present
+    if ! command -v mise &>/dev/null; then
+        brew install mise
+    fi
+
+    # Trust the config file
+    mise trust "$HOME/.config/mise/config.toml" 2>/dev/null || true
+
+    # Install all tools defined in config
+    log_info "Installing runtimes (go, node, python, ruby)..."
+    mise install
+
+    log_success "mise configured with runtimes"
+}
+
 # Create secrets.env template
 create_secrets_template() {
     if [ ! -f "$HOME/.secrets.env" ]; then
@@ -231,6 +254,7 @@ main() {
     create_backup
     create_symlinks
     install_brew_packages
+    setup_mise
     setup_security
     setup_autosync
     create_secrets_template

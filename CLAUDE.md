@@ -24,6 +24,11 @@ brew bundle --file=Brewfile               # Install packages from Brewfile
 pre-commit install                        # Setup pre-commit hooks
 pre-commit run --all-files                # Run all pre-commit checks
 gitleaks detect --source=. --no-git       # Scan for secrets
+
+# Runtime management (mise)
+mise list                                 # List installed runtimes
+mise install                              # Install runtimes from config
+mise use go@1.24.3                        # Install/use specific version
 ```
 
 ## Architecture
@@ -49,6 +54,7 @@ gitleaks detect --source=. --no-git       # Scan for secrets
 ├── tig/                # Tig config → ~/.tigrc
 ├── fzf/                # FZF config → ~/.fzf.zsh, ~/.fzf.bash
 ├── ghostty/            # Ghostty config → ~/.config/ghostty/config
+├── mise/               # mise config → ~/.config/mise/config.toml
 │
 ├── .pre-commit-config.yaml   # Pre-commit hooks config
 ├── .gitleaks.toml            # Gitleaks secret scanning config
@@ -61,6 +67,7 @@ gitleaks detect --source=. --no-git       # Scan for secrets
 - **Backup/Rollback**: `install.sh` creates timestamped backups; `rollback.sh` restores them
 - **Security**: gitleaks + pre-commit hooks scan for secrets before commit
 - **Secrets**: Store API keys in `~/.secrets.env` (gitignored, created by install.sh)
+- **Runtimes**: mise manages Go 1.24.3, Node.js 25.2.1, Python 3.13, Ruby 3.4.8
 
 ## Development Notes
 

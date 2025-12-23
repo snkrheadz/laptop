@@ -46,6 +46,7 @@ remove_symlinks() {
         "$HOME/.fzf.zsh"
         "$HOME/.fzf.bash"
         "$HOME/.config/ghostty/config"
+        "$HOME/.config/mise/config.toml"
     )
 
     for link in "${symlinks[@]}"; do
