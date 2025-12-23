@@ -1,0 +1,23 @@
+# Gitleaks configuration
+# https://github.com/gitleaks/gitleaks
+
+title = "Dotfiles Gitleaks Config"
+
+[extend]
+# Use default rules
+useDefault = true
+
+# Allow specific patterns (false positives)
+[[rules]]
+id = "dotfiles-allowlist"
+description = "Allowlist for common dotfile patterns"
+regex = '''(?i)(example|placeholder|your[-_]?key[-_]?here|xxx+)'''
+allowlist = true
+
+# Ignore paths
+[allowlist]
+paths = [
+    '''\.git/''',
+    '''\.gitleaks\.toml''',
+    '''Brewfile''',
+]

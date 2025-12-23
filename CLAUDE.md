@@ -4,41 +4,51 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-macOS laptop setup repository that automates dotfiles management and package installation via Homebrew.
+macOS laptop setup repository with dotfiles management, auto-sync, and security features.
 
 ## Commands
 
 ```bash
-# Full setup (init + link + brew install)
-make setup
+# Full installation (backup, symlinks, brew packages, security tools, auto-sync)
+make install
 
-# Dump current installed packages to Brewfile
-make brew-bundle-dump
+# Rollback to previous configuration
+make rollback
 
-# Install packages from Brewfile
-make brew-bundle
-
-# Link dotfiles to $HOME
-make link
-
-# Install language runtimes (via asdf)
-make install-go
-make install-python
-make install-ruby
-make install-nodejs
+# Manual operations
+make brew-dump        # Dump current Homebrew packages to Brewfile
+make brew-install     # Install packages from Brewfile
+make sync             # Run auto-sync manually
+make security-check   # Run gitleaks and pre-commit checks
+make setup-hooks      # Install pre-commit hooks
 ```
 
 ## Architecture
 
-- `Brewfile` - Homebrew packages, casks, and VSCode extensions
-- `dotfiles/` - Configuration files symlinked to `$HOME` (e.g., `.zshrc`, `.gitconfig`, `.tmux.conf`)
-- `scripts/` - Setup scripts (`init.sh` installs Xcode CLI + Homebrew, `link.sh` creates symlinks)
-- `zsh/` - Zsh modules symlinked to `$HOME/.zsh`
-- `alacritty/` - Alacritty terminal configuration
-- `bin/` - Custom executables (e.g., `tat` for tmux session management)
+```
+├── install.sh          # Main installer (creates backup, symlinks, installs packages)
+├── rollback.sh         # Restore from backup
+├── scripts/
+│   └── auto-sync.sh    # Hourly auto-sync via launchd
+├── Brewfile            # Homebrew packages, casks, VSCode extensions
+│
+├── zsh/                # Shell config → ~/.zshrc, ~/.aliases, ~/.zsh/
+├── git/                # Git config → ~/.gitconfig, ~/.gitmessage, ~/.gitignore
+├── tmux/               # Tmux config → ~/.tmux.conf
+├── tig/                # Tig config → ~/.tigrc
+├── fzf/                # FZF config → ~/.fzf.zsh, ~/.fzf.bash
+├── asdf/               # asdf config → ~/.asdfrc
+├── mycli/              # mycli config → ~/.myclirc
+├── alacritty/          # Alacritty config → ~/.config/alacritty/
+│
+├── .pre-commit-config.yaml   # Pre-commit hooks config
+├── .gitleaks.toml            # Gitleaks secret scanning config
+└── .gitignore                # Enhanced security-focused gitignore
+```
 
-## Workflow
+## Key Features
 
-1. `scripts/init.sh` - Installs Xcode command line tools and Homebrew
-2. `scripts/link.sh` - Symlinks all dotfiles from `dotfiles/` to `$HOME`, sets up zsh and alacritty configs
-3. `brew bundle` - Installs all packages from Brewfile
+- **Auto-sync**: launchd agent runs `auto-sync.sh` every hour to commit and push changes
+- **Backup/Rollback**: `install.sh` creates timestamped backups; `rollback.sh` restores them
+- **Security**: gitleaks + pre-commit hooks scan for secrets before commit
+- **Secrets**: Store API keys in `~/.secrets.env` (gitignored, created by install.sh)

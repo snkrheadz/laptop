@@ -1,26 +1,41 @@
-# dump current apps to Brewfile
-brew-bundle-dump:
+# Install dotfiles (full setup)
+install:
+	./install.sh
+
+# Rollback to previous configuration
+rollback:
+	./rollback.sh
+
+# Dump current Homebrew packages to Brewfile
+brew-dump:
 	brew bundle dump --force --file=Brewfile
-# Import from Brewfile
-brew-bundle:
+
+# Install Homebrew packages from Brewfile
+brew-install:
 	brew bundle --file=Brewfile
-# Setup laptop
-setup: init link brew-bundle
-# Init laptop
-init:
-	scripts/init.sh
-# Link dotfiles
-link:
-	scripts/link.sh
-# Install golang
-install-go:
-	scripts/install-go.sh
-# Install python
-install-python:
-	scripts/install-python.sh
-# Install ruby
-install-ruby:
-	scripts/install-ruby.sh
-# Install nodejs
-install-nodejs:
-	scripts/install-nodejs.sh
+
+# Run auto-sync manually
+sync:
+	./scripts/auto-sync.sh
+
+# Run security checks
+security-check:
+	gitleaks detect --source=. --no-git
+	pre-commit run --all-files
+
+# Setup pre-commit hooks
+setup-hooks:
+	pre-commit install
+
+# Show help
+help:
+	@echo "Available commands:"
+	@echo "  make install        - Full installation (backup, symlinks, brew, security)"
+	@echo "  make rollback       - Rollback to previous configuration"
+	@echo "  make brew-dump      - Dump current Homebrew packages to Brewfile"
+	@echo "  make brew-install   - Install packages from Brewfile"
+	@echo "  make sync           - Run auto-sync manually"
+	@echo "  make security-check - Run gitleaks and pre-commit checks"
+	@echo "  make setup-hooks    - Install pre-commit hooks"
+
+.PHONY: install rollback brew-dump brew-install sync security-check setup-hooks help

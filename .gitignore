@@ -1,0 +1,85 @@
+# Secrets and credentials
+.secrets.env
+*.env.local
+.env
+.env.*
+!.env.example
+secrets/
+credentials/
+*.pem
+*.key
+*.p12
+*.pfx
+
+# API keys and tokens
+*_token
+*_secret
+*_key
+*.credentials
+*.credential
+service-account*.json
+google-credentials*.json
+
+# SSH keys
+id_rsa*
+id_ed25519*
+id_ecdsa*
+id_dsa*
+*.pub
+
+# GPG keys
+*.gpg
+*.asc
+
+# AWS
+.aws/credentials
+.aws/config
+
+# GCP
+.config/gcloud/
+
+# Azure
+.azure/
+
+# Terraform
+*.tfstate
+*.tfstate.*
+*.tfvars
+.terraform/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Editor/IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.ruby-lsp/
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Log files
+*.log
+*.log.*
+
+# Node.js
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Claude Code
+.claude/
