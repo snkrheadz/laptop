@@ -72,7 +72,6 @@ create_backup() {
         "$HOME/.fzf.zsh"
         "$HOME/.fzf.bash"
         "$HOME/.zsh"
-        "$HOME/.config/alacritty"
     )
 
     for file in "${files_to_backup[@]}"; do
@@ -124,15 +123,6 @@ create_symlinks() {
     # fzf
     safe_ln "$DOTFILES_DIR/fzf/.fzf.zsh" "$HOME/.fzf.zsh"
     safe_ln "$DOTFILES_DIR/fzf/.fzf.bash" "$HOME/.fzf.bash"
-
-    # alacritty
-    mkdir -p "$HOME/.config/alacritty"
-    if [ ! -d "$HOME/.config/alacritty/themes" ]; then
-        git clone https://github.com/alacritty/alacritty-theme "$HOME/.config/alacritty/themes"
-    fi
-    if [ -f "$DOTFILES_DIR/alacritty/alacritty.toml" ]; then
-        safe_ln "$DOTFILES_DIR/alacritty/alacritty.toml" "$HOME/.config/alacritty/alacritty.toml"
-    fi
 
     log_success "Symbolic links created"
 }

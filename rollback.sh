@@ -46,8 +46,6 @@ remove_symlinks() {
         "$HOME/.myclirc"
         "$HOME/.fzf.zsh"
         "$HOME/.fzf.bash"
-        "$HOME/.asdfrc"
-        "$HOME/.config/alacritty/alacritty.toml"
     )
 
     for link in "${symlinks[@]}"; do
@@ -75,12 +73,6 @@ restore_backup() {
         if [ -e "$file" ]; then
             local filename=$(basename "$file")
             local dest="$HOME/$filename"
-
-            # Handle .config files specially
-            if [ "$filename" = "alacritty" ]; then
-                dest="$HOME/.config/alacritty"
-                mkdir -p "$HOME/.config"
-            fi
 
             cp -R "$file" "$dest"
             log_info "Restored: $dest"
