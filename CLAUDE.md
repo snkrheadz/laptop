@@ -36,6 +36,14 @@ gitleaks detect --source=. --no-git       # Scan for secrets
 ├── Brewfile            # Homebrew packages, casks, VSCode extensions
 │
 ├── zsh/                # Shell config → ~/.zshrc, ~/.aliases, ~/.zsh/
+│   ├── .zshrc          # Main zsh config (loads functions → configs → aliases → oh-my-zsh)
+│   ├── .aliases        # Shell aliases
+│   ├── functions/      # Custom zsh functions (autoloaded)
+│   └── configs/        # Modular zsh configs
+│       ├── pre/        # Loaded first (before main configs)
+│       ├── *.zsh       # Main configs (color, editor, history, etc.)
+│       └── post/       # Loaded last (path.zsh, completion.zsh)
+│
 ├── git/                # Git config → ~/.gitconfig, ~/.gitmessage, ~/.gitignore
 ├── tmux/               # Tmux config → ~/.tmux.conf
 ├── tig/                # Tig config → ~/.tigrc
@@ -53,3 +61,25 @@ gitleaks detect --source=. --no-git       # Scan for secrets
 - **Backup/Rollback**: `install.sh` creates timestamped backups; `rollback.sh` restores them
 - **Security**: gitleaks + pre-commit hooks scan for secrets before commit
 - **Secrets**: Store API keys in `~/.secrets.env` (gitignored, created by install.sh)
+
+## Development Notes
+
+### zsh Loading Order
+
+The `.zshrc` loads configuration in this order:
+
+1. `zsh/functions/*` - Custom functions
+2. `zsh/configs/pre/*` - Pre-configs
+3. `zsh/configs/*.zsh` - Main configs
+4. `zsh/configs/post/*` - Post-configs (PATH, completion)
+5. `~/.aliases` - Shell aliases
+6. oh-my-zsh with plugins: `git`, `zsh-autosuggestions`
+
+### Symlink Management
+
+`install.sh` uses `safe_ln()` function to create symlinks. This removes existing symlinks/files before creating new ones to prevent circular references when running install.sh multiple times.
+
+### Avoiding Conflicts
+
+- Do not create functions with names that conflict with oh-my-zsh plugin aliases (e.g., `g` is used by git plugin)
+- Check `alias` output after installation to identify potential conflicts
