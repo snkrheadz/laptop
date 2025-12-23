@@ -10,17 +10,20 @@ macOS laptop setup repository with dotfiles management, auto-sync, and security 
 
 ```bash
 # Full installation (backup, symlinks, brew packages, security tools, auto-sync)
-make install
+./install.sh
 
 # Rollback to previous configuration
-make rollback
+./rollback.sh
 
 # Manual operations
-make brew-dump        # Dump current Homebrew packages to Brewfile
-make brew-install     # Install packages from Brewfile
-make sync             # Run auto-sync manually
-make security-check   # Run gitleaks and pre-commit checks
-make setup-hooks      # Install pre-commit hooks
+brew bundle dump --force --file=Brewfile  # Dump current Homebrew packages
+brew bundle --file=Brewfile               # Install packages from Brewfile
+./scripts/auto-sync.sh                    # Run auto-sync manually
+
+# Security checks
+pre-commit install                        # Setup pre-commit hooks
+pre-commit run --all-files                # Run all pre-commit checks
+gitleaks detect --source=. --no-git       # Scan for secrets
 ```
 
 ## Architecture
