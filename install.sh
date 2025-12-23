@@ -120,6 +120,10 @@ create_symlinks() {
     safe_ln "$DOTFILES_DIR/fzf/.fzf.zsh" "$HOME/.fzf.zsh"
     safe_ln "$DOTFILES_DIR/fzf/.fzf.bash" "$HOME/.fzf.bash"
 
+    # ghostty
+    mkdir -p "$HOME/.config/ghostty"
+    safe_ln "$DOTFILES_DIR/ghostty/config" "$HOME/.config/ghostty/config"
+
     log_success "Symbolic links created"
 }
 

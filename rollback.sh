@@ -45,6 +45,7 @@ remove_symlinks() {
         "$HOME/.tigrc"
         "$HOME/.fzf.zsh"
         "$HOME/.fzf.bash"
+        "$HOME/.config/ghostty/config"
     )
 
     for link in "${symlinks[@]}"; do

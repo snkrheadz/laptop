@@ -40,6 +40,7 @@ gitleaks detect --source=. --no-git       # Scan for secrets
 ├── tmux/               # Tmux config → ~/.tmux.conf
 ├── tig/                # Tig config → ~/.tigrc
 ├── fzf/                # FZF config → ~/.fzf.zsh, ~/.fzf.bash
+├── ghostty/            # Ghostty config → ~/.config/ghostty/config
 │
 ├── .pre-commit-config.yaml   # Pre-commit hooks config
 ├── .gitleaks.toml            # Gitleaks secret scanning config

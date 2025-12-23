@@ -1,0 +1,36 @@
+# Ghostty Configuration
+# https://ghostty.org/docs/config
+
+# Font
+font-family = "JetBrains Mono"
+font-size = 12
+font-thicken = true
+
+# Theme
+theme = "catppuccin-mocha"
+
+# Window
+window-inherit-working-directory = true
+window-padding-x = 10
+window-padding-y = 10
+window-decoration = true
+
+# Background
+background-opacity = 0.80
+background-blur-radius = 10
+
+unfocused-split-opacity = 0.80
+split-divider-color = #ff8700
+
+# Cursor
+cursor-style = block
+cursor-style-blink = true
+
+# Shell
+shell-integration = zsh
+
+# Clipboard
+copy-on-select = true
+
+# macOS specific
+macos-option-as-alt = true
