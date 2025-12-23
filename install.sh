@@ -68,7 +68,6 @@ create_backup() {
         "$HOME/.git_template"
         "$HOME/.tmux.conf"
         "$HOME/.tigrc"
-        "$HOME/.myclirc"
         "$HOME/.fzf.zsh"
         "$HOME/.fzf.bash"
         "$HOME/.zsh"
@@ -116,9 +115,6 @@ create_symlinks() {
 
     # tig
     safe_ln "$DOTFILES_DIR/tig/.tigrc" "$HOME/.tigrc"
-
-    # mycli
-    safe_ln "$DOTFILES_DIR/mycli/.myclirc" "$HOME/.myclirc"
 
     # fzf
     safe_ln "$DOTFILES_DIR/fzf/.fzf.zsh" "$HOME/.fzf.zsh"

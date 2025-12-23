@@ -43,7 +43,6 @@ remove_symlinks() {
         "$HOME/.git_template"
         "$HOME/.tmux.conf"
         "$HOME/.tigrc"
-        "$HOME/.myclirc"
         "$HOME/.fzf.zsh"
         "$HOME/.fzf.bash"
     )

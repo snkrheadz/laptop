@@ -28,7 +28,7 @@ gitleaks detect --source=. --no-git       # Scan for secrets
 
 ## Architecture
 
-```
+```text
 ├── install.sh          # Main installer (creates backup, symlinks, installs packages)
 ├── rollback.sh         # Restore from backup
 ├── scripts/
@@ -40,7 +40,6 @@ gitleaks detect --source=. --no-git       # Scan for secrets
 ├── tmux/               # Tmux config → ~/.tmux.conf
 ├── tig/                # Tig config → ~/.tigrc
 ├── fzf/                # FZF config → ~/.fzf.zsh, ~/.fzf.bash
-├── mycli/              # mycli config → ~/.myclirc
 │
 ├── .pre-commit-config.yaml   # Pre-commit hooks config
 ├── .gitleaks.toml            # Gitleaks secret scanning config
