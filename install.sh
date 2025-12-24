@@ -71,6 +71,7 @@ create_backup() {
         "$HOME/.fzf.zsh"
         "$HOME/.fzf.bash"
         "$HOME/.zsh"
+        "$HOME/.claude/statusline.sh"
     )
 
     for file in "${files_to_backup[@]}"; do
@@ -128,6 +129,11 @@ create_symlinks() {
     # mise
     mkdir -p "$HOME/.config/mise"
     safe_ln "$DOTFILES_DIR/mise/config.toml" "$HOME/.config/mise/config.toml"
+
+    # claude
+    mkdir -p "$HOME/.claude"
+    mkdir -p "$HOME/.claude/usage"
+    safe_ln "$DOTFILES_DIR/claude/statusline.sh" "$HOME/.claude/statusline.sh"
 
     log_success "Symbolic links created"
 }
