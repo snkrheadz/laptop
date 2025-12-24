@@ -8,16 +8,17 @@ Personal macOS configuration management system with automated dotfiles synchroni
 
 This repository manages configurations for the following applications:
 
-| Category        | Application     | Config Location            |
-| --------------- | --------------- | -------------------------- |
-| Shell           | Zsh + Oh-My-Zsh | `~/.zshrc`, `~/.zsh/`      |
-| Terminal        | Ghostty         | `~/.config/ghostty/config` |
-| Editor          | Neovim, Vim     | via Homebrew               |
-| Version Control | Git, Tig        | `~/.gitconfig`, `~/.tigrc` |
-| Multiplexer     | tmux            | `~/.tmux.conf`             |
-| Fuzzy Finder    | fzf             | `~/.fzf.zsh`               |
-| Packages        | Homebrew        | `Brewfile`                 |
+| Category        | Application     | Config Location              |
+| --------------- | --------------- | ---------------------------- |
+| Shell           | Zsh + Oh-My-Zsh | `~/.zshrc`, `~/.zsh/`        |
+| Terminal        | Ghostty         | `~/.config/ghostty/config`   |
+| Editor          | Neovim, Vim     | via Homebrew                 |
+| Version Control | Git, Tig        | `~/.gitconfig`, `~/.tigrc`   |
+| Multiplexer     | tmux            | `~/.tmux.conf`               |
+| Fuzzy Finder    | fzf             | `~/.fzf.zsh`                 |
+| Packages        | Homebrew        | `Brewfile`                   |
 | Runtimes        | mise            | `~/.config/mise/config.toml` |
+| AI Assistant    | Claude Code     | `~/.claude/statusline.sh`    |
 
 **Brewfile includes:**
 
@@ -72,6 +73,8 @@ laptop/
 ├── tig/                    # Tig (git TUI) config
 ├── fzf/                    # Fuzzy finder config
 ├── mise/                   # mise runtime manager config
+├── claude/                 # Claude Code configuration
+│   └── statusline.sh       # Custom status line script
 │
 ├── scripts/
 │   └── auto-sync.sh        # Hourly auto-sync script
@@ -272,6 +275,42 @@ alias deploy="./scripts/deploy-work.sh"
 ### Symlink Safety
 
 `install.sh` uses `safe_ln()` which removes existing symlinks before creating new ones. This prevents circular references when running install.sh multiple times.
+
+## Claude Code Status Line
+
+Custom status line for Claude Code CLI that displays:
+
+- Model name (Opus/Sonnet)
+- Current directory
+- Git branch
+- Daily cumulative cost
+- Context window remaining
+
+**Display example:**
+```
+[Opus] 📁 laptop | 🌿 main | 💰 $5.20 (Today) | 📊 185k
+```
+
+**Requirements:**
+- `jq` (included in Brewfile)
+
+**Configuration:**
+
+Add to `~/.claude/settings.json`:
+```json
+{
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh",
+    "padding": 0
+  }
+}
+```
+
+**Daily usage tracking:**
+- Cost data is stored in `~/.claude/usage/YYYY-MM-DD.json`
+- Each session is tracked separately to avoid double-counting
+- Resets automatically at midnight
 
 ## License
 
