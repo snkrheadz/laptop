@@ -82,4 +82,5 @@ __pycache__/
 venv/
 
 # Claude Code
-.claude/
+.claude/*
+!.claude/skills/
