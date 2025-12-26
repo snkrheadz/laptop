@@ -30,6 +30,7 @@
   ff = only
 [commit]
   template = ~/.gitmessage
+	gpgsign = true
 [fetch]
   prune = true
 [rebase]
@@ -44,6 +45,7 @@
 [user]
   name = snkrheadz
   email = aki.d.sc@gmail.com
+	signingkey = 91A94303B6F66CD5
 [ghq]
   root = ~/ghq
 [submodule]
