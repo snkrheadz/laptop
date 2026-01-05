@@ -18,7 +18,7 @@ This repository manages configurations for the following applications:
 | Fuzzy Finder    | fzf             | `~/.fzf.zsh`                 |
 | Packages        | Homebrew        | `Brewfile`                   |
 | Runtimes        | mise            | `~/.config/mise/config.toml` |
-| AI Assistant    | Claude Code     | `~/.claude/statusline.sh`    |
+| AI Assistant    | Claude Code     | `~/.claude/` (CLAUDE.md, hooks, agents) |
 
 **Brewfile includes:**
 
@@ -74,7 +74,10 @@ laptop/
 ├── fzf/                    # Fuzzy finder config
 ├── mise/                   # mise runtime manager config
 ├── claude/                 # Claude Code configuration
-│   └── statusline.sh       # Custom status line script
+│   ├── CLAUDE.md           # User global instructions
+│   ├── statusline.sh       # Custom status line script
+│   ├── hooks/              # PostToolUse hooks
+│   └── agents/             # Subagents
 │
 ├── scripts/
 │   └── auto-sync.sh        # Hourly auto-sync script
@@ -276,41 +279,67 @@ alias deploy="./scripts/deploy-work.sh"
 
 `install.sh` uses `safe_ln()` which removes existing symlinks before creating new ones. This prevents circular references when running install.sh multiple times.
 
-## Claude Code Status Line
+## Claude Code Configuration
 
-Custom status line for Claude Code CLI that displays:
+This repository manages Claude Code settings via symlinks:
 
+```text
+claude/
+├── CLAUDE.md           # User global instructions → ~/.claude/CLAUDE.md
+├── statusline.sh       # Custom status line script → ~/.claude/statusline.sh
+├── hooks/
+│   └── validate-shell.sh  # PostToolUse hook → ~/.claude/hooks/
+└── agents/
+    └── verify-shell.md    # Shell verification agent → ~/.claude/agents/
+```
+
+### Managed Components
+
+| Component | Description |
+|-----------|-------------|
+| `CLAUDE.md` | User global instructions (workflow, best practices, prohibitions) |
+| `statusline.sh` | Custom status line showing model, cost, context |
+| `validate-shell.sh` | PostToolUse hook for shellcheck validation on .sh files |
+| `verify-shell.md` | Subagent for comprehensive shell script verification |
+
+### Status Line
+
+Displays in Claude Code CLI:
+```
+[Opus] 📁 laptop | 🌿 main | 💰 $5.20 (Today) | 📊 185k
+```
+
+**Features:**
 - Model name (Opus/Sonnet)
 - Current directory
 - Git branch
 - Daily cumulative cost
 - Context window remaining
 
-**Display example:**
-```
-[Opus] 📁 laptop | 🌿 main | 💰 $5.20 (Today) | 📊 185k
-```
+### Hooks
 
-**Requirements:**
-- `jq` (included in Brewfile)
+**PostToolUse: validate-shell.sh**
+- Triggers after `Write` or `Edit` tools
+- Runs `shellcheck` on `.sh` files
+- Blocks commit if issues found
 
-**Configuration:**
+### Available Plugins
 
-Add to `~/.claude/settings.json`:
+- `/commit-commands:commit-push-pr` - Commit, push, and create PR in one command
+
+### Not Managed
+
+`~/.claude/settings.json` is NOT managed (Claude auto-modifies it). Required hook config:
 ```json
 {
-  "statusLine": {
-    "type": "command",
-    "command": "~/.claude/statusline.sh",
-    "padding": 0
+  "hooks": {
+    "PostToolUse": [{
+      "matcher": "Write|Edit",
+      "hooks": [{"type": "command", "command": "~/.claude/hooks/validate-shell.sh"}]
+    }]
   }
 }
 ```
-
-**Daily usage tracking:**
-- Cost data is stored in `~/.claude/usage/YYYY-MM-DD.json`
-- Each session is tracked separately to avoid double-counting
-- Resets automatically at midnight
 
 ## License
 
