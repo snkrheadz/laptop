@@ -56,6 +56,13 @@ mise use go@1.24.3                        # Install/use specific version
 ├── ghostty/            # Ghostty config → ~/.config/ghostty/config
 ├── mise/               # mise config → ~/.config/mise/config.toml
 │
+├── claude/             # Claude Code config → ~/.claude/
+│   ├── statusline.sh   # Status line display script
+│   ├── CLAUDE.md       # User global instructions
+│   ├── commands/       # Slash commands (e.g., /commit-push-pr)
+│   ├── hooks/          # PostToolUse hooks (e.g., shellcheck)
+│   └── agents/         # Subagents (e.g., verify-shell)
+│
 ├── .pre-commit-config.yaml   # Pre-commit hooks config
 ├── .gitleaks.toml            # Gitleaks secret scanning config
 └── .gitignore                # Enhanced security-focused gitignore
@@ -90,3 +97,35 @@ The `.zshrc` loads configuration in this order:
 
 - Do not create functions with names that conflict with oh-my-zsh plugin aliases (e.g., `g` is used by git plugin)
 - Check `alias` output after installation to identify potential conflicts
+
+### Claude Code Configuration
+
+The `claude/` directory contains Claude Code settings managed by this repository:
+
+**Managed files** (symlinked to `~/.claude/`):
+- `CLAUDE.md` - User global instructions
+- `commands/commit-push-pr.md` - `/commit-push-pr` slash command
+- `hooks/validate-shell.sh` - PostToolUse hook for shellcheck
+- `agents/verify-shell.md` - Shell script verification subagent
+
+**Not managed** (Claude auto-modifies):
+- `~/.claude/settings.json` - Contains plugins, permissions, hooks config
+
+**Required hooks in settings.json**:
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/validate-shell.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
+```

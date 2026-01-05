@@ -72,6 +72,10 @@ create_backup() {
         "$HOME/.fzf.bash"
         "$HOME/.zsh"
         "$HOME/.claude/statusline.sh"
+        "$HOME/.claude/CLAUDE.md"
+        "$HOME/.claude/commands"
+        "$HOME/.claude/hooks"
+        "$HOME/.claude/agents/verify-shell.md"
     )
 
     for file in "${files_to_backup[@]}"; do
@@ -134,6 +138,21 @@ create_symlinks() {
     mkdir -p "$HOME/.claude"
     mkdir -p "$HOME/.claude/usage"
     safe_ln "$DOTFILES_DIR/claude/statusline.sh" "$HOME/.claude/statusline.sh"
+
+    # claude commands
+    mkdir -p "$HOME/.claude/commands"
+    safe_ln "$DOTFILES_DIR/claude/commands/commit-push-pr.md" "$HOME/.claude/commands/commit-push-pr.md"
+
+    # claude hooks
+    mkdir -p "$HOME/.claude/hooks"
+    safe_ln "$DOTFILES_DIR/claude/hooks/validate-shell.sh" "$HOME/.claude/hooks/validate-shell.sh"
+
+    # claude agents (managed ones only)
+    mkdir -p "$HOME/.claude/agents"
+    safe_ln "$DOTFILES_DIR/claude/agents/verify-shell.md" "$HOME/.claude/agents/verify-shell.md"
+
+    # claude CLAUDE.md (user global)
+    safe_ln "$DOTFILES_DIR/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
 
     log_success "Symbolic links created"
 }
