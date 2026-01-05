@@ -112,9 +112,6 @@ The `claude/` directory contains Claude Code settings managed by this repository
 **Available plugins**:
 - `/commit-commands:commit-push-pr` - Commit, push, and create PR in one command
 
-**External dependencies** (not managed):
-- `~/.claude/count_tokens.js` - Token tracking (claude-code-leaderboard)
-
 ## Best Practices
 
 - Test after code changes to verify behavior
