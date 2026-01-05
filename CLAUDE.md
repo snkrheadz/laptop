@@ -116,17 +116,17 @@ The `claude/` directory contains Claude Code settings managed by this repository
 ```json
 {
   "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/validate-shell.sh"
-          }
-        ]
-      }
-    ]
+    "PostToolUse": [{
+      "matcher": "Write|Edit",
+      "hooks": [{"type": "command", "command": "~/.claude/hooks/validate-shell.sh"}]
+    }]
   }
 }
 ```
+
+## Best Practices
+
+- Test after code changes to verify behavior
+- Review related files before committing multiple changes
+- Use concise PR titles that describe the changes
+- Consider PostToolUse hooks for code format automation in projects
