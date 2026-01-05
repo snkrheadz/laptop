@@ -57,6 +57,7 @@ mise use go@1.24.3                        # Install/use specific version
 ├── mise/               # mise config → ~/.config/mise/config.toml
 │
 ├── claude/             # Claude Code config → ~/.claude/
+│   ├── settings.json   # Claude Code settings (hooks, plugins, permissions)
 │   ├── statusline.sh   # Status line display script
 │   ├── CLAUDE.md       # User global instructions
 │   ├── hooks/          # PostToolUse hooks (e.g., shellcheck)
@@ -102,6 +103,8 @@ The `.zshrc` loads configuration in this order:
 The `claude/` directory contains Claude Code settings managed by this repository:
 
 **Managed files** (symlinked to `~/.claude/`):
+- `settings.json` - Hooks, plugins, permissions, statusLine config
+- `statusline.sh` - Status line display script
 - `CLAUDE.md` - User global instructions
 - `hooks/validate-shell.sh` - PostToolUse hook for shellcheck
 - `agents/verify-shell.md` - Shell script verification subagent
@@ -109,20 +112,8 @@ The `claude/` directory contains Claude Code settings managed by this repository
 **Available plugins**:
 - `/commit-commands:commit-push-pr` - Commit, push, and create PR in one command
 
-**Not managed** (Claude auto-modifies):
-- `~/.claude/settings.json` - Contains plugins, permissions, hooks config
-
-**Required hooks in settings.json**:
-```json
-{
-  "hooks": {
-    "PostToolUse": [{
-      "matcher": "Write|Edit",
-      "hooks": [{"type": "command", "command": "~/.claude/hooks/validate-shell.sh"}]
-    }]
-  }
-}
-```
+**External dependencies** (not managed):
+- `~/.claude/count_tokens.js` - Token tracking (claude-code-leaderboard)
 
 ## Best Practices
 

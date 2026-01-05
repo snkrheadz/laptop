@@ -76,6 +76,7 @@ create_backup() {
         "$HOME/.claude/commands"
         "$HOME/.claude/hooks"
         "$HOME/.claude/agents/verify-shell.md"
+        "$HOME/.claude/settings.json"
     )
 
     for file in "${files_to_backup[@]}"; do
@@ -149,6 +150,9 @@ create_symlinks() {
 
     # claude CLAUDE.md (user global)
     safe_ln "$DOTFILES_DIR/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+
+    # claude settings.json
+    safe_ln "$DOTFILES_DIR/claude/settings.json" "$HOME/.claude/settings.json"
 
     log_success "Symbolic links created"
 }
