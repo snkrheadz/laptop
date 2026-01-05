@@ -8,7 +8,7 @@
 ## ワークフロー
 
 - 大きなタスクは Plan Mode (`Shift+Tab` x2) で計画を立ててから実行
-- `/commit-push-pr` コマンドでコミット・プッシュ・PR作成を一括実行
+- `/commit-commands:commit-push-pr` コマンドでコミット・プッシュ・PR作成を一括実行
 - シェルスクリプト編集時は自動的に shellcheck が実行される
 
 ## 禁止事項
