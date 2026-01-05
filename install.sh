@@ -139,10 +139,6 @@ create_symlinks() {
     mkdir -p "$HOME/.claude/usage"
     safe_ln "$DOTFILES_DIR/claude/statusline.sh" "$HOME/.claude/statusline.sh"
 
-    # claude commands
-    mkdir -p "$HOME/.claude/commands"
-    safe_ln "$DOTFILES_DIR/claude/commands/commit-push-pr.md" "$HOME/.claude/commands/commit-push-pr.md"
-
     # claude hooks
     mkdir -p "$HOME/.claude/hooks"
     safe_ln "$DOTFILES_DIR/claude/hooks/validate-shell.sh" "$HOME/.claude/hooks/validate-shell.sh"
