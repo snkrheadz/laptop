@@ -59,5 +59,6 @@
     "playwright@claude-plugins-official": true,
     "document-skills@anthropic-agent-skills": true,
     "ralph-wiggum@claude-plugins-official": true
-  }
+  },
+  "model": "opus"
 }
