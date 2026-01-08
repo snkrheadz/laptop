@@ -1,8 +1,6 @@
 {
   "permissions": {
-    "allow": [
-      "mcp__pencil"
-    ]
+    "allow": []
   },
   "hooks": {
     "PostToolUse": [
