@@ -1,9 +1,8 @@
 {
   "permissions": {
-    "allow": [
-      "mcp__pencil"
-    ]
+    "allow": []
   },
+  "model": "opus",
   "hooks": {
     "PostToolUse": [
       {
@@ -51,14 +50,12 @@
     "figma@claude-plugins-official": true,
     "github@claude-plugins-official": true,
     "security-guidance@claude-plugins-official": true,
-    "notion@claude-plugins-official": true,
     "gopls-lsp@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
     "Notion@claude-plugins-official": true,
     "playwright@claude-plugins-official": true,
     "document-skills@anthropic-agent-skills": true,
-    "ralph-wiggum@claude-plugins-official": true
-  },
-  "model": "opus"
+    "ralph-loop@claude-plugins-official": true
+  }
 }
