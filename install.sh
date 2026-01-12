@@ -147,6 +147,7 @@ create_symlinks() {
     # claude agents (managed ones only)
     mkdir -p "$HOME/.claude/agents"
     safe_ln "$DOTFILES_DIR/claude/agents/verify-shell.md" "$HOME/.claude/agents/verify-shell.md"
+    safe_ln "$DOTFILES_DIR/claude/agents/gcp-best-practices-advisor.md" "$HOME/.claude/agents/gcp-best-practices-advisor.md"
 
     # claude CLAUDE.md (user global)
     safe_ln "$DOTFILES_DIR/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
