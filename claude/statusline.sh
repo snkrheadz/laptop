@@ -1,6 +1,6 @@
 #!/bin/bash
 # Claude Code Status Line Script
-# Displays: Model | Directory | Git Branch | Daily Cost | Context Remaining
+# Displays: Model | Directory | Git Branch | Daily Cost | Token Info | Context Info
 #
 # Installation:
 #   1. Symlink to ~/.claude/statusline.sh
@@ -8,6 +8,16 @@
 #      "statusLine": { "type": "command", "command": "~/.claude/statusline.sh", "padding": 0 }
 
 input=$(cat)
+
+# === Helper function: Format number to K notation ===
+format_k() {
+    local num=$1
+    if [ "$num" -ge 1000 ]; then
+        awk "BEGIN {printf \"%.1fk\", $num/1000}"
+    else
+        echo "$num"
+    fi
+}
 
 # JSON parsing (requires jq)
 MODEL=$(echo "$input" | jq -r '.model.display_name // "Unknown"')
@@ -54,19 +64,40 @@ jq --arg sid "$SESSION_ID" --argjson cost "$COST" '
 # Cost display
 DAILY_DISPLAY=$(printf '$%.2f' "$DAILY_TOTAL")
 
-# Context remaining calculation
+# === Token and Context calculation ===
 CONTEXT_SIZE=$(echo "$input" | jq -r '.context_window.context_window_size // 0')
 USAGE=$(echo "$input" | jq -r '.context_window.current_usage // null')
 
+TOKEN_DISPLAY=""
 CONTEXT_DISPLAY=""
+
 if [ "$USAGE" != "null" ] && [ "$CONTEXT_SIZE" != "0" ]; then
+    # Extract token values
     INPUT_TOKENS=$(echo "$USAGE" | jq -r '.input_tokens // 0')
+    OUTPUT_TOKENS=$(echo "$USAGE" | jq -r '.output_tokens // 0')
     CACHE_CREATE=$(echo "$USAGE" | jq -r '.cache_creation_input_tokens // 0')
     CACHE_READ=$(echo "$USAGE" | jq -r '.cache_read_input_tokens // 0')
-    CURRENT_TOKENS=$((INPUT_TOKENS + CACHE_CREATE + CACHE_READ))
-    REMAINING=$((CONTEXT_SIZE - CURRENT_TOKENS))
-    REMAINING_K=$((REMAINING / 1000))
-    CONTEXT_DISPLAY=" | 📊 ${REMAINING_K}k"
+
+    # Calculate total tokens
+    TOTAL_TOKENS=$((INPUT_TOKENS + OUTPUT_TOKENS + CACHE_CREATE + CACHE_READ))
+
+    # Token display: 🎫 In:8.5k Out:1.2k C:2.0k Tot:11.7k
+    TOKEN_DISPLAY="🎫 In:$(format_k "$INPUT_TOKENS") Out:$(format_k "$OUTPUT_TOKENS") C:$(format_k "$CACHE_READ") Tot:$(format_k "$TOTAL_TOKENS")"
+
+    # Context percentage calculation
+    CONTEXT_PERCENT=$((TOTAL_TOKENS * 100 / CONTEXT_SIZE))
+
+    # Usable context = ~95% of context_window_size (Claude's internal limit)
+    USABLE_SIZE=$((CONTEXT_SIZE * 95 / 100))
+    USABLE_PERCENT=$((TOTAL_TOKENS * 100 / USABLE_SIZE))
+
+    # Context display: 🧠 200.0k 8% (9%)
+    CONTEXT_DISPLAY="🧠 $(format_k "$CONTEXT_SIZE") ${CONTEXT_PERCENT}% (${USABLE_PERCENT}%)"
 fi
 
-echo "[$MODEL] 📁 $DIR_NAME$GIT_BRANCH | 💰 $DAILY_DISPLAY (Today)$CONTEXT_DISPLAY"
+# Final output
+if [ -n "$TOKEN_DISPLAY" ] && [ -n "$CONTEXT_DISPLAY" ]; then
+    echo "[$MODEL] 📁 $DIR_NAME$GIT_BRANCH | 💰 $DAILY_DISPLAY | $TOKEN_DISPLAY | $CONTEXT_DISPLAY"
+else
+    echo "[$MODEL] 📁 $DIR_NAME$GIT_BRANCH | 💰 $DAILY_DISPLAY"
+fi
