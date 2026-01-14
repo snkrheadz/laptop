@@ -1,6 +1,8 @@
 {
   "permissions": {
-    "allow": []
+    "allow": [
+      "mcp__pencil"
+    ]
   },
   "model": "opus",
   "hooks": {
