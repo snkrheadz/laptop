@@ -123,50 +123,161 @@ Claudeは「優しいイエスマン」ではなく「厳しいメンター」�
 - PRのタイトルは変更内容を簡潔に表現する
 - プロジェクトではPostToolUseフックでコードフォーマット自動化を検討する
 
-## プロジェクト固有のスキル
+## Claude Code 拡張機能リファレンス
 
-各プロジェクトのルートディレクトリに`.claude/skills/`が存在する場合、そこにプロジェクト固有のスキルが定義されています。
+Claude Code の拡張機能（サブエージェント、プラグイン、スキル）の作成・設定方法。
 
-### 利用可能なスキル一覧
+### サブエージェント (Sub-agents)
 
-プロジェクト内で利用可能なスキルは、以下のコマンドで確認できます：
+特定のタスクを委譲するカスタムエージェントを定義。
 
-```bash
-ls .claude/skills/
+**ファイル配置:**
+```
+~/.claude/agents/          # ユーザーレベル（全プロジェクト）
+.claude/agents/            # プロジェクトレベル（version control推奨）
 ```
 
-### 主要なスキル（プロジェクト例: aiops-n8n）
+**テンプレート:**
+```markdown
+---
+name: agent-name
+description: エージェントの説明（いつ使うか）
+tools: Read, Grep, Glob
+model: sonnet
+permissionMode: default
+---
 
-**n8nプロジェクトで使用するスキル:**
-
-1. **`/spec-driven-dev`** - 仕様駆動開発
-   - 用途: `.claude/specs/**/*.md`に記載された仕様書に基づいて開発を進める
-   - 使用タイミング: 新機能の実装、既存機能の変更時
-   - 例: `/spec-driven-dev .claude/specs/workflows/incident-response.md`
-
-2. **`/n8n-workflow-manager`** (alias: `/n8n-wf`) - n8nワークフロー管理
-   - 用途: n8nワークフローのJSON管理と機密情報の安全な取り扱い
-   - サブコマンド:
-     - `save <path>`: ワークフローを機密情報除外して保存
-     - `list`: 保存済みワークフロー一覧
-     - `export <name>`: n8nにインポート可能な形式で出力
-     - `verify <name>`: 仕様書との整合性チェック
-   - 例: `/n8n-workflow-manager save ~/Downloads/workflow.json`
-
-### スキル使用の原則
-
-- プロジェクトに`.claude/skills/`が存在する場合、関連するタスクでは**必ずそのスキルを使用する**
-- スキルの存在を忘れないように、タスク開始時に`.claude/skills/`を確認する習慣をつける
-- 新しいスキルを作成した場合、このセクションに追加する
-
-### スキルの自動検出
-
-プロジェクトルートで以下を実行すると、利用可能なスキルと使い方が表示されます：
-
-```bash
-# スキル一覧を確認
-find .claude/skills/ -name "*.md" -exec basename {} .md \;
-
-# スキルの詳細を確認
-cat .claude/skills/<skill-name>.md
+指示内容...
 ```
+
+**設定オプション:**
+| フィールド | 値 |
+|-----------|------|
+| `tools` | `Read`, `Edit`, `Write`, `Bash`, `Glob`, `Grep`, `Task` など |
+| `model` | `sonnet`, `opus`, `haiku`, `inherit` |
+| `permissionMode` | `default`, `acceptEdits`, `dontAsk`, `bypassPermissions`, `plan` |
+| `hooks` | `PreToolUse`, `PostToolUse`, `Stop` イベント |
+
+**組み込みサブエージェント:**
+- `Explore`: 読み取り専用、コードベース探索用
+- `Plan`: 計画立案用
+- `general-purpose`: 複雑なマルチステップタスク
+
+### プラグイン (Plugins)
+
+複数プロジェクト間で共有する拡張機能パッケージ。
+
+**ディレクトリ構造:**
+```
+my-plugin/
+├── .claude-plugin/
+│   └── plugin.json         # 必須
+├── commands/               # スラッシュコマンド
+│   └── hello.md
+├── agents/                 # サブエージェント
+├── skills/                 # スキル
+└── hooks/
+    └── hooks.json
+```
+
+**plugin.json:**
+```json
+{
+  "name": "plugin-name",
+  "description": "説明",
+  "version": "1.0.0"
+}
+```
+
+**スラッシュコマンド例:**
+```markdown
+# commands/review.md
+---
+description: コードレビュー
+---
+$ARGUMENTS のコードをレビュー...
+```
+
+**テスト:**
+```bash
+claude --plugin-dir ./my-plugin
+/plugin-name:command
+```
+
+### エージェントスキル (Skills)
+
+Claude が自動的に選択・実行するスキルを定義。
+
+**ファイル配置:**
+```
+~/.claude/skills/skill-name/SKILL.md   # ユーザーレベル
+.claude/skills/skill-name/SKILL.md     # プロジェクトレベル
+```
+
+**SKILL.md テンプレート:**
+```markdown
+---
+name: skill-name
+description: "説明とトリガーキーワード"
+allowed-tools: Read, Grep
+model: sonnet
+context: fork               # オプション: 独立コンテキスト
+user-invocable: true        # オプション: /メニュー表示
+---
+
+スキルの指示...
+```
+
+**メタデータオプション:**
+| フィールド | 説明 |
+|-----------|------|
+| `name` | スキル名（小文字、ハイフン、最大64文字） |
+| `description` | 説明とトリガーキーワード（Claudeが自動判定に使用） |
+| `allowed-tools` | ツール制限（カンマ区切り） |
+| `model` | 実行モデル |
+| `context: fork` | 独立したサブエージェント実行 |
+| `user-invocable: false` | スラッシュメニューから非表示 |
+
+**進歩的情報開示 (Progressive Disclosure):**
+```
+my-skill/
+├── SKILL.md          # 概要（500行以下）
+├── reference.md      # 詳細（参照時読み込み）
+└── scripts/
+    └── helper.py     # 実行のみ（内容読み込まない）
+```
+
+### ツール自動承認 (CLI)
+
+非対話モード（CI/CD等）でツール実行を自動承認。
+
+**CLI使用法:**
+```bash
+# ツール自動承認
+claude -p "Fix the bug" --allowedTools "Read,Edit,Bash"
+
+# 特定コマンドのみ許可
+claude -p "Create commit" \
+  --allowedTools "Bash(git diff:*),Bash(git commit:*)"
+
+# 構造化JSON出力
+claude -p "Extract functions" \
+  --output-format json \
+  --json-schema '{"type":"object","properties":{"functions":{"type":"array"}}}'
+
+# 会話継続
+claude -p "Start task" --continue
+```
+
+**利用可能なツール:**
+- 基本: `Read`, `Edit`, `Write`, `Bash`, `Glob`, `Grep`
+- 制限付き: `Bash(git:*)`, `Bash(npm:*)`
+- エージェント: `Task`, `Task(agent-name)`
+- その他: `Skill`, `AskUserQuestion`
+
+### 関連ドキュメント
+
+- [Sub-agents](https://code.claude.com/docs/ja/sub-agents)
+- [Plugins](https://code.claude.com/docs/ja/plugins)
+- [Skills](https://code.claude.com/docs/ja/skills)
+- [Headless/CLI](https://code.claude.com/docs/ja/headless)
