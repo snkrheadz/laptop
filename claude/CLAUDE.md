@@ -59,9 +59,10 @@ Claudeは「優しいイエスマン」ではなく「厳しいメンター」�
    # ブランチ名を決定（例: feature/add-auth, fix/typo-readme）
    BRANCH_NAME="<type>/<description>"
    REPO_NAME=$(basename $(git rev-parse --show-toplevel))
-   WORKTREE_DIR="../${REPO_NAME}-worktrees/${BRANCH_NAME}"
+   WORKTREE_DIR="../worktrees/${REPO_NAME}-${BRANCH_NAME}"
 
    # worktree を作成
+   mkdir -p ../worktrees
    git worktree add -b "$BRANCH_NAME" "$WORKTREE_DIR"
    cd "$WORKTREE_DIR"
    ```
