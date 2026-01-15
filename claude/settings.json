@@ -74,6 +74,10 @@
           {
             "type": "command",
             "command": "~/.claude/count_tokens.js"
+          },
+          {
+            "type": "command",
+            "command": "node ~/.claude/hooks/save-to-obsidian.js"
           }
         ]
       }
