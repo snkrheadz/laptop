@@ -22,9 +22,9 @@ const XDG_CONFIG_DIR = process.env.XDG_CONFIG_HOME ?? `${USER_HOME_DIR}/.config`
 const CLAUDE_CONFIG_DIR_ENV = 'CLAUDE_CONFIG_DIR';
 const CLAUDE_PROJECTS_DIR = 'projects';
 
-// Obsidian出力先（環境変数で上書き可能）
-const OBSIDIAN_VAULT = process.env.OBSIDIAN_VAULT || '/Users/snkrheadz/ghq/github.com/snkrheadz/aiops-kpi';
-const OUTPUT_DIR = `${OBSIDIAN_VAULT}/06_Claude`;
+// Obsidian出力先（環境変数 OBSIDIAN_VAULT が必須）
+const OBSIDIAN_VAULT = process.env.OBSIDIAN_VAULT;
+const OUTPUT_DIR = OBSIDIAN_VAULT ? `${OBSIDIAN_VAULT}/06_Claude` : null;
 
 // ノイズフィルタリングパターン
 const NOISE_PATTERNS = [
@@ -236,6 +236,11 @@ async function saveToObsidian(markdown, dateStr) {
 // メイン関数
 async function main() {
   try {
+    // 0. OBSIDIAN_VAULT が設定されていなければ終了
+    if (!OBSIDIAN_VAULT) {
+      process.exit(0);
+    }
+
     // 1. 最新セッションファイルを特定
     const sessionFile = await findLatestSessionFile();
     if (!sessionFile) {
