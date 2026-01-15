@@ -1,7 +1,7 @@
 {
   "permissions": {
     "additionalDirectories": [
-      "../*-worktrees/"
+      "../laptop-worktrees/"
     ],
     "allow": [
       "Read(~/.claude/**)",
