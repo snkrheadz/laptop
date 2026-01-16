@@ -327,19 +327,15 @@ Displays in Claude Code CLI:
 
 - `/commit-commands:commit-push-pr` - Commit, push, and create PR in one command
 
-### Not Managed
+### Settings (settings.json)
 
-`~/.claude/settings.json` is NOT managed (Claude auto-modifies it). Required hook config:
-```json
-{
-  "hooks": {
-    "PostToolUse": [{
-      "matcher": "Write|Edit",
-      "hooks": [{"type": "command", "command": "~/.claude/hooks/validate-shell.sh"}]
-    }]
-  }
-}
-```
+`claude/settings.json` manages Claude Code configuration:
+- Hooks (PostToolUse, Stop, Notification)
+- Plugins
+- Permissions (allow/deny)
+- plansDirectory (Obsidian integration)
+
+This file is symlinked to `~/.claude/settings.json`.
 
 ## License
 
