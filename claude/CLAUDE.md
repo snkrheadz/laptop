@@ -281,3 +281,12 @@ claude -p "Start task" --continue
 - [Plugins](https://code.claude.com/docs/ja/plugins)
 - [Skills](https://code.claude.com/docs/ja/skills)
 - [Headless/CLI](https://code.claude.com/docs/ja/headless)
+- [CHANGELOG](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md) - **最新機能の調査時は必ず確認**
+
+### 調査時の注意
+
+Claude Code の機能や設定について調査する際は、必ず以下を確認すること：
+
+1. **CHANGELOG.md** - 最新バージョンで追加・変更された機能を把握
+2. **公式ドキュメント** - 上記リンク先で詳細仕様を確認
+3. **既存設定との整合性** - このリポジトリの設定と矛盾がないか確認
