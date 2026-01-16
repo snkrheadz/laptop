@@ -34,6 +34,29 @@ const NOISE_PATTERNS = [
   /<user-prompt-submit-hook>/,
 ];
 
+// トピック検出キーワード
+const TOPIC_KEYWORDS = {
+  legal: ['法務', '法的', 'legal', '契約', '利用規約'],
+  research: ['調査', 'research', '調べ', 'リサーチ', '検索'],
+  api: ['api', 'endpoint', 'rest', 'graphql', 'webhook'],
+  scraping: ['scraping', 'スクレイピング', 'bot', 'クローリング'],
+  vto: ['vto', 'virtual try-on', 'バーチャル試着', 'virtual-try-on'],
+  cost: ['コスト', 'cost', '料金', '費用', '見積'],
+  implementation: ['実装', 'implement', 'コード', 'coding', 'プログラム'],
+  review: ['レビュー', 'review', 'pr', 'pull request'],
+  planning: ['計画', 'plan', '設計', 'design', 'アーキテクチャ'],
+  debug: ['デバッグ', 'debug', 'バグ', 'bug', 'エラー', 'error'],
+  test: ['テスト', 'test', 'testing', '検証'],
+  infra: ['インフラ', 'infrastructure', 'aws', 'gcp', 'azure', 'docker', 'k8s'],
+};
+
+// プロジェクトマッピング（ディレクトリ名 → 表示名）
+const PROJECT_MAP = {
+  'aiops-kpi': 'AIOps KPI',
+  'laptop': 'Laptop Setup',
+  'worktrees': null, // worktree親ディレクトリは除外
+};
+
 // Claude設定パスを取得
 function getClaudePaths() {
   const envPaths = process.env[CLAUDE_CONFIG_DIR_ENV];
@@ -200,21 +223,128 @@ function formatToMarkdown(conversations, sessionTime) {
   return lines.join('\n');
 }
 
+// セッションファイルパスからプロジェクト名を判定
+function detectProject(sessionFilePath) {
+  if (!sessionFilePath) return null;
+
+  // パスからプロジェクトディレクトリ名を抽出
+  // 例: ~/.claude/projects/-Users-snkrheadz-ghq-github-com-snkrheadz-aiops-kpi/xxx.jsonl
+  // ディレクトリ名の最後のセグメント（ハイフン区切り）がプロジェクト名
+  const match = sessionFilePath.match(/\/projects\/([^/]+)\//);
+  if (match) {
+    // -Users-snkrheadz-ghq-github-com-snkrheadz-aiops-kpi -> aiops-kpi
+    const encoded = match[1];
+    const parts = encoded.split('-');
+    // 最後のハイフン区切りの部分がプロジェクト名（2パーツ以上ならハイフン結合）
+    // ghq-github-com-snkrheadz-aiops-kpi の場合、snkrheadz以降を取得
+    const snkrheadzIdx = parts.lastIndexOf('snkrheadz');
+    if (snkrheadzIdx !== -1 && snkrheadzIdx < parts.length - 1) {
+      const projectName = parts.slice(snkrheadzIdx + 1).join('-');
+      // マッピングがあれば使用、なければそのまま
+      return PROJECT_MAP[projectName] !== undefined ? PROJECT_MAP[projectName] : projectName;
+    }
+  }
+
+  return null;
+}
+
+// 会話内容からトピックを抽出
+function extractTopics(conversations) {
+  const text = conversations
+    .map(c => c.content)
+    .join(' ')
+    .toLowerCase();
+
+  const detected = [];
+  for (const [topic, keywords] of Object.entries(TOPIC_KEYWORDS)) {
+    if (keywords.some(kw => text.includes(kw.toLowerCase()))) {
+      detected.push(topic);
+    }
+  }
+
+  return detected.slice(0, 5); // 最大5個
+}
+
+// 会話内容からサマリーを生成
+function generateSummary(conversations) {
+  const userMessages = conversations.filter(c => c.role === 'user');
+  if (userMessages.length === 0) return null;
+
+  // 最初のユーザーメッセージから抽出（100文字以内）
+  const firstMessage = userMessages[0].content;
+  let summary = firstMessage
+    .replace(/\n/g, ' ')
+    .replace(/<[^>]+>/g, '') // HTMLタグ除去
+    .replace(/\s+/g, ' ')    // 連続空白を単一に
+    .trim()
+    .slice(0, 100);
+
+  if (firstMessage.length > 100) {
+    summary += '...';
+  }
+
+  return summary;
+}
+
+// メタデータを抽出
+function extractMetadata(conversations, sessionFilePath, sessionTime) {
+  const project = detectProject(sessionFilePath);
+  const topics = extractTopics(conversations);
+  const summary = generateSummary(conversations);
+
+  return {
+    project,
+    topics,
+    summary,
+    sessionStart: sessionTime,
+  };
+}
+
 // Front Matterを生成
-function generateFrontMatter(dateStr) {
-  return `---
+function generateFrontMatter(dateStr, metadata = {}) {
+  const { project, topics, summary, sessionStart } = metadata;
+
+  let yaml = `---
 tags:
   - claude-code
-  - conversation
-created: "${dateStr}"
----
+  - conversation`;
 
-# Claude Code会話記録 ${dateStr}
-`;
+  // トピックタグを追加（最大3個）
+  if (topics && topics.length > 0) {
+    topics.slice(0, 3).forEach(topic => {
+      yaml += `\n  - ${topic}`;
+    });
+  }
+
+  yaml += `\ncreated: "${dateStr}"`;
+
+  if (project) {
+    yaml += `\nproject: "${project}"`;
+  }
+
+  if (topics && topics.length > 0) {
+    yaml += `\ntopics:`;
+    topics.forEach(topic => {
+      yaml += `\n  - ${topic}`;
+    });
+  }
+
+  if (summary) {
+    // ダブルクォートをエスケープ
+    yaml += `\nsummary: "${summary.replace(/"/g, '\\"')}"`;
+  }
+
+  if (sessionStart) {
+    yaml += `\nsession_start: "${sessionStart}"`;
+  }
+
+  yaml += `\n---\n\n# Claude Code会話記録 ${dateStr}\n`;
+
+  return yaml;
 }
 
 // Obsidianに保存
-async function saveToObsidian(markdown, dateStr) {
+async function saveToObsidian(markdown, dateStr, metadata = {}) {
   // 出力ディレクトリを作成
   if (!existsSync(OUTPUT_DIR)) {
     await mkdir(OUTPUT_DIR, { recursive: true });
@@ -228,7 +358,7 @@ async function saveToObsidian(markdown, dateStr) {
     await appendFile(filePath, markdown, 'utf-8');
   } else {
     // 新規ファイル作成（Front Matter付き）
-    const content = generateFrontMatter(dateStr) + markdown;
+    const content = generateFrontMatter(dateStr, metadata) + markdown;
     await writeFile(filePath, content, 'utf-8');
   }
 }
@@ -264,11 +394,14 @@ async function main() {
     const dateStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
     const sessionTime = now.toTimeString().slice(0, 5); // HH:MM
 
-    // 5. Markdown生成
+    // 5. メタデータを抽出
+    const metadata = extractMetadata(conversations, sessionFile, sessionTime);
+
+    // 6. Markdown生成
     const markdown = formatToMarkdown(conversations, sessionTime);
 
-    // 6. ファイル出力
-    await saveToObsidian(markdown, dateStr);
+    // 7. ファイル出力
+    await saveToObsidian(markdown, dateStr, metadata);
 
     process.exit(0);
   } catch (error) {
