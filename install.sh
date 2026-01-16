@@ -95,6 +95,45 @@ create_backup() {
     log_success "Backup completed at $BACKUP_DIR"
 }
 
+# Migrate non-dotfiles agents from symlinks to actual files
+# These agents are no longer managed in this repo but should be preserved for existing users
+migrate_non_dotfiles_agents() {
+    log_info "Checking for non-dotfiles agents to migrate..."
+
+    local agents_to_migrate=(
+        "gcp-best-practices-advisor.md"
+        "state-machine-diagram.md"
+    )
+
+    mkdir -p "$HOME/.claude/agents"
+
+    for agent in "${agents_to_migrate[@]}"; do
+        local agent_path="$HOME/.claude/agents/$agent"
+
+        # Check if it's a symlink pointing to this repo
+        if [ -L "$agent_path" ]; then
+            local target
+            target=$(readlink "$agent_path")
+
+            # If symlink points to this dotfiles repo
+            if [[ "$target" == *"/laptop/claude/agents/"* ]] || [[ "$target" == "$DOTFILES_DIR/claude/agents/"* ]]; then
+                # If the target file still exists, copy its content
+                if [ -f "$target" ]; then
+                    log_info "Migrating $agent from symlink to actual file..."
+                    cp "$target" "$agent_path.tmp"
+                    rm "$agent_path"
+                    mv "$agent_path.tmp" "$agent_path"
+                    log_success "Migrated: $agent"
+                else
+                    # Target doesn't exist, just remove broken symlink
+                    log_warning "Removing broken symlink: $agent"
+                    rm "$agent_path"
+                fi
+            fi
+        fi
+    done
+}
+
 # Create symbolic links
 create_symlinks() {
     log_info "Creating symbolic links..."
@@ -283,6 +322,7 @@ main() {
     install_xcode_cli
     install_homebrew
     create_backup
+    migrate_non_dotfiles_agents
     create_symlinks
     install_brew_packages
     setup_mise
