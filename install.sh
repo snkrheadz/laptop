@@ -76,6 +76,8 @@ create_backup() {
         "$HOME/.claude/commands"
         "$HOME/.claude/hooks"
         "$HOME/.claude/agents/verify-shell.md"
+        "$HOME/.claude/agents/diagnose-dotfiles.md"
+        "$HOME/.claude/agents/migration-assistant.md"
         "$HOME/.claude/settings.json"
     )
 
@@ -145,10 +147,11 @@ create_symlinks() {
     safe_ln "$DOTFILES_DIR/claude/hooks/validate-shell.sh" "$HOME/.claude/hooks/validate-shell.sh"
     safe_ln "$DOTFILES_DIR/claude/hooks/save-to-obsidian.js" "$HOME/.claude/hooks/save-to-obsidian.js"
 
-    # claude agents (managed ones only)
+    # claude agents (dotfiles-related only)
     mkdir -p "$HOME/.claude/agents"
     safe_ln "$DOTFILES_DIR/claude/agents/verify-shell.md" "$HOME/.claude/agents/verify-shell.md"
-    safe_ln "$DOTFILES_DIR/claude/agents/gcp-best-practices-advisor.md" "$HOME/.claude/agents/gcp-best-practices-advisor.md"
+    safe_ln "$DOTFILES_DIR/claude/agents/diagnose-dotfiles.md" "$HOME/.claude/agents/diagnose-dotfiles.md"
+    safe_ln "$DOTFILES_DIR/claude/agents/migration-assistant.md" "$HOME/.claude/agents/migration-assistant.md"
 
     # claude CLAUDE.md (user global)
     safe_ln "$DOTFILES_DIR/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
