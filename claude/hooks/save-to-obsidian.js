@@ -8,10 +8,14 @@
  * 2. JSONL読み込み・パース
  * 3. ノイズフィルタリング（system-reminder, tool_use等）
  * 4. Markdown変換
- * 5. 日付別ファイルに追記
+ * 5. セッションごとに個別ファイルを作成
+ *
+ * ファイル命名規則:
+ * {YYYY-MM-DD}_{HH-MM}_{topic}.md
+ * 例: 2026-01-16_11-41_legal.md
  */
 
-import { readFile, readdir, writeFile, appendFile, mkdir, stat } from 'node:fs/promises';
+import { readFile, readdir, writeFile, mkdir, stat } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
@@ -25,6 +29,9 @@ const CLAUDE_PROJECTS_DIR = 'projects';
 // Obsidian出力先（環境変数 OBSIDIAN_VAULT が必須）
 const OBSIDIAN_VAULT = process.env.OBSIDIAN_VAULT;
 const OUTPUT_DIR = OBSIDIAN_VAULT ? `${OBSIDIAN_VAULT}/06_Claude` : null;
+
+// 処理済みセッションを記録するファイル
+const PROCESSED_SESSIONS_FILE = OBSIDIAN_VAULT ? `${OBSIDIAN_VAULT}/06_Claude/.processed_sessions` : null;
 
 // ノイズフィルタリングパターン
 const NOISE_PATTERNS = [
@@ -116,6 +123,39 @@ async function findLatestSessionFile() {
   return latestFile;
 }
 
+// セッションIDを取得（JSONLファイル名から）
+function getSessionId(sessionFilePath) {
+  if (!sessionFilePath) return null;
+  // ファイル名（.jsonl除く）をセッションIDとして使用
+  return path.basename(sessionFilePath, '.jsonl');
+}
+
+// 処理済みセッションを読み込み
+async function loadProcessedSessions() {
+  if (!PROCESSED_SESSIONS_FILE || !existsSync(PROCESSED_SESSIONS_FILE)) {
+    return new Set();
+  }
+
+  try {
+    const content = await readFile(PROCESSED_SESSIONS_FILE, 'utf-8');
+    return new Set(content.trim().split('\n').filter(Boolean));
+  } catch {
+    return new Set();
+  }
+}
+
+// 処理済みセッションを保存
+async function saveProcessedSession(sessionId) {
+  if (!PROCESSED_SESSIONS_FILE) return;
+
+  const sessions = await loadProcessedSessions();
+  sessions.add(sessionId);
+
+  // 最新1000件のみ保持（古いものは削除）
+  const recentSessions = [...sessions].slice(-1000);
+  await writeFile(PROCESSED_SESSIONS_FILE, recentSessions.join('\n') + '\n', 'utf-8');
+}
+
 // JSONLファイルをパース
 async function parseJsonlFile(filePath) {
   const content = await readFile(filePath, 'utf-8');
@@ -205,10 +245,8 @@ function filterAndTransform(entries) {
 }
 
 // Markdownフォーマットに変換
-function formatToMarkdown(conversations, sessionTime) {
+function formatToMarkdown(conversations) {
   const lines = [];
-
-  lines.push(`\n## セッション ${sessionTime}\n`);
 
   for (const conv of conversations) {
     if (conv.role === 'user') {
@@ -296,74 +334,24 @@ function extractMetadata(conversations, sessionFilePath, sessionTime) {
     project,
     topics,
     summary,
-    sessionStart: sessionTime,
+    sessionTime,
   };
 }
 
-// 既存ファイルのFront Matterを解析
-function parseFrontMatter(content) {
-  const match = content.match(/^---\n([\s\S]*?)\n---\n/);
-  if (!match) return { frontMatter: {}, body: content };
+// ファイル名を生成
+function generateFileName(dateStr, sessionTime, topics) {
+  // sessionTime: HH:MM → HH-MM（ファイルシステム互換）
+  const timeStr = sessionTime.replace(':', '-');
 
-  const yamlContent = match[1];
-  let body = content.slice(match[0].length);
+  // プライマリトピックを取得（なければ general）
+  const primaryTopic = topics.length > 0 ? topics[0] : 'general';
 
-  // タイトル行（# Claude Code会話記録 YYYY-MM-DD）と先頭の空行を除去
-  body = body.replace(/^\n*# Claude Code会話記録 \d{4}-\d{2}-\d{2}\n*/, '');
-
-  // 簡易YAMLパース
-  const frontMatter = {};
-
-  // created
-  const createdMatch = yamlContent.match(/created:\s*"([^"]+)"/);
-  if (createdMatch) frontMatter.created = createdMatch[1];
-
-  // project
-  const projectMatch = yamlContent.match(/project:\s*"([^"]+)"/);
-  if (projectMatch) frontMatter.project = projectMatch[1];
-
-  // summary
-  const summaryMatch = yamlContent.match(/summary:\s*"([^"]+)"/);
-  if (summaryMatch) frontMatter.summary = summaryMatch[1];
-
-  // session_start
-  const sessionMatch = yamlContent.match(/session_start:\s*"([^"]+)"/);
-  if (sessionMatch) frontMatter.sessionStart = sessionMatch[1];
-
-  // topics (配列)
-  const topicsMatch = yamlContent.match(/topics:\n((?:\s+-\s+\S+\n?)+)/);
-  if (topicsMatch) {
-    frontMatter.topics = topicsMatch[1]
-      .split('\n')
-      .map(line => line.replace(/^\s+-\s+/, '').trim())
-      .filter(Boolean);
-  }
-
-  return { frontMatter, body };
-}
-
-// メタデータをマージ
-function mergeMetadata(existing, newMeta) {
-  // topicsをユニオン（重複排除、最大5個）
-  const existingTopics = existing.topics || [];
-  const newTopics = newMeta.topics || [];
-  const mergedTopics = [...new Set([...existingTopics, ...newTopics])].slice(0, 5);
-
-  return {
-    // projectは新しい値を優先（既存があればそれを維持）
-    project: newMeta.project || existing.project,
-    // summaryは新しいセッションの内容で更新
-    summary: newMeta.summary || existing.summary,
-    // topicsはユニオン
-    topics: mergedTopics,
-    // session_startは最初のセッション時刻を保持
-    sessionStart: existing.sessionStart || newMeta.sessionStart,
-  };
+  return `${dateStr}_${timeStr}_${primaryTopic}.md`;
 }
 
 // Front Matterを生成
 function generateFrontMatter(dateStr, metadata = {}) {
-  const { project, topics, summary, sessionStart } = metadata;
+  const { project, topics, summary, sessionTime } = metadata;
 
   let yaml = `---
 tags:
@@ -395,42 +383,34 @@ tags:
     yaml += `\nsummary: "${summary.replace(/"/g, '\\"')}"`;
   }
 
-  if (sessionStart) {
-    yaml += `\nsession_start: "${sessionStart}"`;
+  if (sessionTime) {
+    yaml += `\nsession_time: "${sessionTime}"`;
   }
 
-  yaml += `\n---\n\n# Claude Code会話記録 ${dateStr}\n`;
+  yaml += `\n---\n\n`;
 
   return yaml;
 }
 
-// Obsidianに保存
+// Obsidianに保存（セッションごとに新規ファイル）
 async function saveToObsidian(markdown, dateStr, metadata = {}) {
   // 出力ディレクトリを作成
   if (!existsSync(OUTPUT_DIR)) {
     await mkdir(OUTPUT_DIR, { recursive: true });
   }
 
-  const fileName = `${dateStr}.md`;
+  const fileName = generateFileName(dateStr, metadata.sessionTime, metadata.topics);
   const filePath = path.join(OUTPUT_DIR, fileName);
 
-  if (existsSync(filePath)) {
-    // 既存ファイルを読み込み
-    const existingContent = await readFile(filePath, 'utf-8');
-    const { frontMatter: existingMeta, body } = parseFrontMatter(existingContent);
+  // タイトルを生成
+  const primaryTopic = metadata.topics.length > 0 ? metadata.topics[0] : 'general';
+  const title = `# ${dateStr} ${metadata.sessionTime} - ${primaryTopic}\n\n`;
 
-    // メタデータをマージ
-    const mergedMeta = mergeMetadata(existingMeta, metadata);
+  // Front Matter + タイトル + コンテンツ
+  const content = generateFrontMatter(dateStr, metadata) + title + markdown;
+  await writeFile(filePath, content, 'utf-8');
 
-    // Front Matterを再生成してファイル全体を書き換え
-    const newFrontMatter = generateFrontMatter(dateStr, mergedMeta);
-    const newContent = newFrontMatter + body + markdown;
-    await writeFile(filePath, newContent, 'utf-8');
-  } else {
-    // 新規ファイル作成（Front Matter付き）
-    const content = generateFrontMatter(dateStr, metadata) + markdown;
-    await writeFile(filePath, content, 'utf-8');
-  }
+  return fileName;
 }
 
 // メイン関数
@@ -447,31 +427,43 @@ async function main() {
       process.exit(0);
     }
 
-    // 2. JSONL読み込み・パース
+    // 2. セッションIDを取得し、既に処理済みかチェック
+    const sessionId = getSessionId(sessionFile);
+    const processedSessions = await loadProcessedSessions();
+
+    if (processedSessions.has(sessionId)) {
+      // 既に処理済み → スキップ
+      process.exit(0);
+    }
+
+    // 3. JSONL読み込み・パース
     const entries = await parseJsonlFile(sessionFile);
     if (entries.length === 0) {
       process.exit(0);
     }
 
-    // 3. フィルタリング・変換
+    // 4. フィルタリング・変換
     const conversations = filterAndTransform(entries);
     if (conversations.length === 0) {
       process.exit(0);
     }
 
-    // 4. 日付とセッション時刻を取得
+    // 5. 日付とセッション時刻を取得
     const now = new Date();
     const dateStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
     const sessionTime = now.toTimeString().slice(0, 5); // HH:MM
 
-    // 5. メタデータを抽出
+    // 6. メタデータを抽出
     const metadata = extractMetadata(conversations, sessionFile, sessionTime);
 
-    // 6. Markdown生成
-    const markdown = formatToMarkdown(conversations, sessionTime);
+    // 7. Markdown生成
+    const markdown = formatToMarkdown(conversations);
 
-    // 7. ファイル出力
+    // 8. ファイル出力
     await saveToObsidian(markdown, dateStr, metadata);
+
+    // 9. セッションIDを処理済みとして記録
+    await saveProcessedSession(sessionId);
 
     process.exit(0);
   } catch (error) {
