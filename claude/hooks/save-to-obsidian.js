@@ -300,6 +300,67 @@ function extractMetadata(conversations, sessionFilePath, sessionTime) {
   };
 }
 
+// 既存ファイルのFront Matterを解析
+function parseFrontMatter(content) {
+  const match = content.match(/^---\n([\s\S]*?)\n---\n/);
+  if (!match) return { frontMatter: {}, body: content };
+
+  const yamlContent = match[1];
+  let body = content.slice(match[0].length);
+
+  // タイトル行（# Claude Code会話記録 YYYY-MM-DD）と先頭の空行を除去
+  body = body.replace(/^\n*# Claude Code会話記録 \d{4}-\d{2}-\d{2}\n*/, '');
+
+  // 簡易YAMLパース
+  const frontMatter = {};
+
+  // created
+  const createdMatch = yamlContent.match(/created:\s*"([^"]+)"/);
+  if (createdMatch) frontMatter.created = createdMatch[1];
+
+  // project
+  const projectMatch = yamlContent.match(/project:\s*"([^"]+)"/);
+  if (projectMatch) frontMatter.project = projectMatch[1];
+
+  // summary
+  const summaryMatch = yamlContent.match(/summary:\s*"([^"]+)"/);
+  if (summaryMatch) frontMatter.summary = summaryMatch[1];
+
+  // session_start
+  const sessionMatch = yamlContent.match(/session_start:\s*"([^"]+)"/);
+  if (sessionMatch) frontMatter.sessionStart = sessionMatch[1];
+
+  // topics (配列)
+  const topicsMatch = yamlContent.match(/topics:\n((?:\s+-\s+\S+\n?)+)/);
+  if (topicsMatch) {
+    frontMatter.topics = topicsMatch[1]
+      .split('\n')
+      .map(line => line.replace(/^\s+-\s+/, '').trim())
+      .filter(Boolean);
+  }
+
+  return { frontMatter, body };
+}
+
+// メタデータをマージ
+function mergeMetadata(existing, newMeta) {
+  // topicsをユニオン（重複排除、最大5個）
+  const existingTopics = existing.topics || [];
+  const newTopics = newMeta.topics || [];
+  const mergedTopics = [...new Set([...existingTopics, ...newTopics])].slice(0, 5);
+
+  return {
+    // projectは新しい値を優先（既存があればそれを維持）
+    project: newMeta.project || existing.project,
+    // summaryは新しいセッションの内容で更新
+    summary: newMeta.summary || existing.summary,
+    // topicsはユニオン
+    topics: mergedTopics,
+    // session_startは最初のセッション時刻を保持
+    sessionStart: existing.sessionStart || newMeta.sessionStart,
+  };
+}
+
 // Front Matterを生成
 function generateFrontMatter(dateStr, metadata = {}) {
   const { project, topics, summary, sessionStart } = metadata;
@@ -354,8 +415,17 @@ async function saveToObsidian(markdown, dateStr, metadata = {}) {
   const filePath = path.join(OUTPUT_DIR, fileName);
 
   if (existsSync(filePath)) {
-    // 既存ファイルに追記
-    await appendFile(filePath, markdown, 'utf-8');
+    // 既存ファイルを読み込み
+    const existingContent = await readFile(filePath, 'utf-8');
+    const { frontMatter: existingMeta, body } = parseFrontMatter(existingContent);
+
+    // メタデータをマージ
+    const mergedMeta = mergeMetadata(existingMeta, metadata);
+
+    // Front Matterを再生成してファイル全体を書き換え
+    const newFrontMatter = generateFrontMatter(dateStr, mergedMeta);
+    const newContent = newFrontMatter + body + markdown;
+    await writeFile(filePath, newContent, 'utf-8');
   } else {
     // 新規ファイル作成（Front Matter付き）
     const content = generateFrontMatter(dateStr, metadata) + markdown;
