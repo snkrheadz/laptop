@@ -204,6 +204,30 @@ claude --plugin-dir ./my-plugin
 /plugin-name:command
 ```
 
+### プロジェクトレベルでのプラグイン有効化
+
+グローバル設定で無効化されているプラグインをプロジェクト単位で有効化できる。
+
+**設定ファイル:** `.claude/settings.local.json`
+
+```json
+{
+  "permissions": {
+    "allow": [
+      "mcp__plugin_playwright_playwright__*",
+      "mcp__awslabs_aws-documentation-mcp-server__*"
+    ]
+  },
+  "enabledPlugins": {
+    "playwright@claude-plugins-official": true
+  }
+}
+```
+
+**利用可能なプラグイン（デフォルト無効）:**
+- `playwright@claude-plugins-official` - ブラウザ自動化（Web開発プロジェクト向け）
+- `github@claude-plugins-official` - GitHub連携（gh CLI推奨のため無効）
+
 ### エージェントスキル (Skills)
 
 Claude が自動的に選択・実行するスキルを定義。

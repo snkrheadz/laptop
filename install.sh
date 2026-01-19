@@ -95,43 +95,30 @@ create_backup() {
     log_success "Backup completed at $BACKUP_DIR"
 }
 
-# Migrate non-dotfiles agents from symlinks to actual files
-# These agents are no longer managed in this repo but should be preserved for existing users
-migrate_non_dotfiles_agents() {
-    log_info "Checking for non-dotfiles agents to migrate..."
-
-    local agents_to_migrate=(
-        "gcp-best-practices-advisor.md"
-        "state-machine-diagram.md"
-    )
+# Create symlinks for all managed agent files
+setup_claude_agents() {
+    log_info "Setting up Claude agents..."
 
     mkdir -p "$HOME/.claude/agents"
 
-    for agent in "${agents_to_migrate[@]}"; do
-        local agent_path="$HOME/.claude/agents/$agent"
+    # All managed agent files
+    local agents=(
+        "verify-shell.md"
+        "diagnose-dotfiles.md"
+        "migration-assistant.md"
+        "arxiv-ai-researcher.md"
+        "aws-best-practices-advisor.md"
+        "gcp-best-practices-advisor.md"
+        "nano-banana-pro-prompt-generator.md"
+        "state-machine-diagram.md"
+        "strategic-research-analyst.md"
+    )
 
-        # Check if it's a symlink pointing to this repo
-        if [ -L "$agent_path" ]; then
-            local target
-            target=$(readlink "$agent_path")
-
-            # If symlink points to this dotfiles repo
-            if [[ "$target" == *"/laptop/claude/agents/"* ]] || [[ "$target" == "$DOTFILES_DIR/claude/agents/"* ]]; then
-                # If the target file still exists, copy its content
-                if [ -f "$target" ]; then
-                    log_info "Migrating $agent from symlink to actual file..."
-                    cp "$target" "$agent_path.tmp"
-                    rm "$agent_path"
-                    mv "$agent_path.tmp" "$agent_path"
-                    log_success "Migrated: $agent"
-                else
-                    # Target doesn't exist, just remove broken symlink
-                    log_warning "Removing broken symlink: $agent"
-                    rm "$agent_path"
-                fi
-            fi
-        fi
+    for agent in "${agents[@]}"; do
+        safe_ln "$DOTFILES_DIR/claude/agents/$agent" "$HOME/.claude/agents/$agent"
     done
+
+    log_success "Claude agents configured"
 }
 
 # Create symbolic links
@@ -185,12 +172,6 @@ create_symlinks() {
     mkdir -p "$HOME/.claude/hooks"
     safe_ln "$DOTFILES_DIR/claude/hooks/validate-shell.sh" "$HOME/.claude/hooks/validate-shell.sh"
     safe_ln "$DOTFILES_DIR/claude/hooks/save-to-obsidian.js" "$HOME/.claude/hooks/save-to-obsidian.js"
-
-    # claude agents (dotfiles-related only)
-    mkdir -p "$HOME/.claude/agents"
-    safe_ln "$DOTFILES_DIR/claude/agents/verify-shell.md" "$HOME/.claude/agents/verify-shell.md"
-    safe_ln "$DOTFILES_DIR/claude/agents/diagnose-dotfiles.md" "$HOME/.claude/agents/diagnose-dotfiles.md"
-    safe_ln "$DOTFILES_DIR/claude/agents/migration-assistant.md" "$HOME/.claude/agents/migration-assistant.md"
 
     # claude CLAUDE.md (user global)
     safe_ln "$DOTFILES_DIR/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
@@ -322,8 +303,8 @@ main() {
     install_xcode_cli
     install_homebrew
     create_backup
-    migrate_non_dotfiles_agents
     create_symlinks
+    setup_claude_agents
     install_brew_packages
     setup_mise
     setup_security
