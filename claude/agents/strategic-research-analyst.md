@@ -1,6 +1,30 @@
 ---
 name: strategic-research-analyst
-description: Use this agent when you need to gather, analyze, or synthesize information about technical specifications, business strategies, market trends, competitive landscapes, or industry insights related to a specific initiative or project. This includes researching new technologies, understanding market dynamics, analyzing business models, or preparing background information for strategic decisions.\n\nExamples:\n\n<example>\nContext: User is exploring a new AI-powered feature for their product.\nuser: "AIを使った画像認識機能を追加したいんだけど、どんな技術オプションがあるか調べて"\nassistant: "画像認識機能の技術調査ですね。strategic-research-analyst エージェントを使って、利用可能な技術オプション、各技術の特徴、市場での採用状況などを包括的に調査します。"\n<Task tool call to strategic-research-analyst>\n</example>\n\n<example>\nContext: User needs market analysis for a new business initiative.\nuser: "競合他社がどんなAIソリューションを提供しているか調べてほしい"\nassistant: "競合分析のリサーチですね。strategic-research-analyst エージェントを起動して、競合他社のAIソリューション、価格戦略、市場ポジショニングについて調査を行います。"\n<Task tool call to strategic-research-analyst>\n</example>\n\n<example>\nContext: User is preparing a proposal and needs supporting data.\nuser: "クラウドコスト最適化の市場規模と成長率を調べて"\nassistant: "市場規模の調査ですね。strategic-research-analyst エージェントを使って、クラウドコスト最適化市場のデータ、成長予測、主要プレイヤーについてリサーチします。"\n<Task tool call to strategic-research-analyst>\n</example>
+description: |
+  Use this agent when you need to gather, analyze, or synthesize information about technical specifications, business strategies, market trends, competitive landscapes, or industry insights related to a specific initiative or project. This includes researching new technologies, understanding market dynamics, analyzing business models, or preparing background information for strategic decisions.
+
+  Examples:
+
+  <example>
+  Context: User is exploring a new AI-powered feature for their product.
+  user: "AIを使った画像認識機能を追加したいんだけど、どんな技術オプションがあるか調べて"
+  assistant: "画像認識機能の技術調査ですね。strategic-research-analyst エージェントを使って、利用可能な技術オプション、各技術の特徴、市場での採用状況などを包括的に調査します。"
+  <Task tool call to strategic-research-analyst>
+  </example>
+
+  <example>
+  Context: User needs market analysis for a new business initiative.
+  user: "競合他社がどんなAIソリューションを提供しているか調べてほしい"
+  assistant: "競合分析のリサーチですね。strategic-research-analyst エージェントを起動して、競合他社のAIソリューション、価格戦略、市場ポジショニングについて調査を行います。"
+  <Task tool call to strategic-research-analyst>
+  </example>
+
+  <example>
+  Context: User is preparing a proposal and needs supporting data.
+  user: "クラウドコスト最適化の市場規模と成長率を調べて"
+  assistant: "市場規模の調査ですね。strategic-research-analyst エージェントを使って、クラウドコスト最適化市場のデータ、成長予測、主要プレイヤーについてリサーチします。"
+  <Task tool call to strategic-research-analyst>
+  </example>
 model: sonnet
 color: red
 ---

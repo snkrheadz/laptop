@@ -1,6 +1,34 @@
 ---
 name: aws-best-practices-advisor
-description: Use this agent when you need guidance on AWS architecture decisions, infrastructure design, security configurations, cost optimization, or when implementing AWS services following AWS Well-Architected Framework principles. This agent should be called proactively when:\n\n<example>\nContext: The user is designing a new AWS infrastructure or discussing AWS service selection.\nuser: "S3バケットを作成してファイルを保存する機能を実装したい"\nassistant: "I'm going to use the Task tool to launch the aws-best-practices-advisor agent to ensure we follow AWS best practices for S3 bucket configuration."\n<commentary>\nSince the user is planning to create S3 resources, use the aws-best-practices-advisor agent to provide guidance on bucket policies, encryption, versioning, and access controls.\n</commentary>\n</example>\n\n<example>\nContext: The user is writing CloudFormation or Terraform code for AWS resources.\nuser: "このLambda関数をデプロイするためのCloudFormationテンプレートを書いて"\nassistant: "Lambda関数のCloudFormationテンプレートを作成します。まず、aws-best-practices-advisor agentでベストプラクティスを確認しましょう。"\n<commentary>\nWhen creating IaC for AWS, use the aws-best-practices-advisor agent to ensure proper IAM roles, VPC configurations, logging, and monitoring are included.\n</commentary>\n</example>\n\n<example>\nContext: The user is troubleshooting AWS-related issues or reviewing existing AWS configurations.\nuser: "本番環境のRDSが遅いので改善したい"\nassistant: "RDSのパフォーマンス改善について、aws-best-practices-advisor agentを使用してAWSのベストプラクティスに基づいた診断と改善提案を行います。"\n<commentary>\nFor AWS performance issues, use the aws-best-practices-advisor agent to analyze the situation and provide recommendations aligned with AWS best practices.\n</commentary>\n</example>
+description: |
+  Use this agent when you need guidance on AWS architecture decisions, infrastructure design, security configurations, cost optimization, or when implementing AWS services following AWS Well-Architected Framework principles. This agent should be called proactively when:
+
+  <example>
+  Context: The user is designing a new AWS infrastructure or discussing AWS service selection.
+  user: "S3バケットを作成してファイルを保存する機能を実装したい"
+  assistant: "I'm going to use the Task tool to launch the aws-best-practices-advisor agent to ensure we follow AWS best practices for S3 bucket configuration."
+  <commentary>
+  Since the user is planning to create S3 resources, use the aws-best-practices-advisor agent to provide guidance on bucket policies, encryption, versioning, and access controls.
+  </commentary>
+  </example>
+
+  <example>
+  Context: The user is writing CloudFormation or Terraform code for AWS resources.
+  user: "このLambda関数をデプロイするためのCloudFormationテンプレートを書いて"
+  assistant: "Lambda関数のCloudFormationテンプレートを作成します。まず、aws-best-practices-advisor agentでベストプラクティスを確認しましょう。"
+  <commentary>
+  When creating IaC for AWS, use the aws-best-practices-advisor agent to ensure proper IAM roles, VPC configurations, logging, and monitoring are included.
+  </commentary>
+  </example>
+
+  <example>
+  Context: The user is troubleshooting AWS-related issues or reviewing existing AWS configurations.
+  user: "本番環境のRDSが遅いので改善したい"
+  assistant: "RDSのパフォーマンス改善について、aws-best-practices-advisor agentを使用してAWSのベストプラクティスに基づいた診断と改善提案を行います。"
+  <commentary>
+  For AWS performance issues, use the aws-best-practices-advisor agent to analyze the situation and provide recommendations aligned with AWS best practices.
+  </commentary>
+  </example>
 model: opus
 color: orange
 ---
