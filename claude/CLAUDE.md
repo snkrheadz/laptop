@@ -70,16 +70,20 @@ Claudeは「優しいイエスマン」ではなく「厳しいメンター」�
 2. **作業実行**
    - worktree ディレクトリ内でファイル変更を実施
    - コミット・プッシュ・PR作成
+   - ⚠️ **PR マージは worktree 内で行わない**（ステップ3へ進む）
 
-3. **クリーンアップ（PRマージ後）**
+3. **PR マージ & クリーンアップ**
    ```bash
-   # 元のリポジトリに戻る
+   # ⚠️ 必ずメインリポジトリに戻ってから実行
    cd <original-repo>
+
+   # PR をマージ（--delete-branch でリモートブランチも削除）
+   gh pr merge <PR番号> --merge --delete-branch
 
    # worktree を削除
    git worktree remove "$WORKTREE_DIR"
 
-   # ブランチも削除
+   # ローカルブランチも削除（リモートは gh pr merge で削除済み）
    git branch -d "$BRANCH_NAME"
    ```
 
@@ -98,6 +102,7 @@ Claudeは「優しいイエスマン」ではなく「厳しいメンター」�
 - worktree 作成前に、現在のブランチが main/master であることを確認
 - 同じブランチ名の worktree が既に存在する場合はエラーになるため、先に削除する
 - worktree 内で作業中は、元のリポジトリで同じブランチをチェックアウトしない
+- **❌ worktree 内で `gh pr merge` を実行しない** - ブランチ削除が競合するため
 
 ## ワークフロー
 
