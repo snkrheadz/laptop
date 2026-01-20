@@ -65,6 +65,15 @@
             "command": "~/.claude/hooks/validate-shell.sh"
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/auto-review-pr.sh"
+          }
+        ]
       }
     ],
     "Stop": [
