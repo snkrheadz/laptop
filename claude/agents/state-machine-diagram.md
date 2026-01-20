@@ -1,6 +1,6 @@
 ---
 name: state-machine-diagram
-description: 既存コンポーネントのステートマシン図を生成。コードから状態遷移を解析し、MermaidまたはD2形式で図を出力。トリガー: state diagram, ステートマシン, 状態遷移図, state machine
+description: "既存コンポーネントのステートマシン図を生成。コードから状態遷移を解析し、MermaidまたはD2形式で図を出力。トリガー: state diagram, ステートマシン, 状態遷移図, state machine"
 tools: Read, Glob, Grep, Bash
 model: sonnet
 ---
