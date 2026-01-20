@@ -1,4 +1,7 @@
 {
+  "env": {
+    "ENABLE_TOOL_SEARCH": "auto:15"
+  },
   "permissions": {
     "additionalDirectories": [
       "../worktrees/"
@@ -12,8 +15,8 @@
       "NotebookEdit",
       "WebSearch",
       "WebFetch",
-      "mcp__Notion__*",
-      "mcp__plugin_figma_figma-desktop__*",
+      "mcp__plugin_Notion_notion*",
+      "mcp__plugin_figma_figma__*",
       "Bash(git *)",
       "Bash(npm *)",
       "Bash(node *)",
@@ -101,7 +104,6 @@
     "code-review@claude-plugins-official": true,
     "commit-commands@claude-plugins-official": true,
     "figma@claude-plugins-official": true,
-    "github@claude-plugins-official": false,
     "security-guidance@claude-plugins-official": false,
     "gopls-lsp@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
