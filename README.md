@@ -342,3 +342,4 @@ This file is symlinked to `~/.claude/settings.json`.
 MIT
 <!-- test comment for auto-review hook verification -->
 <!-- another test 1768883933 -->
+<!-- test 1768884120 -->
