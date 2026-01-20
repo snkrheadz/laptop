@@ -340,3 +340,4 @@ This file is symlinked to `~/.claude/settings.json`.
 ## License
 
 MIT
+<!-- test comment for auto-review hook verification -->
