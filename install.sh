@@ -109,6 +109,7 @@ setup_claude_agents() {
         "arxiv-ai-researcher.md"
         "aws-best-practices-advisor.md"
         "gcp-best-practices-advisor.md"
+        "gemini-api-researcher.md"
         "nano-banana-pro-prompt-generator.md"
         "state-machine-diagram.md"
         "strategic-research-analyst.md"
