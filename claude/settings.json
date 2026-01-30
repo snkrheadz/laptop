@@ -41,8 +41,7 @@
       "Bash(source *)",
       "Bash(shellcheck *)",
       "Bash(pre-commit *)",
-      "Bash(gitleaks *)",
-      "mcp__pencil"
+      "Bash(gitleaks *)"
     ],
     "deny": [
       "Read(~/.secrets.env)",
