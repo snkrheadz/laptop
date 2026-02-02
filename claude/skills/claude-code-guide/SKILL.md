@@ -1,8 +1,9 @@
 ---
 name: claude-code-guide
-description: "Claude Code 拡張機能（サブエージェント、プラグイン、スキル）の作成・設定方法。トリガー: 拡張機能, agent作成, skill作成, plugin作成, CLI自動承認, headless"
+description: "Claude Code 拡張機能（サブエージェント、プラグイン、スキル）の作成・設定方法。トリガー: 拡張機能, agent作成, skill作成, plugin作成, CLI自動承認, headless, エージェント, プラグイン, スキル"
 user-invocable: true
 allowed-tools: Read
+model: haiku
 ---
 
 # Claude Code 拡張機能ガイド

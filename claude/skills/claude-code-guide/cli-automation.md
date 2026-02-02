@@ -88,7 +88,7 @@ claude -p "Explain the code"
 - name: Run Claude
   run: |
     claude -p "Fix linting errors" \
-      --allowedTools "Read,Edit,Bash(npm run lint:*)" \
+      --allowedTools "Read,Edit,Bash(npm:*)" \
       --output-format json
 ```
 

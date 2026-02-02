@@ -52,10 +52,12 @@ permissionMode: default
 
 ### Task tool での呼び出し
 
-```
-Task tool を使用してサブエージェントを呼び出す:
-- subagent_type: "agent-name"
-- prompt: "タスクの説明"
+```json
+{
+  "subagent_type": "agent-name",
+  "prompt": "タスクの説明",
+  "description": "短い説明（3-5語）"
+}
 ```
 
 ### エージェント内でのフック定義

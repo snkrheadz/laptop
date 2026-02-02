@@ -19,6 +19,16 @@ log_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
 log_warning() { echo -e "${YELLOW}[WARNING]${NC} $1"; }
 log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
+# Helper function to safely create symlinks
+# Removes existing symlink/file before creating new one to avoid nested links
+# shellcheck disable=SC2329  # Function is used in create_symlinks, setup_claude_agents, setup_claude_skills
+safe_ln() {
+    local target="$1"
+    local link_name="$2"
+    rm -rf "$link_name"
+    ln -sf "$target" "$link_name"
+}
+
 # Check if running on macOS
 check_macos() {
     if [ "$(uname)" != "Darwin" ]; then
@@ -79,6 +89,7 @@ create_backup() {
         "$HOME/.claude/agents/diagnose-dotfiles.md"
         "$HOME/.claude/agents/migration-assistant.md"
         "$HOME/.claude/settings.json"
+        "$HOME/.claude/skills"
     )
 
     for file in "${files_to_backup[@]}"; do
@@ -126,15 +137,6 @@ setup_claude_agents() {
 create_symlinks() {
     log_info "Creating symbolic links..."
 
-    # Helper function to safely create symlinks
-    # Removes existing symlink/file before creating new one to avoid nested links
-    safe_ln() {
-        local target="$1"
-        local link_name="$2"
-        rm -rf "$link_name"
-        ln -sf "$target" "$link_name"
-    }
-
     # zsh
     safe_ln "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc"
     safe_ln "$DOTFILES_DIR/zsh/.aliases" "$HOME/.aliases"
@@ -180,11 +182,25 @@ create_symlinks() {
     # claude settings.json
     safe_ln "$DOTFILES_DIR/claude/settings.json" "$HOME/.claude/settings.json"
 
-    # claude skills
-    mkdir -p "$HOME/.claude/skills"
-    safe_ln "$DOTFILES_DIR/claude/skills/claude-code-guide" "$HOME/.claude/skills/claude-code-guide"
-
     log_success "Symbolic links created"
+}
+
+# Create symlinks for all managed skill directories
+setup_claude_skills() {
+    log_info "Setting up Claude skills..."
+
+    mkdir -p "$HOME/.claude/skills"
+
+    # All managed skill directories
+    local skills=(
+        "claude-code-guide"
+    )
+
+    for skill in "${skills[@]}"; do
+        safe_ln "$DOTFILES_DIR/claude/skills/$skill" "$HOME/.claude/skills/$skill"
+    done
+
+    log_success "Claude skills configured"
 }
 
 # Install Homebrew packages
@@ -310,6 +326,7 @@ main() {
     create_backup
     create_symlinks
     setup_claude_agents
+    setup_claude_skills
     install_brew_packages
     setup_mise
     setup_security
