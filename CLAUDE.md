@@ -61,7 +61,8 @@ mise use go@1.24.3                        # Install/use specific version
 │   ├── statusline.sh   # Status line display script
 │   ├── CLAUDE.md       # User global instructions
 │   ├── hooks/          # PostToolUse hooks (e.g., shellcheck)
-│   └── agents/         # Subagents (e.g., verify-shell)
+│   ├── agents/         # Subagents (e.g., verify-shell)
+│   └── skills/         # Skills (e.g., claude-code-guide)
 │
 ├── .pre-commit-config.yaml   # Pre-commit hooks config
 ├── .gitleaks.toml            # Gitleaks secret scanning config
@@ -108,6 +109,7 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `CLAUDE.md` - User global instructions
 - `hooks/validate-shell.sh` - PostToolUse hook for shellcheck
 - `agents/verify-shell.md` - Shell script verification subagent
+- `skills/claude-code-guide/` - Claude Code extension guide skill
 
 **Available plugins**:
 - `/commit-commands:commit-push-pr` - Commit, push, and create PR in one command

@@ -180,6 +180,10 @@ create_symlinks() {
     # claude settings.json
     safe_ln "$DOTFILES_DIR/claude/settings.json" "$HOME/.claude/settings.json"
 
+    # claude skills
+    mkdir -p "$HOME/.claude/skills"
+    safe_ln "$DOTFILES_DIR/claude/skills/claude-code-guide" "$HOME/.claude/skills/claude-code-guide"
+
     log_success "Symbolic links created"
 }
 
