@@ -116,6 +116,7 @@ setup_claude_agents() {
     local agents=(
         "arxiv-ai-researcher.md"
         "aws-best-practices-advisor.md"
+        "code-simplifier.md"
         "diagnose-dotfiles.md"
         "gcp-best-practices-advisor.md"
         "gemini-api-researcher.md"
@@ -176,6 +177,7 @@ create_symlinks() {
     mkdir -p "$HOME/.claude/hooks"
     safe_ln "$DOTFILES_DIR/claude/hooks/validate-shell.sh" "$HOME/.claude/hooks/validate-shell.sh"
     safe_ln "$DOTFILES_DIR/claude/hooks/save-to-obsidian.js" "$HOME/.claude/hooks/save-to-obsidian.js"
+    safe_ln "$DOTFILES_DIR/claude/hooks/format-code.sh" "$HOME/.claude/hooks/format-code.sh"
 
     # claude CLAUDE.md (user global)
     safe_ln "$DOTFILES_DIR/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
@@ -195,6 +197,8 @@ setup_claude_skills() {
     # All managed skill directories
     local skills=(
         "claude-code-guide"
+        "techdebt"
+        "test-and-fix"
     )
 
     for skill in "${skills[@]}"; do
