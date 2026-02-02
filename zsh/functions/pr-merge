@@ -1,0 +1,68 @@
+# pr-merge: PR をマージし、worktree と ローカルブランチをクリーンアップ
+#
+# Usage:
+#   pr-merge <PR番号>           # worktree内から実行
+#   pr-merge <PR番号> <worktree_path>  # メインリポから実行
+
+function pr-merge() {
+  local pr_num="$1"
+  local worktree_path="$2"
+
+  # PR番号必須
+  if [[ -z "$pr_num" ]]; then
+    echo "Usage: pr-merge <PR番号> [worktree_path]"
+    return 1
+  fi
+
+  # メインリポジトリのパスを取得
+  local main_repo
+  main_repo=$(git rev-parse --show-toplevel)
+
+  # worktree内かどうか判定
+  local git_common_dir
+  git_common_dir=$(git rev-parse --git-common-dir 2>/dev/null)
+
+  if [[ "$git_common_dir" != ".git" && "$git_common_dir" != "$(git rev-parse --git-dir)" ]]; then
+    # worktree内にいる
+    worktree_path="$main_repo"
+    main_repo=$(dirname "$git_common_dir")
+  fi
+
+  # worktree_pathが指定されていない場合はエラー
+  if [[ -z "$worktree_path" ]]; then
+    echo "Error: worktree path not specified and not running from worktree"
+    return 1
+  fi
+
+  # ブランチ名を取得
+  local branch_name
+  branch_name=$(git -C "$worktree_path" rev-parse --abbrev-ref HEAD)
+
+  echo "=== PR Merge & Cleanup ==="
+  echo "PR: #$pr_num"
+  echo "Worktree: $worktree_path"
+  echo "Branch: $branch_name"
+  echo ""
+
+  # 1. メインリポに移動
+  cd "$main_repo" || return 1
+
+  # 2. worktree削除
+  echo "Removing worktree..."
+  git worktree remove "$worktree_path" || return 1
+
+  # 3. ローカルブランチ削除
+  echo "Deleting local branch..."
+  git branch -D "$branch_name" || return 1
+
+  # 4. PRマージ（リモートブランチは--delete-branchで削除）
+  echo "Merging PR..."
+  gh pr merge "$pr_num" --merge --delete-branch || return 1
+
+  # 5. mainを更新
+  echo "Pulling main..."
+  git pull origin main
+
+  echo ""
+  echo "Done!"
+}
