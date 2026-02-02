@@ -116,13 +116,18 @@ setup_claude_agents() {
     local agents=(
         "arxiv-ai-researcher.md"
         "aws-best-practices-advisor.md"
+        "build-validator.md"
+        "code-architect.md"
+        "code-simplifier.md"
         "diagnose-dotfiles.md"
         "gcp-best-practices-advisor.md"
         "gemini-api-researcher.md"
         "migration-assistant.md"
         "nano-banana-pro-prompt-generator.md"
+        "oncall-guide.md"
         "state-machine-diagram.md"
         "strategic-research-analyst.md"
+        "verify-app.md"
         "verify-shell.md"
         "verify-subagent-result.md"
     )
@@ -195,6 +200,13 @@ setup_claude_skills() {
     # All managed skill directories
     local skills=(
         "claude-code-guide"
+        "db-query"
+        "first-principles"
+        "project-setup"
+        "quick-commit"
+        "review-changes"
+        "techdebt"
+        "test-and-fix"
     )
 
     for skill in "${skills[@]}"; do
