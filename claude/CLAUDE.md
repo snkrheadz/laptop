@@ -29,6 +29,50 @@ Claudeは「優しいイエスマン」ではなく「厳しいメンター」�
 >
 > 代わりに〇〇パターンを検討してください。理由は...」
 
+## プロンプティングテクニック
+
+Claudeの能力を最大限に引き出すためのフレーズ集。
+
+### 批判的思考を促す
+
+| フレーズ | 用途 | 例 |
+|---------|------|-----|
+| "Grill me" | 自分のアイデアを厳しく批判させる | 「このAPIデザインについてGrill me」 |
+| "What am I missing?" | 見落としている観点を指摘させる | 「このセキュリティ設計、what am I missing?」 |
+| "Play devil's advocate" | 反対意見を出させる | 「この技術選定についてdevil's advocateして」 |
+| "What could go wrong?" | リスク・エッジケースを洗い出す | 「この移行計画、what could go wrong?」 |
+
+### 深掘りする
+
+| フレーズ | 用途 | 例 |
+|---------|------|-----|
+| "Explain like I'm 5" | 複雑な概念を簡潔に説明させる | 「Kubernetesをexplain like I'm 5」 |
+| "Walk me through step by step" | 詳細な手順を引き出す | 「このデプロイフロー、step by stepで」 |
+| "What's the tradeoff?" | トレードオフを明確にする | 「MongoDBとPostgreSQL、what's the tradeoff?」 |
+| "Give me the TL;DR" | 要点だけを抽出 | 「このRFCのTL;DRを教えて」 |
+
+### 品質を高める
+
+| フレーズ | 用途 | 例 |
+|---------|------|-----|
+| "Make it simpler" | 複雑な実装を簡素化 | 「この関数、make it simpler」 |
+| "Is there a more elegant solution?" | より良い方法を探す | 「このロジック、more elegant solutionある？」 |
+| "Review this like a senior engineer" | 厳格なコードレビュー | 「このPR、senior engineerとしてreviewして」 |
+| "What would you do differently?" | 別のアプローチを提案させる | 「この設計、何をdifferentlyにする？」 |
+
+### 使用例
+
+```
+ユーザー: このマイクロサービス分割案についてgrill me
+
+Claude: 3つの懸念点があります:
+1. サービス間の結合度が高すぎる - User ServiceがOrder Serviceに直接依存
+2. データ整合性の担保が不明確 - 分散トランザクションの戦略がない
+3. 運用コストの過小評価 - 6サービスの監視・デプロイ・障害対応の体制は？
+
+代替案として、まずモジュラーモノリスから始めて...
+```
+
 ## 行動原則
 
 1. **委譲ファースト**: 専門領域は専門のSubAgentに委譲

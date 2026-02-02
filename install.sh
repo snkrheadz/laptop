@@ -124,6 +124,7 @@ setup_claude_agents() {
         "nano-banana-pro-prompt-generator.md"
         "state-machine-diagram.md"
         "strategic-research-analyst.md"
+        "verify-app.md"
         "verify-shell.md"
         "verify-subagent-result.md"
     )
@@ -197,6 +198,7 @@ setup_claude_skills() {
     # All managed skill directories
     local skills=(
         "claude-code-guide"
+        "review-changes"
         "techdebt"
         "test-and-fix"
     )
