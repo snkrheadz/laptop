@@ -114,16 +114,17 @@ setup_claude_agents() {
 
     # All managed agent files
     local agents=(
-        "verify-shell.md"
-        "diagnose-dotfiles.md"
-        "migration-assistant.md"
         "arxiv-ai-researcher.md"
         "aws-best-practices-advisor.md"
+        "diagnose-dotfiles.md"
         "gcp-best-practices-advisor.md"
         "gemini-api-researcher.md"
+        "migration-assistant.md"
         "nano-banana-pro-prompt-generator.md"
         "state-machine-diagram.md"
         "strategic-research-analyst.md"
+        "verify-shell.md"
+        "verify-subagent-result.md"
     )
 
     for agent in "${agents[@]}"; do
