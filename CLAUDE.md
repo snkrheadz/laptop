@@ -43,7 +43,8 @@ mise use go@1.24.3                        # Install/use specific version
 ├── zsh/                # Shell config → ~/.zshrc, ~/.aliases, ~/.zsh/
 │   ├── .zshrc          # Main zsh config (loads functions → configs → aliases → oh-my-zsh)
 │   ├── .aliases        # Shell aliases
-│   ├── functions/      # Custom zsh functions (autoloaded)
+│   ├── functions/      # Custom zsh functions: _git_delete_branch, change-extension,
+│   │                   #   envup, mcd, pr-merge
 │   └── configs/        # Modular zsh configs
 │       ├── pre/        # Loaded first (before main configs)
 │       ├── *.zsh       # Main configs (color, editor, history, etc.)
@@ -54,15 +55,23 @@ mise use go@1.24.3                        # Install/use specific version
 ├── tig/                # Tig config → ~/.tigrc
 ├── fzf/                # FZF config → ~/.fzf.zsh, ~/.fzf.bash
 ├── ghostty/            # Ghostty config → ~/.config/ghostty/config
+├── iterm2/             # iTerm2 config (com.googlecode.iterm2.plist)
 ├── mise/               # mise config → ~/.config/mise/config.toml
+├── bin/                # Executable scripts (tat - tmux utility)
+├── raycast/            # Raycast settings export (*.rayconfig)
 │
 ├── claude/             # Claude Code config → ~/.claude/
 │   ├── settings.json   # Claude Code settings (hooks, plugins, permissions)
 │   ├── statusline.sh   # Status line display script
 │   ├── CLAUDE.md       # User global instructions
-│   ├── hooks/          # PostToolUse hooks (e.g., shellcheck)
-│   ├── agents/         # Subagents (e.g., verify-shell)
-│   └── skills/         # Skills (e.g., claude-code-guide)
+│   ├── hooks/          # PostToolUse hooks: validate-shell.sh, save-to-obsidian.js
+│   ├── agents/         # Subagents (16): verify-shell, code-architect, build-validator,
+│   │                   #   aws-best-practices-advisor, diagnose-dotfiles, etc.
+│   └── skills/         # Skills (9): claude-code-guide, quick-commit, merge-pr,
+│                       #   review-changes, test-and-fix, db-query, etc.
+│
+├── .github/
+│   └── workflows/main.yml  # CI/CD (gitleaks + shellcheck)
 │
 ├── .pre-commit-config.yaml   # Pre-commit hooks config
 ├── .gitleaks.toml            # Gitleaks secret scanning config
@@ -107,12 +116,30 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `settings.json` - Hooks, plugins, permissions, statusLine config
 - `statusline.sh` - Status line display script
 - `CLAUDE.md` - User global instructions
-- `hooks/validate-shell.sh` - PostToolUse hook for shellcheck
-- `agents/verify-shell.md` - Shell script verification subagent
-- `skills/claude-code-guide/` - Claude Code extension guide skill
 
-**Available plugins**:
-- `/commit-commands:commit-push-pr` - Commit, push, and create PR in one command
+**Hooks** (2):
+- `hooks/validate-shell.sh` - PostToolUse hook for shellcheck
+- `hooks/save-to-obsidian.js` - Saves context to Obsidian
+
+**Agents** (16):
+- `verify-shell`, `verify-app`, `build-validator` - Verification agents
+- `code-architect`, `code-simplifier` - Code design agents
+- `aws-best-practices-advisor`, `gcp-best-practices-advisor` - Cloud guidance
+- `arxiv-ai-researcher`, `gemini-api-researcher` - Research agents
+- `strategic-research-analyst`, `nano-banana-pro-prompt-generator`
+- `state-machine-diagram`, `migration-assistant`, `oncall-guide`
+- `diagnose-dotfiles`, `verify-subagent-result`
+
+**Skills** (9):
+- `claude-code-guide` - Claude Code extension documentation
+- `db-query` - Database query helper
+- `first-principles` - First principles analysis
+- `merge-pr` - PR merge with worktree cleanup
+- `project-setup` - Project setup wizard
+- `quick-commit` - Fast commit workflow
+- `review-changes` - Code review helper
+- `techdebt` - Tech debt analysis
+- `test-and-fix` - Test and fix workflow
 
 ## Best Practices
 

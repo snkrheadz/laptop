@@ -11,14 +11,15 @@ This repository manages configurations for the following applications:
 | Category        | Application     | Config Location              |
 | --------------- | --------------- | ---------------------------- |
 | Shell           | Zsh + Oh-My-Zsh | `~/.zshrc`, `~/.zsh/`        |
-| Terminal        | Ghostty         | `~/.config/ghostty/config`   |
+| Terminal        | Ghostty, iTerm2 | `~/.config/ghostty/config`, `iterm2/` |
 | Editor          | Neovim, Vim     | via Homebrew                 |
 | Version Control | Git, Tig        | `~/.gitconfig`, `~/.tigrc`   |
 | Multiplexer     | tmux            | `~/.tmux.conf`               |
 | Fuzzy Finder    | fzf             | `~/.fzf.zsh`                 |
 | Packages        | Homebrew        | `Brewfile`                   |
 | Runtimes        | mise            | `~/.config/mise/config.toml` |
-| AI Assistant    | Claude Code     | `~/.claude/` (CLAUDE.md, hooks, agents) |
+| Launcher        | Raycast         | `raycast/*.rayconfig`        |
+| AI Assistant    | Claude Code     | `~/.claude/` (settings, hooks, agents, skills) |
 
 **Brewfile includes:**
 
@@ -56,7 +57,7 @@ laptop/
 ├── zsh/                    # Shell configuration
 │   ├── .zshrc              # Main config (loads below in order)
 │   ├── .aliases            # Shell aliases
-│   ├── functions/          # Custom zsh functions
+│   ├── functions/          # Custom zsh functions (5)
 │   └── configs/            # Modular configs
 │       ├── pre/            # Loaded first
 │       ├── *.zsh           # Main configs (color, editor, history, etc.)
@@ -69,18 +70,26 @@ laptop/
 │   └── .git_template/      # Git hooks template
 │
 ├── ghostty/                # Ghostty terminal config
+├── iterm2/                 # iTerm2 settings plist
 ├── tmux/                   # tmux configuration
 ├── tig/                    # Tig (git TUI) config
 ├── fzf/                    # Fuzzy finder config
 ├── mise/                   # mise runtime manager config
+├── bin/                    # Executable scripts (tat)
+├── raycast/                # Raycast settings export
 ├── claude/                 # Claude Code configuration
 │   ├── CLAUDE.md           # User global instructions
+│   ├── settings.json       # Hooks, plugins, permissions
 │   ├── statusline.sh       # Custom status line script
-│   ├── hooks/              # PostToolUse hooks
-│   └── agents/             # Subagents
+│   ├── hooks/              # PostToolUse hooks (2)
+│   ├── agents/             # Subagents (16)
+│   └── skills/             # Custom skills (9)
 │
 ├── scripts/
 │   └── auto-sync.sh        # Hourly auto-sync script
+│
+├── .github/
+│   └── workflows/main.yml  # CI/CD (gitleaks + shellcheck)
 │
 ├── .pre-commit-config.yaml # Pre-commit hooks
 ├── .gitleaks.toml          # Secret scanning rules
@@ -199,12 +208,12 @@ brew bundle --file=Brewfile
 
 ### Installed Runtimes
 
-| Runtime | Version |
-|---------|---------|
-| Go      | 1.24.3  |
-| Node.js | 25.2.1  |
-| Python  | 3.13.x  |
-| Ruby    | 3.4.8   |
+| Runtime | Version          |
+|---------|------------------|
+| Go      | 1.24.3           |
+| Node.js | 25.2.1, 22.16.0  |
+| Python  | 3.13.x           |
+| Ruby    | 3.4.8            |
 
 ### Commands
 
@@ -281,16 +290,34 @@ alias deploy="./scripts/deploy-work.sh"
 
 ## Claude Code Configuration
 
-This repository manages Claude Code settings via symlinks:
+This repository manages Claude Code settings via symlinks to `~/.claude/`:
 
 ```text
 claude/
-├── CLAUDE.md           # User global instructions → ~/.claude/CLAUDE.md
-├── statusline.sh       # Custom status line script → ~/.claude/statusline.sh
-├── hooks/
-│   └── validate-shell.sh  # PostToolUse hook → ~/.claude/hooks/
-└── agents/
-    └── verify-shell.md    # Shell verification agent → ~/.claude/agents/
+├── CLAUDE.md           # User global instructions
+├── settings.json       # Hooks, plugins, permissions
+├── statusline.sh       # Custom status line script
+├── hooks/              # PostToolUse hooks (2)
+│   ├── validate-shell.sh   # shellcheck validation
+│   └── save-to-obsidian.js # Obsidian integration
+├── agents/             # Subagents (16)
+│   ├── verify-shell.md, verify-app.md, build-validator.md
+│   ├── code-architect.md, code-simplifier.md, oncall-guide.md
+│   ├── aws-best-practices-advisor.md, gcp-best-practices-advisor.md
+│   ├── arxiv-ai-researcher.md, gemini-api-researcher.md
+│   ├── strategic-research-analyst.md, nano-banana-pro-prompt-generator.md
+│   ├── state-machine-diagram.md, migration-assistant.md
+│   ├── diagnose-dotfiles.md, verify-subagent-result.md
+└── skills/             # Custom skills (9)
+    ├── claude-code-guide/  # Claude Code extension guide
+    ├── db-query/           # Database query helper
+    ├── first-principles/   # First principles analysis
+    ├── merge-pr/           # PR merge automation
+    ├── project-setup/      # Project setup wizard
+    ├── quick-commit/       # Fast commit workflow
+    ├── review-changes/     # Code review helper
+    ├── techdebt/           # Tech debt analysis
+    └── test-and-fix/       # Test and fix workflow
 ```
 
 ### Managed Components
@@ -298,9 +325,11 @@ claude/
 | Component | Description |
 |-----------|-------------|
 | `CLAUDE.md` | User global instructions (workflow, best practices, prohibitions) |
+| `settings.json` | Hooks, plugins, permissions, Obsidian integration |
 | `statusline.sh` | Custom status line showing model, cost, context |
-| `validate-shell.sh` | PostToolUse hook for shellcheck validation on .sh files |
-| `verify-shell.md` | Subagent for comprehensive shell script verification |
+| `hooks/` | PostToolUse hooks for shellcheck and Obsidian |
+| `agents/` | 16 specialized subagents for various tasks |
+| `skills/` | 9 custom skills for common workflows |
 
 ### Status Line
 
@@ -309,33 +338,32 @@ Displays in Claude Code CLI:
 [Opus] 📁 laptop | 🌿 main | 💰 $5.20 (Today) | 📊 185k
 ```
 
-**Features:**
-- Model name (Opus/Sonnet)
-- Current directory
-- Git branch
-- Daily cumulative cost
-- Context window remaining
-
 ### Hooks
 
-**PostToolUse: validate-shell.sh**
-- Triggers after `Write` or `Edit` tools
-- Runs `shellcheck` on `.sh` files
-- Blocks commit if issues found
+| Hook | Description |
+|------|-------------|
+| `validate-shell.sh` | Runs shellcheck on `.sh` files after Write/Edit |
+| `save-to-obsidian.js` | Saves conversation context to Obsidian |
 
-### Available Plugins
+### Key Subagents
 
-- `/commit-commands:commit-push-pr` - Commit, push, and create PR in one command
+| Agent | Purpose |
+|-------|---------|
+| `verify-shell` | Shell script verification |
+| `verify-app` | Application verification |
+| `build-validator` | Build validation |
+| `code-architect` | Architecture design |
+| `aws-best-practices-advisor` | AWS guidance |
+| `gcp-best-practices-advisor` | GCP guidance |
+| `diagnose-dotfiles` | Dotfiles troubleshooting |
 
-### Settings (settings.json)
+### Available Skills
 
-`claude/settings.json` manages Claude Code configuration:
-- Hooks (PostToolUse, Stop, Notification)
-- Plugins
-- Permissions (allow/deny)
-- plansDirectory (Obsidian integration)
-
-This file is symlinked to `~/.claude/settings.json`.
+- `/claude-code-guide` - Claude Code extension documentation
+- `/quick-commit` - Fast commit workflow
+- `/merge-pr` - PR merge with worktree cleanup
+- `/review-changes` - Code review helper
+- `/test-and-fix` - Run tests and fix failures
 
 ## License
 
