@@ -73,10 +73,12 @@ SubAgentの結果は「正しい」と仮定せず、必ず検証を行う。
 |--------|-----------|
 | 90-100 | そのままユーザーに提示 |
 | 70-89 | 不確かな部分を明示して確認を求める |
-| 50-69 | `verify-subagent-result` エージェントで交差検証（※1） |
+| 50-69 | `verify-subagent-result` エージェントで交差検証 |
 | 0-49 | 異なるソース/アプローチで再調査（最大2回） |
 
-※1: Task tool で `subagent_type: "verify-subagent-result"` を指定して呼び出す
+**検証エージェントの呼び出し方法**:
+- Claudeが description に基づき自動委譲を判断
+- または明示的に「verify-subagent-result エージェントで検証して」とリクエスト
 
 ### 出力フォーマット
 

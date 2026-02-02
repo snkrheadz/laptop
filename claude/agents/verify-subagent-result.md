@@ -1,6 +1,6 @@
 ---
 name: verify-subagent-result
-description: SubAgentの調査結果を交差検証するエージェント。異なるソースで情報の正確性を確認し、信頼度スコアを再評価する。Task tool で subagent_type="verify-subagent-result" を指定して呼び出す。
+description: SubAgent結果の交差検証を実行。複数のソースで情報の正確性を確認し、信頼度スコアを再評価する。信頼度スコアが50-69の場合に使用。
 tools: WebSearch, WebFetch, Read, Grep, Glob, Bash
 model: sonnet
 ---
