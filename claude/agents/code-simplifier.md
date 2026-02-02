@@ -1,6 +1,6 @@
 ---
 name: code-simplifier
-description: コード実装後の簡素化・重複削除を行うエージェント。ネストの削減、繰り返しロジックの抽出、可読性向上を実施。「このコードを簡素化して」「重複を削除して」で呼び出し。
+description: コード実装後の簡素化・重複削除を行うエージェント。ネストの削減、繰り返しロジックの抽出、可読性向上を実施。トリガー: simplify code, remove duplicates, コードを簡素化して, 重複を削除して
 tools: Read, Edit, Grep, Glob
 model: sonnet
 ---

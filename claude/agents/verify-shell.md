@@ -1,6 +1,6 @@
 ---
 name: verify-shell
-description: シェルスクリプトの検証を行うエージェント。.shファイルの静的解析、構文チェック、ベストプラクティス確認を実行する。シェルスクリプトを作成・編集した後に使用。
+description: シェルスクリプトの検証を行うエージェント。.shファイルの静的解析、構文チェック、ベストプラクティス確認を実行する。トリガー: shell validation, shellcheck, シェルスクリプトを検証して
 tools: Bash, Read, Grep, Glob
 model: haiku
 ---

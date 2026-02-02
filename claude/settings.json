@@ -63,10 +63,6 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/validate-shell.sh"
-          },
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/format-code.sh"
           }
         ]
       }

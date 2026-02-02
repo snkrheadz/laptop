@@ -1,6 +1,6 @@
 ---
 name: verify-app
-description: アプリケーションの動作検証エージェント。実装後にUIやAPIの動作を確認し、期待通りに機能するか検証する。「アプリを検証して」「動作確認して」「UIをテストして」で呼び出し。
+description: アプリケーションの動作検証エージェント。実装後にUIやAPIの動作を確認し、期待通りに機能するか検証する。トリガー: verify app, test application, アプリを検証して, 動作確認して, UIをテストして
 tools: Bash, Read, Grep, Glob, WebFetch
 model: sonnet
 ---

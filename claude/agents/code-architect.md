@@ -1,6 +1,6 @@
 ---
 name: code-architect
-description: ソフトウェア設計支援エージェント。アーキテクチャ設計、技術選定、設計パターンの提案を行う。「設計を相談したい」「アーキテクチャレビュー」「技術選定」で呼び出し。
+description: ソフトウェア設計支援エージェント。アーキテクチャ設計、技術選定、設計パターンの提案を行う。トリガー: architecture design, system design, 設計を相談したい, アーキテクチャレビュー, 技術選定
 tools: Read, Grep, Glob, WebSearch, WebFetch
 model: sonnet
 ---

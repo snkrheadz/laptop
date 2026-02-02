@@ -1,6 +1,6 @@
 ---
 name: oncall-guide
-description: 本番障害対応ガイドエージェント。インシデント発生時の調査・対応手順をサポート。「本番で障害」「インシデント対応」「エラー調査」で呼び出し。
+description: 本番障害対応ガイドエージェント。インシデント発生時の調査・対応手順をサポート。トリガー: incident response, on-call, 本番で障害, インシデント対応, エラー調査
 tools: Bash, Read, Grep, Glob, WebFetch
 model: sonnet
 ---

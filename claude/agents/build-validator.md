@@ -1,6 +1,6 @@
 ---
 name: build-validator
-description: ビルド検証エージェント。コミット/PR前にビルドが通るか検証する。型チェック、リント、ビルドを実行し問題を事前検出。「ビルド検証して」「CIが通るか確認」で呼び出し。
+description: ビルド検証エージェント。コミット/PR前にビルドが通るか検証する。型チェック、リント、ビルドを実行し問題を事前検出。トリガー: validate build, pre-CI check, ビルド検証して, CIが通るか確認
 tools: Bash, Read, Grep, Glob
 model: haiku
 ---
