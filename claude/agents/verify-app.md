@@ -95,14 +95,35 @@ curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/
 npm run dev &
 SERVER_PID=$!
 
-# 起動待機
-sleep 5
+# 起動待機（ヘルスチェックでポーリング）
+wait_for_server() {
+    local url="$1"
+    local max_attempts=30
+    local attempt=1
+
+    while [ $attempt -le $max_attempts ]; do
+        if curl -s -o /dev/null -w "%{http_code}" "$url" | grep -q "200\|404"; then
+            echo "Server is ready"
+            return 0
+        fi
+        echo "Waiting for server... ($attempt/$max_attempts)"
+        sleep 1
+        attempt=$((attempt + 1))
+    done
+
+    echo "Server failed to start within timeout"
+    return 1
+}
+
+wait_for_server "http://localhost:3000/health"
 
 # 検証実行...
 
 # クリーンアップ
 kill $SERVER_PID 2>/dev/null
 ```
+
+**注意**: 固定の `sleep` ではなく、ヘルスチェックエンドポイントをポーリングして起動を確認する。
 
 ## 出力形式
 

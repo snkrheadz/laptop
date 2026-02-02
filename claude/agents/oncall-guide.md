@@ -161,8 +161,8 @@ SELECT count(*) FROM pg_stat_activity;
 
 #### エラーログ
 ```
-[ERROR] 2024-01-15 10:23:45 - Connection refused to database
-[ERROR] 2024-01-15 10:23:46 - Request timeout after 30s
+[ERROR] 2025-01-15 10:23:45 - Connection refused to database
+[ERROR] 2025-01-15 10:23:46 - Request timeout after 30s
 ```
 
 #### 仮説
@@ -220,3 +220,15 @@ SELECT count(*) FROM pg_stat_activity;
 - **確認する**: 変更前に影響範囲を確認
 - **相談する**: 判断に迷ったらエスカレーション
 - **本番直接操作は最終手段**: ロールバック、スケールアウトを優先
+
+## パーミッション要件
+
+このエージェントで使用するコマンドには追加のパーミッションが必要:
+
+```
+# settings.json の permissions.allow に追加が必要
+"Bash(kubectl *)"
+"Bash(aws *)"
+```
+
+パーミッションがない場合は、コマンドを提示し、ユーザーに手動実行を依頼する。

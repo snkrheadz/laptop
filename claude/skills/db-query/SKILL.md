@@ -61,7 +61,7 @@ mysql -e "SELECT ..." -h $DB_HOST -u $DB_USER -p$DB_PASS $DB_NAME
 
 ### データサマリー
 - **行数**: 1,234
-- **期間**: 2024-01-01 〜 2024-01-31
+- **期間**: 2025-01-01 〜 2025-01-31
 
 ### 主要な発見
 1. 1/15に急増（前日比 +150%）
@@ -164,9 +164,9 @@ SELECT ...
 
 | date | active_users | change |
 |------|-------------|--------|
-| 2024-01-01 | 1,000 | - |
-| 2024-01-02 | 1,200 | +20% |
-| 2024-01-03 | 950 | -21% |
+| 2025-01-01 | 1,000 | - |
+| 2025-01-02 | 1,200 | +20% |
+| 2025-01-03 | 950 | -21% |
 
 ### 分析
 
@@ -184,10 +184,33 @@ SELECT ...
 
 ## セキュリティ注意事項
 
+### 必須ルール
+
+- **SELECT文のみ実行**: DELETE, UPDATE, DROP, INSERT, TRUNCATE, ALTER は絶対に実行しない
 - **本番DBへの直接接続は避ける**: 可能な限りレプリカを使用
-- **破壊的クエリの禁止**: DELETE, UPDATE, DROP は実行しない
 - **結果の取り扱い**: 個人情報を含む場合は注意
 - **クエリログ**: 実行したクエリは記録される前提で
+
+### 安全なクエリ実行
+
+```bash
+# PostgreSQL: 読み取り専用トランザクションを使用
+psql -c "SET TRANSACTION READ ONLY; SELECT ..." -h $DB_HOST -U $DB_USER -d $DB_NAME
+
+# MySQL: 読み取り専用フラグ
+mysql --safe-updates -e "SELECT ..." -h $DB_HOST -u $DB_USER $DB_NAME
+
+# BigQuery: ドライランで事前確認
+bq query --dry_run --use_legacy_sql=false 'SELECT ...'
+```
+
+### 禁止パターン検出
+
+実行前にクエリを検証し、以下のパターンが含まれる場合は**実行を拒否**:
+
+- `DELETE`, `UPDATE`, `INSERT`, `DROP`, `TRUNCATE`, `ALTER`, `CREATE`
+- `; --` (SQLインジェクションパターン)
+- `GRANT`, `REVOKE` (権限操作)
 
 ## BigQuery 固有
 

@@ -10,25 +10,59 @@ model: sonnet
 
 プロジェクトの構成を検出し、適切なClaude Code設定を生成します。
 
-## 検出対象
+## 必須実行ステップ
 
-| 検出ファイル | プロジェクトタイプ | フォーマッター | 実行方法 |
-|-------------|------------------|--------------|---------|
-| `package.json` | Node.js | prettier | `node_modules/.bin/prettier`（ローカル優先） |
-| `go.mod` | Go | gofmt | `gofmt`（システム） |
-| `Cargo.toml` | Rust | rustfmt | `rustfmt`（システム） |
-| `pyproject.toml` | Python | ruff | `ruff`（システム） |
+**このスキルが呼び出されたら、以下のステップを順番に実行すること。**
 
-## 実行手順
-
-### 1. プロジェクト構成の検出
+### Step 1: プロジェクトタイプを検出
 
 ```bash
-# プロジェクトルートで検出ファイルを確認
+# [Bash] 以下を実行してプロジェクトタイプを判定
 ls -la package.json go.mod Cargo.toml pyproject.toml 2>/dev/null
 ```
 
-### 2. 生成ファイル
+検出結果に基づいてプロジェクトタイプを決定:
+
+| 検出ファイル | プロジェクトタイプ | フォーマッター |
+|-------------|------------------|--------------|
+| `package.json` | Node.js | prettier |
+| `go.mod` | Go | gofmt |
+| `Cargo.toml` | Rust | rustfmt |
+| `pyproject.toml` | Python | ruff |
+
+### Step 2: ディレクトリを作成
+
+```bash
+# [Bash] .claude/hooks ディレクトリを作成
+mkdir -p .claude/hooks
+```
+
+### Step 3: settings.local.json を生成
+
+```bash
+# [Write] .claude/settings.local.json を作成
+```
+
+### Step 4: format-code.sh を生成
+
+```bash
+# [Write] .claude/hooks/format-code.sh を作成（プロジェクトタイプに応じた内容）
+```
+
+### Step 5: 実行権限を付与
+
+```bash
+# [Bash] 実行権限を付与
+chmod +x .claude/hooks/format-code.sh
+```
+
+### Step 6: 結果を報告
+
+セットアップ完了後、ユーザーに結果を報告。
+
+---
+
+## 生成ファイルの内容
 
 #### `.claude/settings.local.json`
 
