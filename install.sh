@@ -202,6 +202,7 @@ setup_claude_skills() {
         "claude-code-guide"
         "db-query"
         "first-principles"
+        "merge-pr"
         "project-setup"
         "quick-commit"
         "review-changes"
