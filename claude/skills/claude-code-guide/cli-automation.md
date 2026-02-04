@@ -1,72 +1,72 @@
-# ツール自動承認 (CLI)
+# Tool Auto-Approval (CLI)
 
-非対話モード（CI/CD等）でツール実行を自動承認。
+Auto-approve tool execution in non-interactive mode (CI/CD etc.).
 
-## 基本的な使い方
+## Basic Usage
 
 ```bash
-# ツール自動承認
+# Tool auto-approval
 claude -p "Fix the bug" --allowedTools "Read,Edit,Bash"
 
-# 特定コマンドのみ許可
+# Allow specific commands only
 claude -p "Create commit" \
   --allowedTools "Bash(git diff:*),Bash(git commit:*)"
 
-# 構造化JSON出力
+# Structured JSON output
 claude -p "Extract functions" \
   --output-format json \
   --json-schema '{"type":"object","properties":{"functions":{"type":"array"}}}'
 
-# 会話継続
+# Continue conversation
 claude -p "Start task" --continue
 ```
 
-## 利用可能なツール
+## Available Tools
 
-### 基本ツール
+### Basic Tools
 
-| ツール | 説明 |
-|--------|------|
-| `Read` | ファイル読み取り |
-| `Edit` | ファイル編集 |
-| `Write` | ファイル作成 |
-| `Bash` | コマンド実行 |
-| `Glob` | ファイル検索 |
-| `Grep` | テキスト検索 |
+| Tool | Description |
+|------|-------------|
+| `Read` | File reading |
+| `Edit` | File editing |
+| `Write` | File creation |
+| `Bash` | Command execution |
+| `Glob` | File search |
+| `Grep` | Text search |
 
-### 制限付きツール
+### Restricted Tools
 
 ```bash
-# git コマンドのみ許可
+# Allow only git commands
 --allowedTools "Bash(git:*)"
 
-# npm コマンドのみ許可
+# Allow only npm commands
 --allowedTools "Bash(npm:*)"
 
-# 特定のコマンドパターン
+# Specific command patterns
 --allowedTools "Bash(git diff:*),Bash(git commit:*)"
 ```
 
-### エージェントツール
+### Agent Tools
 
 ```bash
-# すべてのエージェント
+# All agents
 --allowedTools "Task"
 
-# 特定のエージェントのみ
+# Specific agent only
 --allowedTools "Task(agent-name)"
 ```
 
-### その他のツール
+### Other Tools
 
-| ツール | 説明 |
-|--------|------|
-| `Skill` | スキル呼び出し |
-| `AskUserQuestion` | ユーザーへの質問 |
+| Tool | Description |
+|------|-------------|
+| `Skill` | Skill invocation |
+| `AskUserQuestion` | Ask user question |
 
-## 出力フォーマット
+## Output Formats
 
-### JSON出力
+### JSON Output
 
 ```bash
 claude -p "List files" \
@@ -74,13 +74,13 @@ claude -p "List files" \
   --json-schema '{"type":"object","properties":{"files":{"type":"array","items":{"type":"string"}}}}'
 ```
 
-### テキスト出力（デフォルト）
+### Text Output (default)
 
 ```bash
 claude -p "Explain the code"
 ```
 
-## CI/CD での使用例
+## CI/CD Usage Examples
 
 ### GitHub Actions
 
@@ -92,16 +92,16 @@ claude -p "Explain the code"
       --output-format json
 ```
 
-### 環境変数
+### Environment Variables
 
 ```bash
 export ANTHROPIC_API_KEY="your-key"
 claude -p "Your prompt"
 ```
 
-## セキュリティ考慮事項
+## Security Considerations
 
-1. **最小権限の原則**: 必要なツールのみ許可
-2. **コマンド制限**: `Bash(command:*)` で特定コマンドに制限
-3. **出力検証**: JSON スキーマで出力を検証
-4. **シークレット管理**: API キーは環境変数で管理
+1. **Principle of least privilege**: Allow only necessary tools
+2. **Command restrictions**: Restrict to specific commands with `Bash(command:*)`
+3. **Output validation**: Validate output with JSON schema
+4. **Secret management**: Manage API keys via environment variables

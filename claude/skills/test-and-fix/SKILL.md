@@ -1,157 +1,157 @@
 ---
 name: test-and-fix
-description: "テスト実行と失敗時の自動修復ループ。テストを実行し、失敗があれば原因を分析して修正を試みる。トリガー: /test-and-fix, テスト修復, CI修復"
+description: "Test execution and automatic repair loop on failure. Runs tests, analyzes cause if failed, and attempts to fix. Triggers: /test-and-fix, test repair, CI repair"
 user-invocable: true
 allowed-tools: Read, Edit, Bash, Grep, Glob
 model: sonnet
 ---
 
-# テスト実行 & 自動修復
+# Test Execution & Auto-Repair
 
-テストを実行し、失敗した場合は原因を分析して自動修復を試みます。最大3回のループで問題解決を目指します。
+Executes tests and attempts automatic repair if they fail. Aims to resolve issues within a maximum of 3 loops.
 
-## テストコマンドの自動検出
+## Automatic Test Command Detection
 
-プロジェクトの構成ファイルから適切なテストコマンドを検出:
+Detects appropriate test command from project configuration files:
 
-| ファイル | テストコマンド |
-|---------|---------------|
-| package.json | `npm test` または `npm run test` |
+| File | Test Command |
+|------|--------------|
+| package.json | `npm test` or `npm run test` |
 | go.mod | `go test ./...` |
 | Cargo.toml | `cargo test` |
-| pyproject.toml / setup.py | `pytest` または `python -m pytest` |
+| pyproject.toml / setup.py | `pytest` or `python -m pytest` |
 | Gemfile | `bundle exec rspec` |
 | Makefile (test target) | `make test` |
 
-## 実行フロー
+## Execution Flow
 
 ```
 ┌─────────────────────────────────────┐
-│ 1. テストコマンドを検出             │
+│ 1. Detect test command              │
 └─────────────────┬───────────────────┘
                   ▼
 ┌─────────────────────────────────────┐
-│ 2. テストを実行                     │
+│ 2. Execute tests                    │
 └─────────────────┬───────────────────┘
                   ▼
           ┌───────────────┐
-          │ テスト成功？  │
+          │ Tests passed? │
           └───────┬───────┘
          Yes      │      No
           │       │       │
           ▼       │       ▼
       ┌───────┐   │   ┌─────────────────────────────────┐
-      │ 完了  │   │   │ 3. エラーメッセージを解析       │
+      │ Done  │   │   │ 3. Analyze error messages       │
       └───────┘   │   └─────────────────┬───────────────┘
                   │                     ▼
                   │   ┌─────────────────────────────────┐
-                  │   │ 4. 関連ファイルを特定           │
+                  │   │ 4. Identify related files       │
                   │   └─────────────────┬───────────────┘
                   │                     ▼
                   │   ┌─────────────────────────────────┐
-                  │   │ 5. 修正を適用                   │
+                  │   │ 5. Apply fixes                  │
                   │   └─────────────────┬───────────────┘
                   │                     ▼
                   │         ┌───────────────────┐
-                  │         │ ループ回数 < 3?   │
+                  │         │ Loop count < 3?   │
                   │         └─────────┬─────────┘
                   │                Yes │ No
                   │                   │  │
                   │                   ▼  ▼
-                  └───────────────────┘  失敗レポート
+                  └───────────────────┘  Failure Report
 ```
 
-## エラー解析パターン
+## Error Analysis Patterns
 
 ### TypeScript / JavaScript
 ```
-# 型エラー
+# Type error
 TS2322: Type 'X' is not assignable to type 'Y'
-→ 型定義の修正
+→ Fix type definition
 
-# 未定義エラー
+# Undefined error
 Cannot find name 'X'
-→ import追加 or 変数定義
+→ Add import or variable definition
 
-# プロパティアクセス
+# Property access
 Property 'X' does not exist on type 'Y'
-→ 型拡張 or オプショナルチェーン
+→ Type extension or optional chaining
 ```
 
 ### Go
 ```
-# 未定義エラー
+# Undefined error
 undefined: X
-→ import追加 or 宣言
+→ Add import or declaration
 
-# 型エラー
+# Type error
 cannot use X (type A) as type B
-→ 型変換 or インターフェース実装
+→ Type conversion or interface implementation
 ```
 
 ### Python
 ```
-# Import エラー
+# Import error
 ModuleNotFoundError: No module named 'X'
-→ import修正 or 依存追加
+→ Fix import or add dependency
 
-# 属性エラー
+# Attribute error
 AttributeError: 'X' object has no attribute 'Y'
-→ メソッド/属性の追加
+→ Add method/attribute
 ```
 
-## 出力形式
+## Output Format
 
 ```markdown
-## テスト修復レポート
+## Test Repair Report
 
-### 実行環境
-- **プロジェクト**: <project-name>
-- **テストコマンド**: `npm test`
-- **開始時刻**: YYYY-MM-DD HH:MM
+### Execution Environment
+- **Project**: <project-name>
+- **Test Command**: `npm test`
+- **Start Time**: YYYY-MM-DD HH:MM
 
 ---
 
-### 修復ループ
+### Repair Loop
 
-#### ループ 1
-**結果**: ❌ 5 tests failed
+#### Loop 1
+**Result**: ❌ 5 tests failed
 
-**エラー概要**:
+**Error Summary**:
 - `src/api.test.ts`: TypeError - Cannot read property 'data' of undefined
 - `src/handler.test.ts`: AssertionError - Expected 200 but got 500
 
-**修正内容**:
-1. `src/api.ts:45` - nullチェックを追加
-2. `src/handler.ts:78` - エラーハンドリングを修正
+**Fixes Applied**:
+1. `src/api.ts:45` - Added null check
+2. `src/handler.ts:78` - Fixed error handling
 
 ---
 
-#### ループ 2
-**結果**: ❌ 2 tests failed
+#### Loop 2
+**Result**: ❌ 2 tests failed
 
-**エラー概要**:
+**Error Summary**:
 - `src/handler.test.ts`: AssertionError - Expected 'success' but got 'error'
 
-**修正内容**:
-1. `src/handler.ts:92` - レスポンスステータスを修正
+**Fixes Applied**:
+1. `src/handler.ts:92` - Fixed response status
 
 ---
 
-#### ループ 3
-**結果**: ✅ All tests passed
+#### Loop 3
+**Result**: ✅ All tests passed
 
 ---
 
-### 最終結果
+### Final Result
 
-**ステータス**: ✅ 成功
-**修復ループ**: 3回
-**修正ファイル**:
-- src/api.ts (1箇所)
-- src/handler.ts (2箇所)
+**Status**: ✅ Success
+**Repair Loops**: 3
+**Files Modified**:
+- src/api.ts (1 location)
+- src/handler.ts (2 locations)
 
-### 修正差分
+### Fix Diff
 
 ```diff
 // src/api.ts
@@ -164,27 +164,27 @@ AttributeError: 'X' object has no attribute 'Y'
 ```
 ```
 
-## 制限事項
+## Limitations
 
-- **最大3回のループ**: 無限ループを防止
-- **自動修正の範囲**:
-  - 型エラー、nullチェック、import追加などの軽微な修正
-  - ビジネスロジックの変更は行わない
-- **テスト追加**: 既存テストの修復のみ、新規テスト作成は行わない
+- **Maximum 3 loops**: Prevents infinite loops
+- **Auto-fix scope**:
+  - Minor fixes like type errors, null checks, import additions
+  - Does not change business logic
+- **Test creation**: Only repairs existing tests, does not create new tests
 
-## 使用方法
+## Usage
 
 ```
-/test-and-fix              # 自動検出したコマンドでテスト実行
-/test-and-fix npm test     # 指定したコマンドでテスト実行
-/test-and-fix --dry-run    # 修正内容の確認のみ（適用しない）
+/test-and-fix              # Run tests with auto-detected command
+/test-and-fix npm test     # Run tests with specified command
+/test-and-fix --dry-run    # Preview fixes only (don't apply)
 ```
 
-## 失敗時の対応
+## When Fix Fails
 
-3回のループで解決できなかった場合:
+If not resolved after 3 loops:
 
-1. 残りのエラーを詳細にレポート
-2. 手動修正が必要な箇所を特定
-3. 修正のヒントを提供
-4. 関連ドキュメントへのリンクを提示
+1. Report remaining errors in detail
+2. Identify locations requiring manual fix
+3. Provide fix hints
+4. Present links to related documentation

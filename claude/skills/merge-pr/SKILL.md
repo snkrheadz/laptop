@@ -1,30 +1,30 @@
 ---
 name: merge-pr
-description: "PR をマージし、worktree とローカルブランチをクリーンアップする。トリガー: /merge-pr, PRマージ, worktreeクリーンアップ"
+description: "Merge PR and cleanup worktree and local branch. Triggers: /merge-pr, PR merge, worktree cleanup"
 user-invocable: true
 allowed-tools: Bash
 ---
 
 # /merge-pr
 
-PRマージとworktreeクリーンアップを一括実行。
+Execute PR merge and worktree cleanup in one command.
 
-## 使い方
+## Usage
 
 ```
 /merge-pr 42
 ```
 
-## 実行フロー
+## Execution Flow
 
-1. 現在のworktreeパスとブランチ名を取得
-2. メインリポジトリに移動
-3. worktree削除: `git worktree remove <path>`
-4. ローカルブランチ削除: `git branch -D <branch>`
-5. PRマージ: `gh pr merge <num> --merge --delete-branch`
-6. main更新: `git pull origin main`
+1. Get current worktree path and branch name
+2. Move to main repository
+3. Remove worktree: `git worktree remove <path>`
+4. Delete local branch: `git branch -D <branch>`
+5. Merge PR: `gh pr merge <num> --merge --delete-branch`
+6. Update main: `git pull origin main`
 
-## 注意
+## Notes
 
-- worktree内から実行した場合、自動でメインリポに移動する
-- マージ前に未コミットの変更がないことを確認する
+- If executed from within a worktree, automatically moves to main repo
+- Ensure no uncommitted changes before merging

@@ -1,17 +1,17 @@
-# プラグイン (Plugins)
+# Plugins
 
-複数プロジェクト間で共有する拡張機能パッケージ。
+Extension packages shared across multiple projects.
 
-## ディレクトリ構造
+## Directory Structure
 
 ```
 my-plugin/
 ├── .claude-plugin/
-│   └── plugin.json         # 必須
-├── commands/               # スラッシュコマンド
+│   └── plugin.json         # Required
+├── commands/               # Slash commands
 │   └── hello.md
-├── agents/                 # サブエージェント
-├── skills/                 # スキル
+├── agents/                 # Sub-agents
+├── skills/                 # Skills
 └── hooks/
     └── hooks.json
 ```
@@ -21,43 +21,43 @@ my-plugin/
 ```json
 {
   "name": "plugin-name",
-  "description": "説明",
+  "description": "Description",
   "version": "1.0.0"
 }
 ```
 
-## スラッシュコマンド
+## Slash Commands
 
-### 基本テンプレート
+### Basic Template
 
 ```markdown
 # commands/review.md
 ---
-description: コードレビュー
+description: Code review
 ---
-$ARGUMENTS のコードをレビュー...
+Review $ARGUMENTS code...
 ```
 
-### 変数
+### Variables
 
-- `$ARGUMENTS` - コマンド呼び出し時の引数
-- `$FILE_PATH` - 現在のファイルパス（該当する場合）
+- `$ARGUMENTS` - Arguments when command is invoked
+- `$FILE_PATH` - Current file path (if applicable)
 
-## テスト方法
+## Testing Method
 
 ```bash
-# ローカルプラグインをテスト
+# Test local plugin
 claude --plugin-dir ./my-plugin
 
-# コマンド呼び出し
+# Invoke command
 /plugin-name:command
 ```
 
-## プロジェクトレベルでのプラグイン有効化
+## Enabling Plugins at Project Level
 
-グローバル設定で無効化されているプラグインをプロジェクト単位で有効化できる。
+Plugins disabled globally can be enabled per-project.
 
-### 設定ファイル
+### Configuration File
 
 `.claude/settings.local.json`:
 
@@ -75,15 +75,15 @@ claude --plugin-dir ./my-plugin
 }
 ```
 
-## 利用可能なプラグイン（デフォルト無効）
+## Available Plugins (Disabled by Default)
 
-| プラグイン | 説明 | 用途 |
-|-----------|------|------|
-| `playwright@claude-plugins-official` | ブラウザ自動化 | Web開発プロジェクト |
-| `github@claude-plugins-official` | GitHub連携 | gh CLI推奨のため通常無効 |
+| Plugin | Description | Use Case |
+|--------|-------------|----------|
+| `playwright@claude-plugins-official` | Browser automation | Web development projects |
+| `github@claude-plugins-official` | GitHub integration | Usually disabled (gh CLI recommended) |
 
-## プラグイン配布
+## Plugin Distribution
 
-1. GitHub リポジトリにプラグインを公開
-2. ユーザーは `~/.claude/plugins/` にクローン
-3. または `claude --plugin-dir` で一時的に読み込み
+1. Publish plugin to GitHub repository
+2. Users clone to `~/.claude/plugins/`
+3. Or load temporarily with `claude --plugin-dir`

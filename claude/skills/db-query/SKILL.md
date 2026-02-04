@@ -1,34 +1,34 @@
 ---
 name: db-query
-description: "データベースクエリ・分析支援。SQLクエリの作成、実行、結果の分析を行う。BigQuery、PostgreSQL、MySQL対応。トリガー: /db-query, SQL, クエリ, データ分析, BigQuery"
+description: "Database query and analysis support. Creates, executes, and analyzes SQL queries. Supports BigQuery, PostgreSQL, MySQL. Triggers: /db-query, SQL, query, data analysis, BigQuery"
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob
 model: sonnet
 ---
 
-# データベースクエリ・分析スキル
+# Database Query & Analysis Skill
 
-SQLクエリの作成、実行、結果の分析を支援します。
+Supports SQL query creation, execution, and result analysis.
 
-## 対応データベース
+## Supported Databases
 
-| DB | CLIツール | 接続方法 |
-|----|----------|---------|
+| DB | CLI Tool | Connection Method |
+|----|----------|-------------------|
 | BigQuery | `bq` | `bq query --use_legacy_sql=false` |
 | PostgreSQL | `psql` | `psql -h host -U user -d db` |
 | MySQL | `mysql` | `mysql -h host -u user -p db` |
 | SQLite | `sqlite3` | `sqlite3 file.db` |
 
-## 機能
+## Features
 
-### 1. クエリ作成支援
+### 1. Query Creation Support
 
-自然言語からSQLを生成:
+Generate SQL from natural language:
 
 ```
-ユーザー: 「先月のアクティブユーザー数を日別で」
+User: "Daily active users for last month"
 
-生成SQL:
+Generated SQL:
 SELECT
   DATE(created_at) AS date,
   COUNT(DISTINCT user_id) AS active_users
@@ -39,7 +39,7 @@ GROUP BY date
 ORDER BY date;
 ```
 
-### 2. クエリ実行
+### 2. Query Execution
 
 ```bash
 # BigQuery
@@ -54,31 +54,31 @@ psql -c "SELECT ..." -h $DB_HOST -U $DB_USER -d $DB_NAME
 mysql -e "SELECT ..." -h $DB_HOST -u $DB_USER -p$DB_PASS $DB_NAME
 ```
 
-### 3. 結果分析
+### 3. Result Analysis
 
 ```markdown
-## クエリ結果分析
+## Query Result Analysis
 
-### データサマリー
-- **行数**: 1,234
-- **期間**: 2025-01-01 〜 2025-01-31
+### Data Summary
+- **Rows**: 1,234
+- **Period**: 2025-01-01 to 2025-01-31
 
-### 主要な発見
-1. 1/15に急増（前日比 +150%）
-2. 週末は平日の60%程度
-3. 平均: 1,000 users/day
+### Key Findings
+1. Spike on 1/15 (+150% from previous day)
+2. Weekends are about 60% of weekdays
+3. Average: 1,000 users/day
 
-### 可視化
-| 日付 | ユーザー数 | 傾向 |
-|------|-----------|------|
-| 1/1  | 500       | ▂ |
-| 1/2  | 800       | ▅ |
-| 1/15 | 2000      | █ |
+### Visualization
+| Date | Users | Trend |
+|------|-------|-------|
+| 1/1  | 500   | ▂ |
+| 1/2  | 800   | ▅ |
+| 1/15 | 2000  | █ |
 ```
 
-## クエリパターン集
+## Query Pattern Collection
 
-### ユーザー分析
+### User Analysis
 
 ```sql
 -- DAU/WAU/MAU
@@ -88,7 +88,7 @@ SELECT
   COUNT(DISTINCT CASE WHEN ts >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY) THEN user_id END) AS mau
 FROM events;
 
--- リテンション
+-- Retention
 WITH cohort AS (
   SELECT
     user_id,
@@ -105,10 +105,10 @@ LEFT JOIN events e ON c.user_id = e.user_id
 GROUP BY cohort_date;
 ```
 
-### パフォーマンス分析
+### Performance Analysis
 
 ```sql
--- スロークエリ (PostgreSQL)
+-- Slow queries (PostgreSQL)
 SELECT
   query,
   calls,
@@ -118,7 +118,7 @@ FROM pg_stat_statements
 ORDER BY total_time DESC
 LIMIT 10;
 
--- テーブルサイズ
+-- Table sizes
 SELECT
   schemaname,
   tablename,
@@ -128,10 +128,10 @@ ORDER BY pg_total_relation_size(schemaname || '.' || tablename) DESC
 LIMIT 10;
 ```
 
-### エラー分析
+### Error Analysis
 
 ```sql
--- エラー頻度
+-- Error frequency
 SELECT
   error_code,
   error_message,
@@ -144,99 +144,99 @@ GROUP BY error_code, error_message
 ORDER BY count DESC;
 ```
 
-## 出力形式
+## Output Format
 
 ```markdown
-## クエリ実行結果
+## Query Execution Result
 
-### クエリ
+### Query
 ```sql
 SELECT ...
 ```
 
-### 実行情報
-- **データベース**: BigQuery / production
-- **実行時間**: 2.3秒
-- **スキャン量**: 1.2 GB
-- **結果行数**: 1,234
+### Execution Info
+- **Database**: BigQuery / production
+- **Execution Time**: 2.3s
+- **Scan Size**: 1.2 GB
+- **Result Rows**: 1,234
 
-### 結果
+### Results
 
 | date | active_users | change |
-|------|-------------|--------|
+|------|--------------|--------|
 | 2025-01-01 | 1,000 | - |
 | 2025-01-02 | 1,200 | +20% |
 | 2025-01-03 | 950 | -21% |
 
-### 分析
+### Analysis
 
-**トレンド**:
-- 全体的に横ばい
-- 週末に減少傾向
+**Trend**:
+- Overall flat
+- Decreasing trend on weekends
 
-**異常値**:
-- 1/15 に急増（イベント影響？）
+**Anomalies**:
+- Spike on 1/15 (event impact?)
 
-**推奨アクション**:
-1. 1/15 の急増要因を調査
-2. 週末施策の検討
+**Recommended Actions**:
+1. Investigate cause of 1/15 spike
+2. Consider weekend campaigns
 ```
 
-## セキュリティ注意事項
+## Security Considerations
 
-### 必須ルール
+### Required Rules
 
-- **SELECT文のみ実行**: DELETE, UPDATE, DROP, INSERT, TRUNCATE, ALTER は絶対に実行しない
-- **本番DBへの直接接続は避ける**: 可能な限りレプリカを使用
-- **結果の取り扱い**: 個人情報を含む場合は注意
-- **クエリログ**: 実行したクエリは記録される前提で
+- **Execute SELECT only**: NEVER execute DELETE, UPDATE, DROP, INSERT, TRUNCATE, ALTER
+- **Avoid direct production DB connection**: Use replicas when possible
+- **Handle results carefully**: Be careful with personal information
+- **Query logs**: Assume all executed queries are logged
 
-### 安全なクエリ実行
+### Safe Query Execution
 
 ```bash
-# PostgreSQL: 読み取り専用トランザクションを使用
+# PostgreSQL: Use read-only transaction
 psql -c "SET TRANSACTION READ ONLY; SELECT ..." -h $DB_HOST -U $DB_USER -d $DB_NAME
 
-# MySQL: 読み取り専用フラグ
+# MySQL: Read-only flag
 mysql --safe-updates -e "SELECT ..." -h $DB_HOST -u $DB_USER $DB_NAME
 
-# BigQuery: ドライランで事前確認
+# BigQuery: Dry run for pre-check
 bq query --dry_run --use_legacy_sql=false 'SELECT ...'
 ```
 
-### 禁止パターン検出
+### Prohibited Pattern Detection
 
-実行前にクエリを検証し、以下のパターンが含まれる場合は**実行を拒否**:
+Validate query before execution, **refuse execution** if contains:
 
 - `DELETE`, `UPDATE`, `INSERT`, `DROP`, `TRUNCATE`, `ALTER`, `CREATE`
-- `; --` (SQLインジェクションパターン)
-- `GRANT`, `REVOKE` (権限操作)
+- `; --` (SQL injection pattern)
+- `GRANT`, `REVOKE` (permission operations)
 
-## BigQuery 固有
+## BigQuery Specific
 
 ```bash
-# テーブル一覧
+# List tables
 bq ls project:dataset
 
-# スキーマ確認
+# Check schema
 bq show --schema project:dataset.table
 
-# クエリ実行（ドライラン）
+# Execute query (dry run)
 bq query --dry_run --use_legacy_sql=false 'SELECT ...'
 
-# 結果をテーブルに保存
+# Save results to table
 bq query --destination_table=project:dataset.result 'SELECT ...'
 ```
 
-## 使用方法
+## Usage
 
 ```bash
-# 自然言語でクエリ作成
-/db-query 先月のDAUを日別で出して
+# Create query from natural language
+/db-query show daily DAU for last month
 
-# SQLを直接実行
+# Execute SQL directly
 /db-query --execute "SELECT COUNT(*) FROM users"
 
-# スキーマ確認
+# Check schema
 /db-query --schema users
 ```

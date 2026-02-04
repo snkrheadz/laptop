@@ -1,52 +1,52 @@
 ---
 name: quick-commit
-description: "簡易コミット。変更をステージング、コミットメッセージ生成、コミット実行を一括で行う。PRは作成しない。トリガー: /quick-commit, クイックコミット, 簡易コミット"
+description: "Quick commit. Stages changes, generates commit message, and executes commit in one action. Does not create PR. Triggers: /quick-commit, quick commit, simple commit"
 user-invocable: true
 allowed-tools: Bash, Read, Grep
 model: haiku
 ---
 
-# クイックコミット
+# Quick Commit
 
-変更をサッと一括コミットするためのスキル。PRは作成せず、ローカルコミットのみ。
+A skill for quickly committing changes in bulk. Local commit only, does not create PR.
 
-## ユースケース
+## Use Cases
 
-- 作業途中の保存ポイント
-- 小さな修正の即コミット
-- WIP (Work In Progress) コミット
+- Save point during work in progress
+- Instant commit for small fixes
+- WIP (Work In Progress) commits
 
-## 実行フロー
+## Execution Flow
 
 ```bash
-# 1. 変更確認
+# 1. Check changes
 git status
 git diff --stat
 
-# 2. 全変更をステージング
+# 2. Stage all changes
 git add -A
 
-# 3. コミットメッセージ生成
-# 変更内容から自動生成
+# 3. Generate commit message
+# Auto-generated from change contents
 
-# 4. コミット実行
+# 4. Execute commit
 git commit -m "<message>"
 ```
 
-## コミットメッセージ規則
+## Commit Message Rules
 
-### 自動判定
+### Auto-Detection
 
-| 変更パターン | Prefix |
-|-------------|--------|
-| 新規ファイル追加 | `feat:` |
-| バグ修正、エラー対応 | `fix:` |
-| テストファイル | `test:` |
-| ドキュメント (.md) | `docs:` |
-| 設定ファイル | `chore:` |
-| リファクタリング | `refactor:` |
+| Change Pattern | Prefix |
+|----------------|--------|
+| New file added | `feat:` |
+| Bug fix, error handling | `fix:` |
+| Test files | `test:` |
+| Documentation (.md) | `docs:` |
+| Configuration files | `chore:` |
+| Refactoring | `refactor:` |
 
-### メッセージ生成例
+### Message Generation Example
 
 ```
 feat: add user authentication module
@@ -56,22 +56,22 @@ feat: add user authentication module
 - Add password hashing
 ```
 
-## 出力形式
+## Output Format
 
 ```markdown
-## クイックコミット完了
+## Quick Commit Complete
 
-### 変更サマリー
-- **追加**: 3 files
-- **変更**: 2 files
-- **削除**: 1 file
+### Change Summary
+- **Added**: 3 files
+- **Modified**: 2 files
+- **Deleted**: 1 file
 
-### コミット情報
-- **ハッシュ**: abc1234
-- **メッセージ**: feat: add user authentication module
-- **ブランチ**: feature/auth
+### Commit Information
+- **Hash**: abc1234
+- **Message**: feat: add user authentication module
+- **Branch**: feature/auth
 
-### 変更ファイル
+### Changed Files
 ```
 A  src/auth/login.ts
 A  src/auth/token.ts
@@ -81,38 +81,38 @@ M  src/types/index.ts
 D  src/deprecated/old-auth.ts
 ```
 
-### 次のアクション
-- `git push` でリモートにプッシュ
-- `/commit-commands:commit-push-pr` でPR作成
+### Next Actions
+- `git push` to push to remote
+- `/commit-commands:commit-push-pr` to create PR
 ```
 
-## オプション
+## Options
 
 ```bash
-# メッセージ指定
+# Specify message
 /quick-commit fix: resolve null pointer exception
 
-# WIPコミット
+# WIP commit
 /quick-commit --wip
-# → "WIP: work in progress" でコミット
+# → Commits with "WIP: work in progress"
 
-# 特定ファイルのみ
+# Specific files only
 /quick-commit src/api/
 ```
 
-## 注意事項
+## Notes
 
-- **機密ファイル除外**: .env, credentials等は自動除外
-- **大量変更時は確認**: 50ファイル以上の変更は確認を求める
-- **PRは作成しない**: PRが必要な場合は `/commit-commands:commit-push-pr` を使用
-- **amend非対応**: 常に新規コミット（amend は明示的に実行）
+- **Sensitive file exclusion**: .env, credentials etc. are auto-excluded
+- **Confirmation for large changes**: Prompts for confirmation when 50+ files changed
+- **Does not create PR**: Use `/commit-commands:commit-push-pr` if PR is needed
+- **No amend support**: Always creates new commit (use explicit command for amend)
 
-## commit-push-pr との違い
+## Difference from commit-push-pr
 
-| 機能 | quick-commit | commit-push-pr |
-|------|--------------|----------------|
-| ステージング | ✅ | ✅ |
-| コミット | ✅ | ✅ |
-| プッシュ | ❌ | ✅ |
-| PR作成 | ❌ | ✅ |
-| 用途 | 作業途中の保存 | 完成した変更の公開 |
+| Feature | quick-commit | commit-push-pr |
+|---------|--------------|----------------|
+| Staging | ✅ | ✅ |
+| Commit | ✅ | ✅ |
+| Push | ❌ | ✅ |
+| Create PR | ❌ | ✅ |
+| Use case | Save during work | Publish completed changes |

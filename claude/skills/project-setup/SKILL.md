@@ -1,68 +1,68 @@
 ---
 name: project-setup
-description: "プロジェクトのClaude Code設定をセットアップ。構成を検出し.claude/settings.local.jsonとhooksを生成。トリガー: /project-setup, プロジェクト設定, formatter設定, project configuration, setup formatter"
+description: "Set up Claude Code configuration for projects. Detects structure and generates .claude/settings.local.json and hooks. Triggers: /project-setup, project configuration, formatter setup, project configuration, setup formatter"
 user-invocable: true
 allowed-tools: Read, Bash, Glob, Grep, Write
 model: sonnet
 ---
 
-# プロジェクトセットアップスキル
+# Project Setup Skill
 
-プロジェクトの構成を検出し、適切なClaude Code設定を生成します。
+Detects project structure and generates appropriate Claude Code configuration.
 
-## 必須実行ステップ
+## Required Execution Steps
 
-**このスキルが呼び出されたら、以下のステップを順番に実行すること。**
+**When this skill is invoked, execute the following steps in order.**
 
-### Step 1: プロジェクトタイプを検出
+### Step 1: Detect Project Type
 
 ```bash
-# [Bash] 以下を実行してプロジェクトタイプを判定
+# [Bash] Execute the following to determine project type
 ls -la package.json go.mod Cargo.toml pyproject.toml 2>/dev/null
 ```
 
-検出結果に基づいてプロジェクトタイプを決定:
+Determine project type based on detection results:
 
-| 検出ファイル | プロジェクトタイプ | フォーマッター |
-|-------------|------------------|--------------|
+| Detected File | Project Type | Formatter |
+|---------------|--------------|-----------|
 | `package.json` | Node.js | prettier |
 | `go.mod` | Go | gofmt |
 | `Cargo.toml` | Rust | rustfmt |
 | `pyproject.toml` | Python | ruff |
 
-### Step 2: ディレクトリを作成
+### Step 2: Create Directory
 
 ```bash
-# [Bash] .claude/hooks ディレクトリを作成
+# [Bash] Create .claude/hooks directory
 mkdir -p .claude/hooks
 ```
 
-### Step 3: settings.local.json を生成
+### Step 3: Generate settings.local.json
 
 ```bash
-# [Write] .claude/settings.local.json を作成
+# [Write] Create .claude/settings.local.json
 ```
 
-### Step 4: format-code.sh を生成
+### Step 4: Generate format-code.sh
 
 ```bash
-# [Write] .claude/hooks/format-code.sh を作成（プロジェクトタイプに応じた内容）
+# [Write] Create .claude/hooks/format-code.sh (content based on project type)
 ```
 
-### Step 5: 実行権限を付与
+### Step 5: Grant Execute Permission
 
 ```bash
-# [Bash] 実行権限を付与
+# [Bash] Grant execute permission
 chmod +x .claude/hooks/format-code.sh
 ```
 
-### Step 6: 結果を報告
+### Step 6: Report Results
 
-セットアップ完了後、ユーザーに結果を報告。
+After setup completes, report results to user.
 
 ---
 
-## 生成ファイルの内容
+## Generated File Contents
 
 #### `.claude/settings.local.json`
 
@@ -86,9 +86,9 @@ chmod +x .claude/hooks/format-code.sh
 
 #### `.claude/hooks/format-code.sh`
 
-プロジェクトタイプに応じたフォーマットスクリプトを生成。
+Generate format script based on project type.
 
-**Node.js (prettier) の例:**
+**Node.js (prettier) example:**
 
 ```bash
 #!/bin/bash
@@ -98,7 +98,7 @@ file_path=$(echo "$input" | jq -r '.tool_input.file_path // empty' 2>/dev/null)
 
 case "$file_path" in
     *.ts|*.tsx|*.js|*.jsx|*.json|*.md|*.css|*.scss|*.html)
-        # ローカルprettier使用（npxより高速）
+        # Use local prettier (faster than npx)
         if [[ -f "node_modules/.bin/prettier" ]]; then
             node_modules/.bin/prettier --write "$file_path" 2>/dev/null || true
         fi
@@ -107,7 +107,7 @@ esac
 exit 0
 ```
 
-**Go (gofmt) の例:**
+**Go (gofmt) example:**
 
 ```bash
 #!/bin/bash
@@ -123,42 +123,42 @@ esac
 exit 0
 ```
 
-### 3. 出力形式
+### 3. Output Format
 
-セットアップ完了後、以下の形式で報告:
+After setup completes, report in the following format:
 
 ```markdown
-## プロジェクトセットアップ完了
+## Project Setup Complete
 
-### 検出結果
-- **タイプ**: Node.js (TypeScript)
-- **フォーマッター**: prettier
-- **実行方法**: node_modules/.bin/prettier（ローカル）
+### Detection Results
+- **Type**: Node.js (TypeScript)
+- **Formatter**: prettier
+- **Execution Method**: node_modules/.bin/prettier (local)
 
-### 生成ファイル
-- `.claude/settings.local.json` - フック設定
-- `.claude/hooks/format-code.sh` - フォーマットスクリプト
+### Generated Files
+- `.claude/settings.local.json` - Hook configuration
+- `.claude/hooks/format-code.sh` - Format script
 
-### .gitignore 追加推奨
-以下を`.gitignore`に追加することを推奨:
+### .gitignore Recommendation
+Recommend adding the following to `.gitignore`:
 ```
 .claude/settings.local.json
 ```
 
-### 動作確認
-ファイルを編集すると、自動的にフォーマッターが実行されます。
+### Verification
+When you edit a file, the formatter will run automatically.
 ```
 
-## 注意事項
+## Notes
 
-- `settings.local.json` はプロジェクト固有のため、`.gitignore` への追加を推奨
-- ローカルにフォーマッターがインストールされていない場合は `npm install` 等を案内
-- 複数のプロジェクトタイプが検出された場合は、適切なものを選択
+- `settings.local.json` is project-specific, so recommend adding to `.gitignore`
+- If formatter is not installed locally, guide to run `npm install` etc.
+- If multiple project types detected, select appropriate one
 
-## フォーマッター別の拡張子マッピング
+## Formatter Extension Mapping
 
-| フォーマッター | 対象拡張子 |
-|--------------|----------|
+| Formatter | Target Extensions |
+|-----------|-------------------|
 | prettier | `.ts`, `.tsx`, `.js`, `.jsx`, `.json`, `.md`, `.css`, `.scss`, `.html` |
 | gofmt | `.go` |
 | rustfmt | `.rs` |

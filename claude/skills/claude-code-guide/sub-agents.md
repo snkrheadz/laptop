@@ -1,66 +1,66 @@
-# サブエージェント (Sub-agents)
+# Sub-agents
 
-特定のタスクを委譲するカスタムエージェントを定義。
+Define custom agents that delegate specific tasks.
 
-## ファイル配置
+## File Placement
 
 ```
-~/.claude/agents/          # ユーザーレベル（全プロジェクト）
-.claude/agents/            # プロジェクトレベル（version control推奨）
+~/.claude/agents/          # User level (all projects)
+.claude/agents/            # Project level (version control recommended)
 ```
 
-## テンプレート
+## Template
 
 ```markdown
 ---
 name: agent-name
-description: エージェントの説明（いつ使うか）
+description: Agent description (when to use)
 tools: Read, Grep, Glob
 model: sonnet
 permissionMode: default
 ---
 
-指示内容...
+Instructions...
 ```
 
-## 設定オプション
+## Configuration Options
 
-| フィールド | 値 |
-|-----------|------|
-| `tools` | `Read`, `Edit`, `Write`, `Bash`, `Glob`, `Grep`, `Task` など |
+| Field | Values |
+|-------|--------|
+| `tools` | `Read`, `Edit`, `Write`, `Bash`, `Glob`, `Grep`, `Task`, etc. |
 | `model` | `sonnet`, `opus`, `haiku`, `inherit` |
 | `permissionMode` | `default`, `acceptEdits`, `dontAsk`, `bypassPermissions`, `plan` |
-| `hooks` | `PreToolUse`, `PostToolUse`, `Stop` イベント |
+| `hooks` | `PreToolUse`, `PostToolUse`, `Stop` events |
 
-## permissionMode 詳細
+## permissionMode Details
 
-| モード | 説明 |
-|--------|------|
-| `default` | 通常の権限確認 |
-| `acceptEdits` | 編集を自動承認 |
-| `dontAsk` | 確認なしで実行（危険） |
-| `bypassPermissions` | すべての権限をバイパス（危険） |
-| `plan` | 計画モード（実行しない） |
+| Mode | Description |
+|------|-------------|
+| `default` | Normal permission confirmation |
+| `acceptEdits` | Auto-approve edits |
+| `dontAsk` | Execute without confirmation (dangerous) |
+| `bypassPermissions` | Bypass all permissions (dangerous) |
+| `plan` | Plan mode (don't execute) |
 
-## 組み込みサブエージェント
+## Built-in Sub-agents
 
-- `Explore`: 読み取り専用、コードベース探索用
-- `Plan`: 計画立案用
-- `general-purpose`: 複雑なマルチステップタスク
+- `Explore`: Read-only, for codebase exploration
+- `Plan`: For planning
+- `general-purpose`: Complex multi-step tasks
 
-## 使用例
+## Usage Examples
 
-### Task tool での呼び出し
+### Invoking with Task tool
 
 ```json
 {
   "subagent_type": "agent-name",
-  "prompt": "タスクの説明",
-  "description": "短い説明（3-5語）"
+  "prompt": "Task description",
+  "description": "Short description (3-5 words)"
 }
 ```
 
-### エージェント内でのフック定義
+### Defining Hooks within Agent
 
 ```markdown
 ---

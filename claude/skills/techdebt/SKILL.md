@@ -1,133 +1,133 @@
 ---
 name: techdebt
-description: "技術的負債の検出と修正提案。重複コード、TODOコメント、未使用import、複雑度の高い関数を検出。トリガー: /techdebt, 技術的負債, コード品質チェック"
+description: "Technical debt detection and fix suggestions. Detects duplicate code, TODO comments, unused imports, and high-complexity functions. Triggers: /techdebt, technical debt, code quality check"
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
 model: sonnet
 ---
 
-# 技術的負債レポーター
+# Technical Debt Reporter
 
-コードベースの技術的負債を検出し、優先度付きのレポートを生成します。
+Detects technical debt in the codebase and generates a prioritized report.
 
-## 検出項目
+## Detection Items
 
-### 1. TODOコメント
+### 1. TODO Comments
 ```bash
-# 検出パターン
+# Detection pattern
 grep -rn "TODO\|FIXME\|HACK\|XXX\|TEMP" --include="*.ts" --include="*.js" --include="*.py" --include="*.go" --include="*.rb"
 ```
 
-### 2. 重複コード
-- 類似パターンの検出（5行以上の重複）
-- コピペの痕跡
+### 2. Duplicate Code
+- Detection of similar patterns (5+ lines of duplication)
+- Evidence of copy-paste
 
-### 3. 未使用コード
-- 未使用の import/require
-- 未使用の変数・関数・クラス
-- デッドコード（到達不能なコード）
+### 3. Unused Code
+- Unused imports/requires
+- Unused variables, functions, classes
+- Dead code (unreachable code)
 
-### 4. 長すぎる関数
-- 100行以上の関数を検出
-- パラメータが6個以上の関数
+### 4. Functions Too Long
+- Detect functions over 100 lines
+- Functions with 6+ parameters
 
-### 5. 深いネスト
-- 4階層以上のネストを検出
-- 複雑な条件分岐
+### 5. Deep Nesting
+- Detect nesting 4 levels or deeper
+- Complex conditional branches
 
-### 6. マジックナンバー
-- 意味不明な数値リテラル
-- ハードコードされた文字列
+### 6. Magic Numbers
+- Unexplained numeric literals
+- Hard-coded strings
 
-### 7. 古い依存関係
-- package.json / go.mod / requirements.txt の outdated チェック
-- セキュリティ脆弱性のある依存
+### 7. Outdated Dependencies
+- Check outdated packages in package.json / go.mod / requirements.txt
+- Dependencies with security vulnerabilities
 
-## 実行フロー
+## Execution Flow
 
-1. 対象ディレクトリを特定（引数がなければ src/ または現在ディレクトリ）
-2. 各検出項目を並列で実行
-3. 結果を集計・優先度付け
-4. レポートを生成
+1. Identify target directory (src/ or current directory if no argument)
+2. Execute each detection item in parallel
+3. Aggregate and prioritize results
+4. Generate report
 
-## 優先度の基準
+## Priority Criteria
 
-| 優先度 | 条件 |
-|--------|------|
-| 高 | セキュリティリスク、本番障害の可能性 |
-| 中 | 保守性低下、バグの温床になりやすい |
-| 低 | コード品質向上、リファクタリング推奨 |
+| Priority | Condition |
+|----------|-----------|
+| High | Security risk, potential production incident |
+| Medium | Maintainability degradation, likely to become bug source |
+| Low | Code quality improvement, recommended refactoring |
 
-## 出力形式
+## Output Format
 
 ```markdown
-## 技術的負債レポート
+## Technical Debt Report
 
-**スキャン日時**: YYYY-MM-DD HH:MM
-**対象**: <directory>
-**ファイル数**: N files
+**Scan Date**: YYYY-MM-DD HH:MM
+**Target**: <directory>
+**File Count**: N files
 
 ---
 
-### サマリー
+### Summary
 
-| カテゴリ | 件数 | 優先度高 | 優先度中 | 優先度低 |
-|---------|------|---------|---------|---------|
+| Category | Count | High | Medium | Low |
+|----------|-------|------|--------|-----|
 | TODO | 5 | 1 | 2 | 2 |
-| 重複コード | 3 | 0 | 3 | 0 |
-| 未使用コード | 8 | 0 | 2 | 6 |
-| 長い関数 | 2 | 0 | 2 | 0 |
-| 深いネスト | 4 | 1 | 3 | 0 |
-| マジックナンバー | 6 | 0 | 0 | 6 |
+| Duplicate Code | 3 | 0 | 3 | 0 |
+| Unused Code | 8 | 0 | 2 | 6 |
+| Long Functions | 2 | 0 | 2 | 0 |
+| Deep Nesting | 4 | 1 | 3 | 0 |
+| Magic Numbers | 6 | 0 | 0 | 6 |
 
-**合計**: 28件 (高:2, 中:12, 低:14)
-
----
-
-### 詳細
-
-#### TODO (5件)
-
-| ファイル | 行 | 内容 | 優先度 |
-|---------|-----|------|-------|
-| src/api.ts | 45 | TODO: エラーハンドリング追加 | 高 |
-| src/util.ts | 12 | FIXME: レースコンディション | 中 |
-
-#### 重複コード (3件)
-
-| 場所1 | 場所2 | 行数 | 優先度 |
-|-------|-------|------|-------|
-| src/a.ts:10-30 | src/b.ts:45-65 | 20行 | 中 |
-
-#### 長い関数 (2件)
-
-| ファイル | 関数名 | 行数 | 優先度 |
-|---------|--------|------|-------|
-| src/handler.ts | processRequest | 150行 | 中 |
+**Total**: 28 items (High: 2, Medium: 12, Low: 14)
 
 ---
 
-### 改善推奨度
+### Details
 
-⭐⭐⭐⭐ (対応を強く推奨)
+#### TODO (5 items)
 
-### 次のアクション
+| File | Line | Content | Priority |
+|------|------|---------|----------|
+| src/api.ts | 45 | TODO: Add error handling | High |
+| src/util.ts | 12 | FIXME: Race condition | Medium |
 
-1. [高] src/api.ts:45 のエラーハンドリングを追加
-2. [高] src/handler.ts:78 の深いネストをリファクタリング
-3. [中] 重複コード3箇所を共通関数に抽出
+#### Duplicate Code (3 items)
+
+| Location 1 | Location 2 | Lines | Priority |
+|------------|------------|-------|----------|
+| src/a.ts:10-30 | src/b.ts:45-65 | 20 lines | Medium |
+
+#### Long Functions (2 items)
+
+| File | Function Name | Lines | Priority |
+|------|---------------|-------|----------|
+| src/handler.ts | processRequest | 150 lines | Medium |
+
+---
+
+### Improvement Recommendation
+
+⭐⭐⭐⭐ (Strongly recommended to address)
+
+### Next Actions
+
+1. [High] Add error handling at src/api.ts:45
+2. [High] Refactor deep nesting at src/handler.ts:78
+3. [Medium] Extract 3 duplicate code locations to common function
 ```
 
-## 使用方法
+## Usage
 
 ```
-/techdebt              # 現在のプロジェクト全体をスキャン
-/techdebt src/         # src/ ディレクトリのみ
-/techdebt --high-only  # 優先度高のみ表示
+/techdebt              # Scan entire current project
+/techdebt src/         # Scan only src/ directory
+/techdebt --high-only  # Show only high priority items
 ```
 
-## 注意事項
+## Notes
 
-- 大規模プロジェクトでは時間がかかる場合がある
-- 検出結果はヒューリスティクスに基づくため、誤検出の可能性がある
-- 自動修正は行わない（レポートのみ）
+- May take time for large projects
+- Detection results are based on heuristics, false positives possible
+- Does not perform automatic fixes (report only)
