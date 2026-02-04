@@ -1,6 +1,6 @@
 ---
 name: verify-app
-description: Application verification agent. Verifies UI and API behavior after implementation to confirm functionality works as expected. Triggers: verify app, test application, verify behavior, run app test, test UI
+description: "Application verification agent. Verifies UI and API behavior after implementation to confirm functionality works as expected. Triggers: verify app, test application, verify behavior, run app test, test UI"
 tools: Bash, Read, Grep, Glob, WebFetch
 model: sonnet
 ---

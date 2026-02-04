@@ -1,6 +1,6 @@
 ---
 name: code-simplifier
-description: Code simplification and deduplication agent. Reduces nesting, extracts repeated logic, and improves readability. Triggers: simplify code, remove duplicates, refactor code, reduce complexity
+description: "Code simplification and deduplication agent. Reduces nesting, extracts repeated logic, and improves readability. Triggers: simplify code, remove duplicates, refactor code, reduce complexity"
 tools: Read, Edit, Grep, Glob
 model: sonnet
 ---
