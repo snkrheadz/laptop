@@ -1,66 +1,66 @@
 ---
 name: claude-code-guide
-description: "Claude Code 拡張機能（サブエージェント、プラグイン、スキル）の作成・設定方法。トリガー: 拡張機能, agent作成, skill作成, plugin作成, CLI自動承認, headless, エージェント, プラグイン, スキル"
+description: "Claude Code extension (sub-agents, plugins, skills) creation and configuration guide. Triggers: extensions, agent creation, skill creation, plugin creation, CLI auto-approval, headless, agents, plugins, skills"
 user-invocable: true
 allowed-tools: Read
 model: haiku
 ---
 
-# Claude Code 拡張機能ガイド
+# Claude Code Extension Guide
 
-Claude Code の拡張機能を作成・設定するためのリファレンス。
+Reference for creating and configuring Claude Code extensions.
 
-## 概要
+## Overview
 
-| 拡張機能 | 用途 | 詳細 |
-|---------|------|------|
-| サブエージェント | 特定タスクを委譲するカスタムエージェント | sub-agents.md |
-| プラグイン | 複数プロジェクト間で共有する拡張パッケージ | plugins.md |
-| スキル | 自動選択・実行される条件付き処理 | skills.md |
-| CLI自動承認 | CI/CD向け非対話モード | cli-automation.md |
+| Extension | Purpose | Details |
+|-----------|---------|---------|
+| Sub-agents | Custom agents that delegate specific tasks | sub-agents.md |
+| Plugins | Extension packages shared across projects | plugins.md |
+| Skills | Condition-based processing auto-selected and executed | skills.md |
+| CLI Auto-approval | Non-interactive mode for CI/CD | cli-automation.md |
 
-## クイックリファレンス
+## Quick Reference
 
-### ファイル配置
+### File Placement
 
 ```
-~/.claude/                    # ユーザーレベル（全プロジェクト）
+~/.claude/                    # User level (all projects)
 ├── agents/agent-name.md
 ├── skills/skill-name/SKILL.md
 └── plugins/...
 
-.claude/                      # プロジェクトレベル（version control推奨）
+.claude/                      # Project level (version control recommended)
 ├── agents/agent-name.md
 └── skills/skill-name/SKILL.md
 ```
 
-### 組み込みサブエージェント
+### Built-in Sub-agents
 
-- `Explore`: 読み取り専用、コードベース探索用
-- `Plan`: 計画立案用
-- `general-purpose`: 複雑なマルチステップタスク
+- `Explore`: Read-only, for codebase exploration
+- `Plan`: For planning
+- `general-purpose`: Complex multi-step tasks
 
-## 詳細ドキュメント
+## Detailed Documentation
 
-各拡張機能の詳細は以下を参照:
+See the following for details on each extension:
 
-- `sub-agents.md` - サブエージェントの作成方法
-- `plugins.md` - プラグインの構造と設定
-- `skills.md` - スキルの定義とメタデータ
-- `cli-automation.md` - CLI自動承認とヘッドレスモード
+- `sub-agents.md` - How to create sub-agents
+- `plugins.md` - Plugin structure and configuration
+- `skills.md` - Skill definition and metadata
+- `cli-automation.md` - CLI auto-approval and headless mode
 
-## 公式ドキュメント
+## Official Documentation
 
-- [Sub-agents](https://code.claude.com/docs/ja/sub-agents)
-- [Plugins](https://code.claude.com/docs/ja/plugins)
-- [Skills](https://code.claude.com/docs/ja/skills)
-- [Headless/CLI](https://code.claude.com/docs/ja/headless)
-- [CHANGELOG](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md) - **最新機能の調査時は必ず確認**
+- [Sub-agents](https://code.claude.com/docs/sub-agents)
+- [Plugins](https://code.claude.com/docs/plugins)
+- [Skills](https://code.claude.com/docs/skills)
+- [Headless/CLI](https://code.claude.com/docs/headless)
+- [CHANGELOG](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md) - **Always check when researching latest features**
 
-## 調査時の注意
+## Research Notes
 
-Claude Code の機能や設定について調査する際は、必ず以下を確認すること:
+When researching Claude Code features and settings, always check:
 
-1. **CHANGELOG.md** - 最新バージョンで追加・変更された機能を把握
-2. **公式ドキュメント** - 上記リンク先で詳細仕様を確認
-3. **既存設定との整合性** - このリポジトリの設定と矛盾がないか確認
+1. **CHANGELOG.md** - Understand features added/changed in latest versions
+2. **Official documentation** - Verify detailed specs at links above
+3. **Consistency with existing settings** - Ensure no conflicts with this repository's settings

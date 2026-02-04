@@ -1,6 +1,6 @@
 ---
 name: first-principles
-description: "設計原則から再考。行き詰まった時に根本から考え直す。前提を疑い、本質的な解決策を探る。トリガー: /first-principles, 原点回帰, 根本から, ゼロベース"
+description: "Rethink from design principles. Go back to fundamentals when stuck. Question assumptions and explore essential solutions. Triggers: /first-principles, back to basics, from scratch, zero-base"
 user-invocable: true
 allowed-tools: Read, Grep, Glob, WebSearch
 model: sonnet
@@ -8,180 +8,180 @@ model: sonnet
 
 # First Principles Thinking
 
-行き詰まった時、複雑になりすぎた時に、根本から考え直すためのスキル。
+A skill for rethinking from fundamentals when stuck or things get too complex.
 
-## いつ使うか
+## When to Use
 
-- 実装が複雑になりすぎた
-- 何を作ろうとしていたか見失った
-- 技術的な解決策に固執している
-- トレードオフの判断に迷っている
-- 「なぜこうなっているのか」がわからなくなった
+- Implementation got too complex
+- Lost sight of what you were trying to build
+- Fixated on a technical solution
+- Struggling with trade-off decisions
+- Don't understand "why it's this way"
 
-## 思考フレームワーク
+## Thinking Framework
 
-### Step 1: 本質的な問題の特定
+### Step 1: Identify the Essential Problem
 
 ```markdown
-## 今、何を解決しようとしている？
+## What are we trying to solve right now?
 
-**表面的な問題**:
-（技術的な実装の話）
+**Surface problem**:
+(Technical implementation talk)
 
-**本質的な問題**:
-（ユーザー/ビジネスにとっての価値）
+**Essential problem**:
+(Value to user/business)
 
-**確認質問**:
-- この問題が解決されると、誰がどう嬉しい？
-- この機能がなかったら、どんな困りごとがある？
+**Verification questions**:
+- If this problem is solved, who benefits and how?
+- If this feature didn't exist, what problems would occur?
 ```
 
-### Step 2: 前提の洗い出しと疑問
+### Step 2: List and Question Assumptions
 
 ```markdown
-## 暗黙の前提
+## Implicit Assumptions
 
-現在の実装で当然としている前提を列挙:
+List assumptions taken for granted in current implementation:
 
-1. [ ] <前提1> → 本当にそうか？
-2. [ ] <前提2> → なぜそう思った？
-3. [ ] <前提3> → 別の方法はないか？
+1. [ ] <assumption 1> → Is this really true?
+2. [ ] <assumption 2> → Why do we think this?
+3. [ ] <assumption 3> → Is there another way?
 
-**疑うべき前提**:
-- 「〜でなければならない」
-- 「〜は無理」
-- 「みんなそうしている」
-- 「前からこうだった」
+**Assumptions to question**:
+- "Must be..."
+- "Impossible to..."
+- "Everyone does it this way"
+- "It's always been this way"
 ```
 
-### Step 3: 制約の再確認
+### Step 3: Re-verify Constraints
 
 ```markdown
-## 本当の制約 vs 思い込み
+## Real Constraints vs Assumptions
 
-| 制約 | 種類 | 根拠 |
-|------|------|------|
-| 予算 100万円 | 🔒 固定 | 承認済み |
-| React使用 | ⚠️ 要確認 | 「チームが慣れている」だけ？ |
-| REST API | ⚠️ 要確認 | GraphQLではダメな理由は？ |
-| 1週間で完成 | 🔒 固定 | リリース日決定済み |
+| Constraint | Type | Basis |
+|------------|------|-------|
+| Budget $10K | 🔒 Fixed | Already approved |
+| Use React | ⚠️ Verify | Just because "team is familiar"? |
+| REST API | ⚠️ Verify | Why not GraphQL? |
+| Complete in 1 week | 🔒 Fixed | Release date confirmed |
 ```
 
-### Step 4: ゼロベースでの選択肢
+### Step 4: Zero-Base Options
 
 ```markdown
-## もし最初からやり直すなら？
+## If starting over from scratch?
 
-**制約だけを条件に、白紙から考えた選択肢**:
+**Options thought from constraints only, from blank slate**:
 
-1. **案A**: <description>
-   - メリット:
-   - デメリット:
+1. **Option A**: <description>
+   - Pros:
+   - Cons:
 
-2. **案B**: <description>
-   - メリット:
-   - デメリット:
+2. **Option B**: <description>
+   - Pros:
+   - Cons:
 
-3. **案C（現在の方向性）**: <description>
-   - メリット:
-   - デメリット:
+3. **Option C (current direction)**: <description>
+   - Pros:
+   - Cons:
 
-**最もシンプルな解決策は？**
-（機能を削る、別のアプローチ、やらない選択肢）
+**What's the simplest solution?**
+(Cut features, different approach, option to not do it)
 ```
 
-### Step 5: 判断と次のアクション
+### Step 5: Decision and Next Actions
 
 ```markdown
-## 結論
+## Conclusion
 
-**選択**: 案X
+**Choice**: Option X
 
-**理由**:
+**Reasons**:
 1. <reason1>
 2. <reason2>
 
-**捨てるもの**:
+**What to drop**:
 - <what to drop>
 
-**次のアクション**:
+**Next actions**:
 1. [ ] <action1>
 2. [ ] <action2>
 ```
 
-## 質問リスト
+## Question List
 
-行き詰まった時に自問する質問:
+Questions to ask yourself when stuck:
 
-### 問題について
-- 「そもそも、これは解決すべき問題か？」
-- 「問題の定義は正しいか？」
-- 「誰のための機能か？」
+### About the Problem
+- "First of all, is this a problem worth solving?"
+- "Is the problem definition correct?"
+- "Who is this feature for?"
 
-### 解決策について
-- 「最もシンプルな解決策は何か？」
-- 「この機能を作らない選択肢は？」
-- 「80%の価値を20%の労力で得る方法は？」
-- 「完璧でなくていいなら、どうする？」
+### About the Solution
+- "What's the simplest solution?"
+- "What if we don't build this feature?"
+- "How to get 80% of value with 20% of effort?"
+- "What if it doesn't have to be perfect?"
 
-### 前提について
-- 「なぜそう思った？」
-- 「それは事実か、推測か？」
-- 「逆のことが正しい可能性は？」
-- 「5年後もこの前提は有効か？」
+### About Assumptions
+- "Why do we think this?"
+- "Is it a fact or speculation?"
+- "Could the opposite be true?"
+- "Will this assumption still be valid in 5 years?"
 
-## 出力形式
+## Output Format
 
 ```markdown
-## First Principles 分析
+## First Principles Analysis
 
-### 現状
-**やろうとしていること**:
+### Current State
+**What we're trying to do**:
 <description>
 
-**行き詰まっている点**:
+**Where we're stuck**:
 <description>
 
 ---
 
-### 本質
+### Essence
 
-**解決すべき本当の問題**:
+**The real problem to solve**:
 <core problem>
 
-**成功の定義**:
+**Definition of success**:
 <what success looks like>
 
 ---
 
-### 前提の検証
+### Assumption Verification
 
-| 前提 | 検証結果 |
-|------|---------|
-| <assumption1> | ✅ 有効 / ❌ 無効 / ⚠️ 要確認 |
-
----
-
-### 再考後の選択肢
-
-1. **シンプル案**: <description>
-2. **現行案の修正**: <description>
-3. **やらない案**: <description>
+| Assumption | Verification Result |
+|------------|---------------------|
+| <assumption1> | ✅ Valid / ❌ Invalid / ⚠️ Needs verification |
 
 ---
 
-### 推奨
+### Options After Rethinking
 
-**選択**: <option>
+1. **Simple option**: <description>
+2. **Modified current option**: <description>
+3. **Don't do it option**: <description>
 
-**理由**: <rationale>
+---
 
-**削ぎ落とすもの**: <what to cut>
+### Recommendation
+
+**Choice**: <option>
+
+**Reason**: <rationale>
+
+**What to cut**: <what to cut>
 ```
 
-## 注意事項
+## Notes
 
-- **分析麻痺を避ける**: 考えすぎず、行動につなげる
-- **完璧を求めない**: 70%の解決策で十分なこともある
-- **チームと共有**: 一人で抱え込まず、視点を借りる
-- **時間を区切る**: 30分考えて結論が出なければ相談
+- **Avoid analysis paralysis**: Don't overthink, connect to action
+- **Don't seek perfection**: Sometimes a 70% solution is enough
+- **Share with team**: Don't hold alone, borrow perspectives
+- **Time-box**: If no conclusion in 30 minutes, consult

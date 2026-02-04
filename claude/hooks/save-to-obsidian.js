@@ -1,18 +1,18 @@
 #!/usr/bin/env node
 
 /**
- * Claude Code会話をObsidianに記録するStopフック
+ * Stop hook to save Claude Code conversations to Obsidian
  *
- * 処理フロー:
- * 1. 最新セッションファイルを特定
- * 2. JSONL読み込み・パース
- * 3. ノイズフィルタリング（system-reminder, tool_use等）
- * 4. Markdown変換
- * 5. セッションごとに個別ファイルを作成
+ * Processing Flow:
+ * 1. Identify the latest session file
+ * 2. Load and parse JSONL
+ * 3. Filter noise (system-reminder, tool_use, etc.)
+ * 4. Convert to Markdown
+ * 5. Create individual file for each session
  *
- * ファイル命名規則:
+ * File Naming Convention:
  * {YYYY-MM-DD}_{HH-MM}_{topic}.md
- * 例: 2026-01-16_11-41_legal.md
+ * Example: 2026-01-16_11-41_legal.md
  */
 
 import { readFile, readdir, writeFile, mkdir, stat } from 'node:fs/promises';
@@ -26,14 +26,14 @@ const XDG_CONFIG_DIR = process.env.XDG_CONFIG_HOME ?? `${USER_HOME_DIR}/.config`
 const CLAUDE_CONFIG_DIR_ENV = 'CLAUDE_CONFIG_DIR';
 const CLAUDE_PROJECTS_DIR = 'projects';
 
-// Obsidian出力先（環境変数 OBSIDIAN_VAULT が必須）
+// Obsidian output destination (OBSIDIAN_VAULT environment variable required)
 const OBSIDIAN_VAULT = process.env.OBSIDIAN_VAULT;
 const OUTPUT_DIR = OBSIDIAN_VAULT ? `${OBSIDIAN_VAULT}/06_Claude` : null;
 
-// 処理済みセッションを記録するファイル
+// File to record processed sessions
 const PROCESSED_SESSIONS_FILE = OBSIDIAN_VAULT ? `${OBSIDIAN_VAULT}/06_Claude/.processed_sessions` : null;
 
-// ノイズフィルタリングパターン
+// Noise filtering patterns
 const NOISE_PATTERNS = [
   /<system-reminder>/,
   /<local-command/,
@@ -41,7 +41,7 @@ const NOISE_PATTERNS = [
   /<user-prompt-submit-hook>/,
 ];
 
-// トピック検出キーワード
+// Topic detection keywords
 const TOPIC_KEYWORDS = {
   legal: ['法務', '法的', 'legal', '契約', '利用規約'],
   research: ['調査', 'research', '調べ', 'リサーチ', '検索'],
@@ -57,14 +57,14 @@ const TOPIC_KEYWORDS = {
   infra: ['インフラ', 'infrastructure', 'aws', 'gcp', 'azure', 'docker', 'k8s'],
 };
 
-// プロジェクトマッピング（ディレクトリ名 → 表示名）
+// Project mapping (directory name → display name)
 const PROJECT_MAP = {
   'aiops-kpi': 'AIOps KPI',
   'laptop': 'Laptop Setup',
-  'worktrees': null, // worktree親ディレクトリは除外
+  'worktrees': null, // Exclude worktree parent directory
 };
 
-// Claude設定パスを取得
+// Get Claude config paths
 function getClaudePaths() {
   const envPaths = process.env[CLAUDE_CONFIG_DIR_ENV];
   const paths = envPaths
@@ -74,7 +74,7 @@ function getClaudePaths() {
   return paths.filter(p => existsSync(path.join(p, CLAUDE_PROJECTS_DIR)));
 }
 
-// JSONLファイルを再帰的に検索
+// Recursively search for JSONL files
 async function findJsonlFiles(dir) {
   const files = [];
 
@@ -92,13 +92,13 @@ async function findJsonlFiles(dir) {
       }
     }
   } catch {
-    // エラー時はスキップ
+    // Skip on error
   }
 
   return files;
 }
 
-// 最新のセッションファイルを特定
+// Identify the latest session file
 async function findLatestSessionFile() {
   const claudePaths = getClaudePaths();
   if (claudePaths.length === 0) return null;
@@ -123,14 +123,14 @@ async function findLatestSessionFile() {
   return latestFile;
 }
 
-// セッションIDを取得（JSONLファイル名から）
+// Get session ID (from JSONL filename)
 function getSessionId(sessionFilePath) {
   if (!sessionFilePath) return null;
-  // ファイル名（.jsonl除く）をセッションIDとして使用
+  // Use filename (without .jsonl) as session ID
   return path.basename(sessionFilePath, '.jsonl');
 }
 
-// 処理済みセッションを読み込み
+// Load processed sessions
 async function loadProcessedSessions() {
   if (!PROCESSED_SESSIONS_FILE || !existsSync(PROCESSED_SESSIONS_FILE)) {
     return new Set();
@@ -144,19 +144,19 @@ async function loadProcessedSessions() {
   }
 }
 
-// 処理済みセッションを保存
+// Save processed session
 async function saveProcessedSession(sessionId) {
   if (!PROCESSED_SESSIONS_FILE) return;
 
   const sessions = await loadProcessedSessions();
   sessions.add(sessionId);
 
-  // 最新1000件のみ保持（古いものは削除）
+  // Keep only latest 1000 entries (delete old ones)
   const recentSessions = [...sessions].slice(-1000);
   await writeFile(PROCESSED_SESSIONS_FILE, recentSessions.join('\n') + '\n', 'utf-8');
 }
 
-// JSONLファイルをパース
+// Parse JSONL file
 async function parseJsonlFile(filePath) {
   const content = await readFile(filePath, 'utf-8');
   const lines = content.trim().split('\n').filter(line => line.length > 0);
@@ -167,20 +167,20 @@ async function parseJsonlFile(filePath) {
       const data = JSON.parse(line);
       entries.push(data);
     } catch {
-      // パースエラーはスキップ
+      // Skip parse errors
     }
   }
 
   return entries;
 }
 
-// コンテンツにノイズパターンが含まれるか確認
+// Check if content contains noise patterns
 function containsNoise(text) {
   if (typeof text !== 'string') return false;
   return NOISE_PATTERNS.some(pattern => pattern.test(text));
 }
 
-// アシスタントメッセージからテキストを抽出
+// Extract text from assistant messages
 function extractAssistantText(content) {
   if (typeof content === 'string') {
     return containsNoise(content) ? null : content;
@@ -190,7 +190,7 @@ function extractAssistantText(content) {
 
   const textParts = [];
   for (const item of content) {
-    // tool_use, tool_result, thinkingは除外
+    // Exclude tool_use, tool_result, thinking
     if (item.type === 'tool_use' || item.type === 'tool_result' || item.type === 'thinking') {
       continue;
     }
@@ -205,18 +205,18 @@ function extractAssistantText(content) {
   return textParts.length > 0 ? textParts.join('\n') : null;
 }
 
-// エントリをフィルタリング・変換
+// Filter and transform entries
 function filterAndTransform(entries) {
   const conversations = [];
 
   for (const entry of entries) {
-    // file-history-snapshotは除外
+    // Exclude file-history-snapshot
     if (entry.type === 'file-history-snapshot') continue;
 
-    // summary系も除外
+    // Exclude summary types
     if (entry.type === 'summary') continue;
 
-    // ユーザーメッセージ
+    // User messages
     if (entry.type === 'user' && entry.message?.content) {
       const content = entry.message.content;
       if (typeof content === 'string' && !containsNoise(content)) {
@@ -228,7 +228,7 @@ function filterAndTransform(entries) {
       }
     }
 
-    // アシスタントメッセージ
+    // Assistant messages
     if (entry.type === 'assistant' && entry.message?.content) {
       const text = extractAssistantText(entry.message.content);
       if (text) {
@@ -244,13 +244,13 @@ function filterAndTransform(entries) {
   return conversations;
 }
 
-// Markdownフォーマットに変換
+// Convert to Markdown format
 function formatToMarkdown(conversations) {
   const lines = [];
 
   for (const conv of conversations) {
     if (conv.role === 'user') {
-      lines.push(`**ユーザー**: ${conv.content}\n`);
+      lines.push(`**User**: ${conv.content}\n`);
     } else if (conv.role === 'assistant') {
       lines.push(`**Claude**: ${conv.content}\n`);
     }
@@ -261,24 +261,24 @@ function formatToMarkdown(conversations) {
   return lines.join('\n');
 }
 
-// セッションファイルパスからプロジェクト名を判定
+// Detect project name from session file path
 function detectProject(sessionFilePath) {
   if (!sessionFilePath) return null;
 
-  // パスからプロジェクトディレクトリ名を抽出
-  // 例: ~/.claude/projects/-Users-snkrheadz-ghq-github-com-snkrheadz-aiops-kpi/xxx.jsonl
-  // ディレクトリ名の最後のセグメント（ハイフン区切り）がプロジェクト名
+  // Extract project directory name from path
+  // Example: ~/.claude/projects/-Users-snkrheadz-ghq-github-com-snkrheadz-aiops-kpi/xxx.jsonl
+  // The last segment (hyphen-separated) of directory name is project name
   const match = sessionFilePath.match(/\/projects\/([^/]+)\//);
   if (match) {
     // -Users-snkrheadz-ghq-github-com-snkrheadz-aiops-kpi -> aiops-kpi
     const encoded = match[1];
     const parts = encoded.split('-');
-    // 最後のハイフン区切りの部分がプロジェクト名（2パーツ以上ならハイフン結合）
-    // ghq-github-com-snkrheadz-aiops-kpi の場合、snkrheadz以降を取得
+    // Get part after snkrheadz (join with hyphen if 2+ parts)
+    // For ghq-github-com-snkrheadz-aiops-kpi, get everything after snkrheadz
     const snkrheadzIdx = parts.lastIndexOf('snkrheadz');
     if (snkrheadzIdx !== -1 && snkrheadzIdx < parts.length - 1) {
       const projectName = parts.slice(snkrheadzIdx + 1).join('-');
-      // マッピングがあれば使用、なければそのまま
+      // Use mapping if exists, otherwise use as-is
       return PROJECT_MAP[projectName] !== undefined ? PROJECT_MAP[projectName] : projectName;
     }
   }
@@ -286,7 +286,7 @@ function detectProject(sessionFilePath) {
   return null;
 }
 
-// 会話内容からトピックを抽出
+// Extract topics from conversation content
 function extractTopics(conversations) {
   const text = conversations
     .map(c => c.content)
@@ -300,20 +300,20 @@ function extractTopics(conversations) {
     }
   }
 
-  return detected.slice(0, 5); // 最大5個
+  return detected.slice(0, 5); // Maximum 5
 }
 
-// 会話内容からサマリーを生成
+// Generate summary from conversation content
 function generateSummary(conversations) {
   const userMessages = conversations.filter(c => c.role === 'user');
   if (userMessages.length === 0) return null;
 
-  // 最初のユーザーメッセージから抽出（100文字以内）
+  // Extract from first user message (within 100 characters)
   const firstMessage = userMessages[0].content;
   let summary = firstMessage
     .replace(/\n/g, ' ')
-    .replace(/<[^>]+>/g, '') // HTMLタグ除去
-    .replace(/\s+/g, ' ')    // 連続空白を単一に
+    .replace(/<[^>]+>/g, '') // Remove HTML tags
+    .replace(/\s+/g, ' ')    // Collapse consecutive whitespace
     .trim()
     .slice(0, 100);
 
@@ -324,7 +324,7 @@ function generateSummary(conversations) {
   return summary;
 }
 
-// メタデータを抽出
+// Extract metadata
 function extractMetadata(conversations, sessionFilePath, sessionTime) {
   const project = detectProject(sessionFilePath);
   const topics = extractTopics(conversations);
@@ -338,18 +338,18 @@ function extractMetadata(conversations, sessionFilePath, sessionTime) {
   };
 }
 
-// ファイル名を生成
+// Generate filename
 function generateFileName(dateStr, sessionTime, topics) {
-  // sessionTime: HH:MM → HH-MM（ファイルシステム互換）
+  // sessionTime: HH:MM → HH-MM (filesystem compatible)
   const timeStr = sessionTime.replace(':', '-');
 
-  // プライマリトピックを取得（なければ general）
+  // Get primary topic (general if none)
   const primaryTopic = topics.length > 0 ? topics[0] : 'general';
 
   return `${dateStr}_${timeStr}_${primaryTopic}.md`;
 }
 
-// Front Matterを生成
+// Generate Front Matter
 function generateFrontMatter(dateStr, metadata = {}) {
   const { project, topics, summary, sessionTime } = metadata;
 
@@ -358,7 +358,7 @@ tags:
   - claude-code
   - conversation`;
 
-  // トピックタグを追加（最大3個）
+  // Add topic tags (max 3)
   if (topics && topics.length > 0) {
     topics.slice(0, 3).forEach(topic => {
       yaml += `\n  - ${topic}`;
@@ -379,7 +379,7 @@ tags:
   }
 
   if (summary) {
-    // ダブルクォートをエスケープ
+    // Escape double quotes
     yaml += `\nsummary: "${summary.replace(/"/g, '\\"')}"`;
   }
 
@@ -392,9 +392,9 @@ tags:
   return yaml;
 }
 
-// Obsidianに保存（セッションごとに新規ファイル）
+// Save to Obsidian (create new file per session)
 async function saveToObsidian(markdown, dateStr, metadata = {}) {
-  // 出力ディレクトリを作成
+  // Create output directory
   if (!existsSync(OUTPUT_DIR)) {
     await mkdir(OUTPUT_DIR, { recursive: true });
   }
@@ -402,72 +402,72 @@ async function saveToObsidian(markdown, dateStr, metadata = {}) {
   const fileName = generateFileName(dateStr, metadata.sessionTime, metadata.topics);
   const filePath = path.join(OUTPUT_DIR, fileName);
 
-  // タイトルを生成
+  // Generate title
   const primaryTopic = metadata.topics.length > 0 ? metadata.topics[0] : 'general';
   const title = `# ${dateStr} ${metadata.sessionTime} - ${primaryTopic}\n\n`;
 
-  // Front Matter + タイトル + コンテンツ
+  // Front Matter + Title + Content
   const content = generateFrontMatter(dateStr, metadata) + title + markdown;
   await writeFile(filePath, content, 'utf-8');
 
   return fileName;
 }
 
-// メイン関数
+// Main function
 async function main() {
   try {
-    // 0. OBSIDIAN_VAULT が設定されていなければ終了
+    // 0. Exit if OBSIDIAN_VAULT not set
     if (!OBSIDIAN_VAULT) {
       process.exit(0);
     }
 
-    // 1. 最新セッションファイルを特定
+    // 1. Identify latest session file
     const sessionFile = await findLatestSessionFile();
     if (!sessionFile) {
       process.exit(0);
     }
 
-    // 2. セッションIDを取得し、既に処理済みかチェック
+    // 2. Get session ID and check if already processed
     const sessionId = getSessionId(sessionFile);
     const processedSessions = await loadProcessedSessions();
 
     if (processedSessions.has(sessionId)) {
-      // 既に処理済み → スキップ
+      // Already processed → skip
       process.exit(0);
     }
 
-    // 3. JSONL読み込み・パース
+    // 3. Load and parse JSONL
     const entries = await parseJsonlFile(sessionFile);
     if (entries.length === 0) {
       process.exit(0);
     }
 
-    // 4. フィルタリング・変換
+    // 4. Filter and transform
     const conversations = filterAndTransform(entries);
     if (conversations.length === 0) {
       process.exit(0);
     }
 
-    // 5. 日付とセッション時刻を取得
+    // 5. Get date and session time
     const now = new Date();
     const dateStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
     const sessionTime = now.toTimeString().slice(0, 5); // HH:MM
 
-    // 6. メタデータを抽出
+    // 6. Extract metadata
     const metadata = extractMetadata(conversations, sessionFile, sessionTime);
 
-    // 7. Markdown生成
+    // 7. Generate Markdown
     const markdown = formatToMarkdown(conversations);
 
-    // 8. ファイル出力
+    // 8. Output file
     await saveToObsidian(markdown, dateStr, metadata);
 
-    // 9. セッションIDを処理済みとして記録
+    // 9. Record session ID as processed
     await saveProcessedSession(sessionId);
 
     process.exit(0);
   } catch (error) {
-    // エラーでもClaudeをブロックしない（stderr出力のみ）
+    // Don't block Claude on error (stderr output only)
     console.error(`[save-to-obsidian] Error: ${error.message}`);
     process.exit(0);
   }

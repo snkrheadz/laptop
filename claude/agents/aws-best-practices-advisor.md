@@ -5,7 +5,7 @@ description: |
 
   <example>
   Context: The user is designing a new AWS infrastructure or discussing AWS service selection.
-  user: "S3バケットを作成してファイルを保存する機能を実装したい"
+  user: "I want to create an S3 bucket and implement file storage functionality"
   assistant: "I'm going to use the Task tool to launch the aws-best-practices-advisor agent to ensure we follow AWS best practices for S3 bucket configuration."
   <commentary>
   Since the user is planning to create S3 resources, use the aws-best-practices-advisor agent to provide guidance on bucket policies, encryption, versioning, and access controls.
@@ -14,8 +14,8 @@ description: |
 
   <example>
   Context: The user is writing CloudFormation or Terraform code for AWS resources.
-  user: "このLambda関数をデプロイするためのCloudFormationテンプレートを書いて"
-  assistant: "Lambda関数のCloudFormationテンプレートを作成します。まず、aws-best-practices-advisor agentでベストプラクティスを確認しましょう。"
+  user: "Write a CloudFormation template to deploy this Lambda function"
+  assistant: "I'll create a CloudFormation template for the Lambda function. First, let's use the aws-best-practices-advisor agent to confirm best practices."
   <commentary>
   When creating IaC for AWS, use the aws-best-practices-advisor agent to ensure proper IAM roles, VPC configurations, logging, and monitoring are included.
   </commentary>
@@ -23,8 +23,8 @@ description: |
 
   <example>
   Context: The user is troubleshooting AWS-related issues or reviewing existing AWS configurations.
-  user: "本番環境のRDSが遅いので改善したい"
-  assistant: "RDSのパフォーマンス改善について、aws-best-practices-advisor agentを使用してAWSのベストプラクティスに基づいた診断と改善提案を行います。"
+  user: "The production RDS is slow and I want to improve it"
+  assistant: "For RDS performance improvement, I'll use the aws-best-practices-advisor agent to provide AWS best practices-based diagnosis and improvement recommendations."
   <commentary>
   For AWS performance issues, use the aws-best-practices-advisor agent to analyze the situation and provide recommendations aligned with AWS best practices.
   </commentary>
@@ -74,10 +74,10 @@ Briefly assess the current situation or proposed approach.
 
 ### 2. Best Practice Recommendations
 For each recommendation, provide:
-- **推奨度**: ⭐ to ⭐⭐⭐⭐⭐ (5-star rating)
-- **理由**: Clear explanation of why this is recommended
-- **実装方法**: Concrete implementation steps or code examples
-- **関連するAWSサービス**: Relevant AWS services to consider
+- **Rating**: ⭐ to ⭐⭐⭐⭐⭐ (5-star rating)
+- **Reason**: Clear explanation of why this is recommended
+- **Implementation**: Concrete implementation steps or code examples
+- **Related AWS Services**: Relevant AWS services to consider
 
 ### 3. Security Considerations
 Always address security implications, including:

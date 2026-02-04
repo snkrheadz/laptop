@@ -1,155 +1,155 @@
 ---
 name: review-changes
-description: "コミット前の変更をレビュー。差分を分析し、問題点・改善点・リスクを指摘。トリガー: /review-changes, 変更レビュー, コミット前チェック, diffレビュー"
+description: "Review changes before commit. Analyzes diff and identifies issues, improvements, and risks. Triggers: /review-changes, change review, pre-commit check, diff review"
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob
 model: sonnet
 ---
 
-# 変更レビュースキル
+# Change Review Skill
 
-コミット前の変更を自動レビューし、問題点・改善点・リスクを指摘します。
+Automatically reviews changes before commit and identifies issues, improvements, and risks.
 
-## レビュー観点
+## Review Perspectives
 
-### 1. コード品質
-- [ ] 不要なデバッグコード (console.log, print, debugger)
-- [ ] ハードコードされた値 (URL, 認証情報, マジックナンバー)
-- [ ] 未使用のimport/変数
-- [ ] コメントアウトされたコード
-- [ ] TODO/FIXME の新規追加
+### 1. Code Quality
+- [ ] Unnecessary debug code (console.log, print, debugger)
+- [ ] Hard-coded values (URLs, credentials, magic numbers)
+- [ ] Unused imports/variables
+- [ ] Commented out code
+- [ ] Newly added TODO/FIXME
 
-### 2. セキュリティ
-- [ ] 機密情報の漏洩 (APIキー, パスワード, トークン)
-- [ ] SQLインジェクション/XSSの可能性
-- [ ] 危険な関数の使用 (eval, exec)
-- [ ] 権限チェックの欠如
+### 2. Security
+- [ ] Sensitive information leaks (API keys, passwords, tokens)
+- [ ] SQL injection/XSS potential
+- [ ] Dangerous function usage (eval, exec)
+- [ ] Missing permission checks
 
-### 3. パフォーマンス
-- [ ] N+1 クエリの可能性
-- [ ] 不必要なループ/再計算
-- [ ] 大きなオブジェクトのコピー
-- [ ] メモリリークの可能性
+### 3. Performance
+- [ ] N+1 query potential
+- [ ] Unnecessary loops/recalculations
+- [ ] Large object copies
+- [ ] Memory leak potential
 
-### 4. 保守性
-- [ ] 関数が長すぎる (50行以上)
-- [ ] ネストが深すぎる (4階層以上)
-- [ ] 命名が不明確
-- [ ] 重複コード
+### 4. Maintainability
+- [ ] Functions too long (50+ lines)
+- [ ] Nesting too deep (4+ levels)
+- [ ] Unclear naming
+- [ ] Duplicate code
 
-### 5. テスト
-- [ ] テストが追加/更新されているか
-- [ ] テストカバレッジの低下
-- [ ] エッジケースのテスト漏れ
+### 5. Tests
+- [ ] Are tests added/updated?
+- [ ] Test coverage decrease
+- [ ] Missing edge case tests
 
-## 実行フロー
+## Execution Flow
 
 ```bash
-# 1. 変更差分を取得
-git diff --staged  # ステージングされた変更
-git diff           # 未ステージの変更
+# 1. Get change diff
+git diff --staged  # Staged changes
+git diff           # Unstaged changes
 
-# 2. 変更ファイル一覧
+# 2. List changed files
 git diff --name-only
 
-# 3. 各ファイルを分析
-# 4. レポート生成
+# 3. Analyze each file
+# 4. Generate report
 ```
 
-## 出力形式
+## Output Format
 
 ```markdown
-## 変更レビューレポート
+## Change Review Report
 
-### 概要
-- **変更ファイル**: N files
-- **追加行**: +XXX
-- **削除行**: -XXX
-- **影響範囲**: src/api/, tests/
-
----
-
-### 検出された問題
-
-#### 🔴 要修正 (ブロッカー)
-
-| ファイル | 行 | 問題 | 説明 |
-|---------|-----|------|------|
-| src/api.ts | 45 | 機密情報 | APIキーがハードコード |
-| src/db.ts | 78 | SQLi | ユーザー入力が直接クエリに |
-
-#### 🟡 推奨修正
-
-| ファイル | 行 | 問題 | 説明 |
-|---------|-----|------|------|
-| src/util.ts | 12 | デバッグコード | console.log が残存 |
-| src/handler.ts | 34 | 長い関数 | 78行 (推奨: 50行以下) |
-
-#### 🟢 情報
-
-| ファイル | 行 | 内容 |
-|---------|-----|------|
-| src/types.ts | 5 | 新しいTODO追加 |
+### Overview
+- **Changed Files**: N files
+- **Lines Added**: +XXX
+- **Lines Deleted**: -XXX
+- **Impact Scope**: src/api/, tests/
 
 ---
 
-### 良い点
+### Detected Issues
 
-- ✅ エラーハンドリングが適切に追加されている
-- ✅ 型定義が明確
-- ✅ テストが追加されている
+#### 🔴 Must Fix (Blockers)
+
+| File | Line | Issue | Description |
+|------|------|-------|-------------|
+| src/api.ts | 45 | Sensitive info | API key hard-coded |
+| src/db.ts | 78 | SQLi | User input directly in query |
+
+#### 🟡 Recommended Fix
+
+| File | Line | Issue | Description |
+|------|------|-------|-------------|
+| src/util.ts | 12 | Debug code | console.log remaining |
+| src/handler.ts | 34 | Long function | 78 lines (recommended: 50 or less) |
+
+#### 🟢 Information
+
+| File | Line | Content |
+|------|------|---------|
+| src/types.ts | 5 | New TODO added |
 
 ---
 
-### 推奨アクション
+### Good Points
 
-1. **[必須]** src/api.ts:45 のAPIキーを環境変数に移動
-2. **[必須]** src/db.ts:78 でプリペアドステートメントを使用
-3. **[推奨]** src/util.ts:12 のconsole.logを削除
-4. **[推奨]** src/handler.ts の関数を分割
+- ✅ Error handling properly added
+- ✅ Type definitions are clear
+- ✅ Tests are added
 
 ---
 
-### コミット判定
+### Recommended Actions
 
-❌ **コミット非推奨** - 要修正項目があります
+1. **[Required]** Move API key at src/api.ts:45 to environment variable
+2. **[Required]** Use prepared statements at src/db.ts:78
+3. **[Recommended]** Remove console.log at src/util.ts:12
+4. **[Recommended]** Split function at src/handler.ts
 
-または
+---
 
-✅ **コミット可能** - 重大な問題はありません
+### Commit Decision
+
+❌ **Commit not recommended** - Has items requiring fix
+
+or
+
+✅ **Commit OK** - No critical issues
 ```
 
-## 使用方法
+## Usage
 
 ```bash
-# ステージング済みの変更をレビュー
+# Review staged changes
 /review-changes
 
-# 特定ファイルのみレビュー
+# Review specific file only
 /review-changes src/api.ts
 
-# 未ステージの変更も含めてレビュー
+# Review including unstaged changes
 /review-changes --all
 ```
 
-## 自動検出パターン
+## Auto-Detection Patterns
 
-### 機密情報 (正規表現)
+### Sensitive Information (regex)
 ```
-# APIキー
+# API key
 (api[_-]?key|apikey)\s*[:=]\s*['"][^'"]+['"]
 
-# パスワード
+# Password
 (password|passwd|pwd)\s*[:=]\s*['"][^'"]+['"]
 
-# トークン
+# Token
 (token|secret|auth)\s*[:=]\s*['"][^'"]+['"]
 
-# AWS認証情報
+# AWS credentials
 AKIA[0-9A-Z]{16}
 ```
 
-### デバッグコード
+### Debug Code
 ```
 console\.(log|debug|info|warn|error)\(
 print\(
@@ -158,9 +158,9 @@ binding\.pry
 import pdb
 ```
 
-## 注意事項
+## Notes
 
-- 大量の変更 (500行以上) は概要のみのレビューに切り替え
-- バイナリファイル、ロックファイルはスキップ
-- 自動生成ファイル (*.min.js, dist/) はスキップ
-- レビュー結果は参考情報であり、最終判断は人間が行う
+- Large changes (500+ lines) switches to overview-only review
+- Binary files and lock files are skipped
+- Auto-generated files (*.min.js, dist/) are skipped
+- Review results are reference information, final decision is made by humans
