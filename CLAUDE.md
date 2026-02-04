@@ -70,6 +70,9 @@ mise use go@1.24.3                        # Install/use specific version
 │   └── skills/         # Skills (9): claude-code-guide, quick-commit, merge-pr,
 │                       #   review-changes, test-and-fix, db-query, etc.
 │
+├── .claude/            # Local skills (project-specific, NOT symlinked)
+│   └── skills/         # Local skills (13): brew-manage, health-check, zsh-config, etc.
+│
 ├── .github/
 │   └── workflows/main.yml  # CI/CD (gitleaks + shellcheck)
 │
@@ -140,6 +143,23 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `review-changes` - Code review helper
 - `techdebt` - Tech debt analysis
 - `test-and-fix` - Test and fix workflow
+
+**Local Skills** (13) - Project-specific, in `.claude/skills/`:
+
+These skills are **only available in this repository** (not symlinked to `~/.claude/`):
+- `brew-manage` - Homebrew package management
+- `claude-config` - Claude Code configuration management
+- `dotfiles-rollback` - Backup and rollback
+- `dotfiles-sync` - Manual dotfiles sync
+- `git-config` - Git configuration files
+- `health-check` - Dotfiles health check
+- `launchd-manage` - Auto-sync launchd management
+- `mise-runtime` - Runtime management (mise)
+- `new-machine-setup` - New machine setup guide
+- `security-check` - Security scanning
+- `symlink-manage` - Symlink management
+- `tmux-config` - tmux configuration
+- `zsh-config` - zsh configuration
 
 ## Best Practices
 
