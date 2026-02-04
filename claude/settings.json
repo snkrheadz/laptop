@@ -1,4 +1,5 @@
 {
+  "language": "japanese",
   "env": {
     "ENABLE_TOOL_SEARCH": "auto:15"
   },
