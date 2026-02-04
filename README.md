@@ -77,13 +77,16 @@ laptop/
 ├── mise/                   # mise runtime manager config
 ├── bin/                    # Executable scripts (tat)
 ├── raycast/                # Raycast settings export
-├── claude/                 # Claude Code configuration
+├── claude/                 # Claude Code configuration → ~/.claude/
 │   ├── CLAUDE.md           # User global instructions
 │   ├── settings.json       # Hooks, plugins, permissions
 │   ├── statusline.sh       # Custom status line script
 │   ├── hooks/              # PostToolUse hooks (2)
-│   ├── agents/             # Subagents (16)
+│   ├── agents/             # Subagents (17)
 │   └── skills/             # Custom skills (9)
+│
+├── .claude/                # Local skills (project-specific, 14)
+│   └── skills/             # Not symlinked to ~/.claude/
 │
 ├── scripts/
 │   └── auto-sync.sh        # Hourly auto-sync script
@@ -300,11 +303,11 @@ claude/
 ├── hooks/              # PostToolUse hooks (2)
 │   ├── validate-shell.sh   # shellcheck validation
 │   └── save-to-obsidian.js # Obsidian integration
-├── agents/             # Subagents (16)
+├── agents/             # Subagents (17)
 │   ├── verify-shell.md, verify-app.md, build-validator.md
 │   ├── code-architect.md, code-simplifier.md, oncall-guide.md
 │   ├── aws-best-practices-advisor.md, gcp-best-practices-advisor.md
-│   ├── arxiv-ai-researcher.md, gemini-api-researcher.md
+│   ├── arxiv-ai-researcher.md, gemini-api-researcher.md, huggingface-spaces-researcher.md
 │   ├── strategic-research-analyst.md, nano-banana-pro-prompt-generator.md
 │   ├── state-machine-diagram.md, migration-assistant.md
 │   ├── diagnose-dotfiles.md, verify-subagent-result.md
@@ -328,7 +331,7 @@ claude/
 | `settings.json` | Hooks, plugins, permissions, Obsidian integration |
 | `statusline.sh` | Custom status line showing model, cost, context |
 | `hooks/` | PostToolUse hooks for shellcheck and Obsidian |
-| `agents/` | 16 specialized subagents for various tasks |
+| `agents/` | 17 specialized subagents for various tasks |
 | `skills/` | 9 custom skills for common workflows |
 
 ### Status Line
@@ -364,6 +367,29 @@ Displays in Claude Code CLI:
 - `/merge-pr` - PR merge with worktree cleanup
 - `/review-changes` - Code review helper
 - `/test-and-fix` - Run tests and fix failures
+
+### Local Skills (Project-specific)
+
+The `.claude/skills/` directory contains 14 project-specific skills that are **only available in this repository** (not symlinked to `~/.claude/`). These skills are tailored for managing this dotfiles repository.
+
+| Skill | Description |
+|-------|-------------|
+| `brew-manage` | Homebrew package management (add/remove/search, Brewfile update) |
+| `claude-config` | Claude Code configuration (settings.json, hooks, agents, skills) |
+| `dotfiles-rollback` | Backup confirmation and rollback to previous state |
+| `dotfiles-sync` | Manual dotfiles sync (Brewfile update, commit, push) |
+| `git-config` | Git config files (.gitconfig, .gitmessage, .gitignore) |
+| `health-check` | Dotfiles health check (symlinks, configs, dependencies) |
+| `hf-spaces` | HuggingFace Spaces search (research demos, model prototypes) |
+| `launchd-manage` | Auto-sync launchd agent management (start/stop/logs) |
+| `mise-runtime` | Runtime management with mise (Go, Node.js, Python, Ruby) |
+| `new-machine-setup` | New machine setup guide (macOS → dotfiles) |
+| `security-check` | Security scanning (gitleaks, pre-commit, secrets) |
+| `symlink-manage` | Symlink status check and repair (broken link detection) |
+| `tmux-config` | tmux configuration (.tmux.conf, keybindings) |
+| `zsh-config` | zsh configuration (functions, configs, aliases) |
+
+**Usage:** These skills are invoked using slash commands (e.g., `/brew-manage`, `/health-check`) when working in this repository with Claude Code.
 
 ## License
 
