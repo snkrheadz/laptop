@@ -65,13 +65,13 @@ mise use go@1.24.3                        # Install/use specific version
 │   ├── statusline.sh   # Status line display script
 │   ├── CLAUDE.md       # User global instructions
 │   ├── hooks/          # PostToolUse hooks: validate-shell.sh, save-to-obsidian.js
-│   ├── agents/         # Subagents (16): verify-shell, code-architect, build-validator,
+│   ├── agents/         # Subagents (17): verify-shell, code-architect, build-validator,
 │   │                   #   aws-best-practices-advisor, diagnose-dotfiles, etc.
 │   └── skills/         # Skills (9): claude-code-guide, quick-commit, merge-pr,
 │                       #   review-changes, test-and-fix, db-query, etc.
 │
 ├── .claude/            # Local skills (project-specific, NOT symlinked)
-│   └── skills/         # Local skills (13): brew-manage, health-check, zsh-config, etc.
+│   └── skills/         # Local skills (14): brew-manage, health-check, zsh-config, etc.
 │
 ├── .github/
 │   └── workflows/main.yml  # CI/CD (gitleaks + shellcheck)
@@ -124,11 +124,11 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `hooks/validate-shell.sh` - PostToolUse hook for shellcheck
 - `hooks/save-to-obsidian.js` - Saves context to Obsidian
 
-**Agents** (16):
+**Agents** (17):
 - `verify-shell`, `verify-app`, `build-validator` - Verification agents
 - `code-architect`, `code-simplifier` - Code design agents
 - `aws-best-practices-advisor`, `gcp-best-practices-advisor` - Cloud guidance
-- `arxiv-ai-researcher`, `gemini-api-researcher` - Research agents
+- `arxiv-ai-researcher`, `gemini-api-researcher`, `huggingface-spaces-researcher` - Research agents
 - `strategic-research-analyst`, `nano-banana-pro-prompt-generator`
 - `state-machine-diagram`, `migration-assistant`, `oncall-guide`
 - `diagnose-dotfiles`, `verify-subagent-result`
@@ -144,7 +144,7 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `techdebt` - Tech debt analysis
 - `test-and-fix` - Test and fix workflow
 
-**Local Skills** (13) - Project-specific, in `.claude/skills/`:
+**Local Skills** (14) - Project-specific, in `.claude/skills/`:
 
 These skills are **only available in this repository** (not symlinked to `~/.claude/`):
 - `brew-manage` - Homebrew package management
@@ -153,6 +153,7 @@ These skills are **only available in this repository** (not symlinked to `~/.cla
 - `dotfiles-sync` - Manual dotfiles sync
 - `git-config` - Git configuration files
 - `health-check` - Dotfiles health check
+- `hf-spaces` - HuggingFace Spaces search
 - `launchd-manage` - Auto-sync launchd management
 - `mise-runtime` - Runtime management (mise)
 - `new-machine-setup` - New machine setup guide

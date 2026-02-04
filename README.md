@@ -82,10 +82,10 @@ laptop/
 │   ├── settings.json       # Hooks, plugins, permissions
 │   ├── statusline.sh       # Custom status line script
 │   ├── hooks/              # PostToolUse hooks (2)
-│   ├── agents/             # Subagents (16)
+│   ├── agents/             # Subagents (17)
 │   └── skills/             # Custom skills (9)
 │
-├── .claude/                # Local skills (project-specific, 13)
+├── .claude/                # Local skills (project-specific, 14)
 │   └── skills/             # Not symlinked to ~/.claude/
 │
 ├── scripts/
@@ -303,11 +303,11 @@ claude/
 ├── hooks/              # PostToolUse hooks (2)
 │   ├── validate-shell.sh   # shellcheck validation
 │   └── save-to-obsidian.js # Obsidian integration
-├── agents/             # Subagents (16)
+├── agents/             # Subagents (17)
 │   ├── verify-shell.md, verify-app.md, build-validator.md
 │   ├── code-architect.md, code-simplifier.md, oncall-guide.md
 │   ├── aws-best-practices-advisor.md, gcp-best-practices-advisor.md
-│   ├── arxiv-ai-researcher.md, gemini-api-researcher.md
+│   ├── arxiv-ai-researcher.md, gemini-api-researcher.md, huggingface-spaces-researcher.md
 │   ├── strategic-research-analyst.md, nano-banana-pro-prompt-generator.md
 │   ├── state-machine-diagram.md, migration-assistant.md
 │   ├── diagnose-dotfiles.md, verify-subagent-result.md
@@ -331,7 +331,7 @@ claude/
 | `settings.json` | Hooks, plugins, permissions, Obsidian integration |
 | `statusline.sh` | Custom status line showing model, cost, context |
 | `hooks/` | PostToolUse hooks for shellcheck and Obsidian |
-| `agents/` | 16 specialized subagents for various tasks |
+| `agents/` | 17 specialized subagents for various tasks |
 | `skills/` | 9 custom skills for common workflows |
 
 ### Status Line
@@ -370,7 +370,7 @@ Displays in Claude Code CLI:
 
 ### Local Skills (Project-specific)
 
-The `.claude/skills/` directory contains 13 project-specific skills that are **only available in this repository** (not symlinked to `~/.claude/`). These skills are tailored for managing this dotfiles repository.
+The `.claude/skills/` directory contains 14 project-specific skills that are **only available in this repository** (not symlinked to `~/.claude/`). These skills are tailored for managing this dotfiles repository.
 
 | Skill | Description |
 |-------|-------------|
@@ -380,6 +380,7 @@ The `.claude/skills/` directory contains 13 project-specific skills that are **o
 | `dotfiles-sync` | Manual dotfiles sync (Brewfile update, commit, push) |
 | `git-config` | Git config files (.gitconfig, .gitmessage, .gitignore) |
 | `health-check` | Dotfiles health check (symlinks, configs, dependencies) |
+| `hf-spaces` | HuggingFace Spaces search (research demos, model prototypes) |
 | `launchd-manage` | Auto-sync launchd agent management (start/stop/logs) |
 | `mise-runtime` | Runtime management with mise (Go, Node.js, Python, Ruby) |
 | `new-machine-setup` | New machine setup guide (macOS → dotfiles) |
