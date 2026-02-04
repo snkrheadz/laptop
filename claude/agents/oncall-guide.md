@@ -1,6 +1,6 @@
 ---
 name: oncall-guide
-description: Production incident response guide agent. Supports investigation and response procedures during incidents. Triggers: incident response, on-call, production incident, error investigation
+description: "Production incident response guide agent. Supports investigation and response procedures during incidents. Triggers: incident response, on-call, production incident, error investigation"
 tools: Bash, Read, Grep, Glob, WebFetch
 model: sonnet
 ---

@@ -1,6 +1,6 @@
 ---
 name: verify-shell
-description: Shell script verification agent. Performs static analysis, syntax checking, and best practices review for .sh files. Triggers: shell validation, shellcheck, verify shell script
+description: "Shell script verification agent. Performs static analysis, syntax checking, and best practices review for .sh files. Triggers: shell validation, shellcheck, verify shell script"
 tools: Bash, Read, Grep, Glob
 model: haiku
 ---

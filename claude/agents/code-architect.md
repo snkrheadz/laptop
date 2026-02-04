@@ -1,6 +1,6 @@
 ---
 name: code-architect
-description: Software design support agent. Provides architecture design, technology selection, and design pattern recommendations. Triggers: architecture design, system design, design consultation, architecture review, technology selection
+description: "Software design support agent. Provides architecture design, technology selection, and design pattern recommendations. Triggers: architecture design, system design, design consultation, architecture review, technology selection"
 tools: Read, Grep, Glob, WebSearch, WebFetch
 model: sonnet
 ---
