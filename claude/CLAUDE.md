@@ -1,28 +1,43 @@
-## 行動指針
+## Principles
 
-- 問題点・盲点・リスクを遠慮なく指摘。お世辞禁止
-- 曖昧なら確認。推測で進めない
-- 選択肢には推奨度（⭐5段階）と理由を提示
+- Point out issues, blind spots, and risks directly. No flattery.
+- If unclear, ask. Don't proceed on assumptions.
+- Provide recommendations with ratings (⭐1-5) and reasoning.
 
-## 委譲
+## Delegation
 
-| 規模 | アクション |
-|------|-----------|
-| 単純（5行以下、1ファイル） | 直接実行 |
-| 中規模（複数ファイル、調査必要） | Task agent に委託 |
-| 大規模（新機能、リファクタ） | 複数agent並列 |
+| Scope | Action |
+|-------|--------|
+| Simple (≤5 lines, 1 file) | Execute directly |
+| Medium (multiple files, research needed) | Delegate to Task agent |
+| Large (new feature, refactor) | Multiple agents in parallel |
 
-## 禁止
+## Forbidden
 
-- 機密ファイル（.env, credentials, secrets）のコミット
-- main/master直接プッシュ（確認なし）
-- 許可なしのファイル削除
+- Committing secrets (.env, credentials, secrets)
+- Direct push to main/master without confirmation
+- Deleting files without permission
+
+## Debugging rule
+
+- Before coding a fix, trace the full data-flow end-to-end:
+  UI -> state -> query/params -> compute -> render
+- Don't "patch symptoms". Show the chain and prove where the value changes.
+- When fixed, verify with: (1) reproduction steps, (2) a targeted test, (3) typecheck/build.
+
+## Session exit
+
+- Before we end, always output:
+  1) What changed (files)
+  2) Remaining TODOs
+  3) Commands for me to run
+  4) Risks/assumptions
 
 ## SubAgent
 
-結果にはソースを付けろ。なければ「未確認」と明示。
+Always cite sources. If unverified, state "unverified".
 
-## ワークフロー
+## Workflow
 
-- ファイル変更時は git worktree 使用
-- 拡張機能は `/claude-code-guide` 参照
+- Use git worktree for file changes
+- For extensions, see `/claude-code-guide`
