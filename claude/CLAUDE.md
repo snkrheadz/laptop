@@ -41,3 +41,16 @@ Always cite sources. If unverified, state "unverified".
 
 - Use git worktree for file changes
 - For extensions, see `/claude-code-guide`
+
+## Plan Review
+
+Planモード終了前（ExitPlanMode呼び出し前）に `pdm-reviewer` agent を呼び出す。
+
+**Skip条件**:
+- 5行以下のバグ修正
+- ドキュメント変更のみ
+- ユーザーが明示的にスキップ指示
+
+**NoGo判定時**:
+- Planをブロックし、改善提案を提示
+- ユーザーが修正後、再レビュー
