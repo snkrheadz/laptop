@@ -44,13 +44,13 @@ Always cite sources. If unverified, state "unverified".
 
 ## Plan Review
 
-Planモード終了前（ExitPlanMode呼び出し前）に `pdm-reviewer` agent を呼び出す。
+Invoke `pdm-reviewer` agent before Plan mode exits (before ExitPlanMode call).
 
-**Skip条件**:
-- 5行以下のバグ修正
-- ドキュメント変更のみ
-- ユーザーが明示的にスキップ指示
+**Skip conditions**:
+- Bug fixes ≤5 lines
+- Documentation-only changes
+- User explicitly requests skip
 
-**NoGo判定時**:
-- Planをブロックし、改善提案を提示
-- ユーザーが修正後、再レビュー
+**On NoGo verdict**:
+- Block the Plan and provide improvement suggestions
+- Re-review after user makes corrections

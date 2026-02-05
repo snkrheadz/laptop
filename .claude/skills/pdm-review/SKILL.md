@@ -1,5 +1,5 @@
 ---
-description: "事業観点でPlan/設計/PRをレビュー。目的とゴールに対する妥当性を評価。トリガー: pdm-review, 事業レビュー, PdMレビュー, ROI確認"
+description: "Review Plans/designs/PRs from business perspective. Evaluate alignment with goals. Triggers: pdm-review, business review, PdM review, ROI check"
 allowed-tools:
   - Task
   - Read
@@ -7,69 +7,69 @@ allowed-tools:
   - Glob
 ---
 
-# pdm-review スキル
+# pdm-review skill
 
-Plan、設計、PRを事業観点でレビューし、目的とゴールに対する妥当性を評価する。
+Review Plans, designs, and PRs from a business perspective to evaluate alignment with goals.
 
-## 概要
+## Overview
 
-PdM (Product Manager) の視点で以下を評価:
-- 目的との整合性
-- 投資対効果 (ROI)
-- リスク
+Evaluate from PdM (Product Manager) perspective:
+- Goal alignment
+- Return on Investment (ROI)
+- Risks
 
-## 使用方法
+## Usage
 
-### 手動呼び出し
+### Manual invocation
 
 ```
 /pdm-review
 ```
 
-現在のコンテキスト（Plan内容、diff、設計書）を自動収集してレビューを実行。
+Automatically collects current context (Plan content, diff, design docs) and runs review.
 
-### 自動呼び出し
+### Automatic invocation
 
-Planモード終了前（ExitPlanMode呼び出し前）に自動で実行される。
+Automatically runs before Plan mode exits (before ExitPlanMode call).
 
-**Skip条件**:
-- 5行以下のバグ修正
-- ドキュメント変更のみ
+**Skip conditions**:
+- Bug fixes ≤5 lines
+- Documentation-only changes
 
-## 実行フロー
+## Execution Flow
 
 ```
-1. Context確認
+1. Context check
    ↓
-   goal/metricsが不明？
-   → Yes: 質問フェーズ
-   → No: 評価フェーズ
+   goal/metrics unclear?
+   → Yes: Question phase
+   → No: Evaluation phase
 
-2. 質問フェーズ（必要時）
-   Q1: この変更で何を達成したい？
-   Q2: 成功をどう測定する？
-   Q3: 制約はある？
+2. Question phase (if needed)
+   Q1: What do you want to achieve with this change?
+   Q2: How will success be measured?
+   Q3: Any constraints?
 
-3. 評価フェーズ
-   - 目的整合性 (⭐1-5)
+3. Evaluation phase
+   - Goal alignment (⭐1-5)
    - ROI (⭐1-5)
-   - リスク評価
+   - Risk assessment
 
-4. 判定
-   Go / NoGo / 要確認
+4. Verdict
+   Go / NoGo / Needs Clarification
 ```
 
-## 出力フォーマット
+## Output Format
 
 ```markdown
 ## PdM Review
 
-### Verdict: [Go / NoGo / 要確認]
+### Verdict: [Go / NoGo / Needs Clarification]
 
 ### Context
-- **Goal**: <目的>
+- **Goal**: <goal>
 - **Success Metrics**: <KPI/KGI>
-- **Constraints**: <制約>
+- **Constraints**: <constraints>
 
 ### Evaluation
 
@@ -79,37 +79,37 @@ Planモード終了前（ExitPlanMode呼び出し前）に自動で実行され�
 | ROI | ⭐X | ... |
 
 ### Risks
-- **[リスク種別]**: <説明> → 対策: <提案>
+- **[Risk Type]**: <description> → Mitigation: <suggestion>
 
 ### Improvement Suggestions
 1. ...
 
 ### Recommendation
-<推奨事項と理由>
+<recommendation with reasoning>
 ```
 
-## NoGo時の動作
+## NoGo Behavior
 
-**NoGo判定時はPlanをブロック**し、以下を提供:
-1. NoGoの明確な理由
-2. 改善提案
-3. Goに変えるために必要なこと
+**When verdict is NoGo, block the Plan** and provide:
+1. Clear reasons for NoGo
+2. Improvement suggestions
+3. What needs to change for Go verdict
 
-## 使用例
+## Examples
 
-- `/pdm-review` - 現在のPlanをレビュー
-- Planモード終了前に自動でレビュー実行
-- PR作成前の事業価値確認
+- `/pdm-review` - Review current Plan
+- Automatic review before Plan mode exits
+- Business value check before PR creation
 
-## 実装
+## Implementation
 
-pdm-reviewer agentを呼び出して実行:
+Invokes pdm-reviewer agent:
 
 ```
 Task tool call:
   subagent_type: pdm-reviewer
   prompt: |
-    以下のPlan/設計/PRをレビューしてください。
+    Please review the following Plan/design/PR.
 
-    [Plan内容/diff/設計書をここに含める]
+    [Include Plan content/diff/design doc here]
 ```
