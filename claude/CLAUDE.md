@@ -41,3 +41,16 @@ Always cite sources. If unverified, state "unverified".
 
 - Use git worktree for file changes
 - For extensions, see `/claude-code-guide`
+
+## Plan Review
+
+Invoke `pdm-reviewer` agent before Plan mode exits (before ExitPlanMode call).
+
+**Skip conditions**:
+- Bug fixes ≤5 lines
+- Documentation-only changes
+- User explicitly requests skip
+
+**On NoGo verdict**:
+- Block the Plan and provide improvement suggestions
+- Re-review after user makes corrections
