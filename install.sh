@@ -112,28 +112,13 @@ setup_claude_agents() {
 
     mkdir -p "$HOME/.claude/agents"
 
-    # All managed agent files
-    local agents=(
-        "arxiv-ai-researcher.md"
-        "aws-best-practices-advisor.md"
-        "build-validator.md"
-        "code-architect.md"
-        "code-simplifier.md"
-        "diagnose-dotfiles.md"
-        "gcp-best-practices-advisor.md"
-        "gemini-api-researcher.md"
-        "migration-assistant.md"
-        "nano-banana-pro-prompt-generator.md"
-        "oncall-guide.md"
-        "state-machine-diagram.md"
-        "strategic-research-analyst.md"
-        "verify-app.md"
-        "verify-shell.md"
-        "verify-subagent-result.md"
-    )
-
-    for agent in "${agents[@]}"; do
-        safe_ln "$DOTFILES_DIR/claude/agents/$agent" "$HOME/.claude/agents/$agent"
+    # Dynamically find all agent files (*.md files in agents directory)
+    for agent_file in "$DOTFILES_DIR/claude/agents"/*.md; do
+        if [ -f "$agent_file" ]; then
+            local agent_name
+            agent_name=$(basename "$agent_file")
+            safe_ln "$agent_file" "$HOME/.claude/agents/$agent_name"
+        fi
     done
 
     log_success "Claude agents configured"
@@ -197,21 +182,13 @@ setup_claude_skills() {
 
     mkdir -p "$HOME/.claude/skills"
 
-    # All managed skill directories
-    local skills=(
-        "claude-code-guide"
-        "db-query"
-        "first-principles"
-        "merge-pr"
-        "project-setup"
-        "quick-commit"
-        "review-changes"
-        "techdebt"
-        "test-and-fix"
-    )
-
-    for skill in "${skills[@]}"; do
-        safe_ln "$DOTFILES_DIR/claude/skills/$skill" "$HOME/.claude/skills/$skill"
+    # Dynamically find all skill directories (directories containing SKILL.md)
+    for skill_dir in "$DOTFILES_DIR/claude/skills"/*/; do
+        if [ -f "${skill_dir}SKILL.md" ]; then
+            local skill_name
+            skill_name=$(basename "$skill_dir")
+            safe_ln "$DOTFILES_DIR/claude/skills/$skill_name" "$HOME/.claude/skills/$skill_name"
+        fi
     done
 
     log_success "Claude skills configured"
