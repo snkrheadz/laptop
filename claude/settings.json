@@ -1,13 +1,9 @@
 {
-  "language": "japanese",
   "env": {
     "ENABLE_TOOL_SEARCH": "auto:15",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "permissions": {
-    "additionalDirectories": [
-      "../worktrees/"
-    ],
     "allow": [
       "Read(~/.claude/**)",
       "Read",
@@ -54,6 +50,9 @@
       "Read(~/.ssh/id_*)",
       "Bash(rm -rf /)",
       "Bash(sudo *)"
+    ],
+    "additionalDirectories": [
+      "../worktrees/"
     ]
   },
   "model": "opus",
@@ -114,5 +113,7 @@
     "playwright@claude-plugins-official": false,
     "document-skills@anthropic-agent-skills": true,
     "ralph-loop@claude-plugins-official": true
-  }
+  },
+  "language": "japanese",
+  "fastMode": true
 }
