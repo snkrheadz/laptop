@@ -114,6 +114,5 @@
     "document-skills@anthropic-agent-skills": true,
     "ralph-loop@claude-plugins-official": true
   },
-  "language": "japanese",
-  "fastMode": true
+  "language": "japanese"
 }
