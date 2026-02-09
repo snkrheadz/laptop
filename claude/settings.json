@@ -55,7 +55,6 @@
       "../worktrees/"
     ]
   },
-  "model": "opus",
   "hooks": {
     "PostToolUse": [
       {
