@@ -46,9 +46,8 @@ mise use go@1.24.3                        # Install/use specific version
 │   ├── functions/      # Custom zsh functions: _git_delete_branch, change-extension,
 │   │                   #   envup, mcd, pr-merge
 │   └── configs/        # Modular zsh configs
-│       ├── pre/        # Loaded first (before main configs)
 │       ├── *.zsh       # Main configs (color, editor, history, etc.)
-│       └── post/       # Loaded last (path.zsh, completion.zsh)
+│       └── post/       # Loaded last (path.zsh, completion.zsh, mise.zsh)
 │
 ├── git/                # Git config → ~/.gitconfig, ~/.gitmessage, ~/.gitignore
 ├── tmux/               # Tmux config → ~/.tmux.conf
@@ -64,14 +63,15 @@ mise use go@1.24.3                        # Install/use specific version
 │   ├── settings.json   # Claude Code settings (hooks, plugins, permissions)
 │   ├── statusline.sh   # Status line display script
 │   ├── CLAUDE.md       # User global instructions
-│   ├── hooks/          # PostToolUse hooks: validate-shell.sh, save-to-obsidian.js
-│   ├── agents/         # Subagents (17): verify-shell, code-architect, build-validator,
-│   │                   #   aws-best-practices-advisor, diagnose-dotfiles, etc.
-│   └── skills/         # Skills (9): claude-code-guide, quick-commit, merge-pr,
-│                       #   review-changes, test-and-fix, db-query, etc.
+│   ├── hooks/          # Lifecycle hooks (4): validate-shell.sh, save-to-obsidian.js,
+│   │                   #   session-context.sh, pre-tool-guard.sh
+│   ├── agents/         # Subagents (18): verify-shell, code-architect, build-validator,
+│   │                   #   aws-best-practices-advisor, diagnose-dotfiles, pdm-reviewer, etc.
+│   └── skills/         # Skills (10): claude-code-guide, quick-commit, merge-pr,
+│                       #   review-changes, test-and-fix, db-query, trace-dataflow, etc.
 │
 ├── .claude/            # Local skills (project-specific, NOT symlinked)
-│   └── skills/         # Local skills (14): brew-manage, health-check, zsh-config, etc.
+│   └── skills/         # Local skills (15): brew-manage, health-check, zsh-config, pdm-review, etc.
 │
 ├── .github/
 │   └── workflows/main.yml  # CI/CD (gitleaks + shellcheck)
@@ -96,9 +96,9 @@ mise use go@1.24.3                        # Install/use specific version
 The `.zshrc` loads configuration in this order:
 
 1. `zsh/functions/*` - Custom functions
-2. `zsh/configs/pre/*` - Pre-configs
+2. `zsh/configs/pre/*` - Pre-configs (code in .zshrc but directory unused)
 3. `zsh/configs/*.zsh` - Main configs
-4. `zsh/configs/post/*` - Post-configs (PATH, completion)
+4. `zsh/configs/post/*` - Post-configs (PATH, completion, mise)
 5. `~/.aliases` - Shell aliases
 6. oh-my-zsh with plugins: `git`, `zsh-autosuggestions`
 
@@ -126,7 +126,7 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `hooks/session-context.sh` - SessionStart hook for project context injection
 - `hooks/pre-tool-guard.sh` - PreToolUse hook for sensitive file access blocking
 
-**Agents** (17):
+**Agents** (18):
 - `verify-shell`, `verify-app`, `build-validator` - Verification agents
 - `code-architect`, `code-simplifier` - Code design agents
 - `aws-best-practices-advisor`, `gcp-best-practices-advisor` - Cloud guidance
@@ -134,8 +134,9 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `strategic-research-analyst`, `nano-banana-pro-prompt-generator`
 - `state-machine-diagram`, `migration-assistant`, `oncall-guide`
 - `diagnose-dotfiles`, `verify-subagent-result`
+- `pdm-reviewer`
 
-**Skills** (9):
+**Skills** (10):
 - `claude-code-guide` - Claude Code extension documentation
 - `db-query` - Database query helper
 - `first-principles` - First principles analysis
@@ -145,8 +146,9 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `review-changes` - Code review helper
 - `techdebt` - Tech debt analysis
 - `test-and-fix` - Test and fix workflow
+- `trace-dataflow` - Data flow tracing
 
-**Local Skills** (14) - Project-specific, in `.claude/skills/`:
+**Local Skills** (15) - Project-specific, in `.claude/skills/`:
 
 These skills are **only available in this repository** (not symlinked to `~/.claude/`):
 - `brew-manage` - Homebrew package management
@@ -159,6 +161,7 @@ These skills are **only available in this repository** (not symlinked to `~/.cla
 - `launchd-manage` - Auto-sync launchd management
 - `mise-runtime` - Runtime management (mise)
 - `new-machine-setup` - New machine setup guide
+- `pdm-review` - Plan/design review from business perspective
 - `security-check` - Security scanning
 - `symlink-manage` - Symlink management
 - `tmux-config` - tmux configuration
