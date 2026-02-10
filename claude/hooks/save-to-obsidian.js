@@ -41,6 +41,30 @@ const NOISE_PATTERNS = [
   /<user-prompt-submit-hook>/,
 ];
 
+// Secret patterns to redact before writing to Obsidian
+const SECRET_PATTERNS = [
+  { pattern: /(?:api[_-]?key|apikey)\s*[:=]\s*['"][^'"]{8,}['"]/gi, label: '[REDACTED:API_KEY]' },
+  { pattern: /(?:secret|token|auth[_-]?token)\s*[:=]\s*['"][^'"]{8,}['"]/gi, label: '[REDACTED:TOKEN]' },
+  { pattern: /ghp_[A-Za-z0-9_]{36,}/g, label: '[REDACTED:GITHUB_TOKEN]' },
+  { pattern: /gho_[A-Za-z0-9_]{36,}/g, label: '[REDACTED:GITHUB_TOKEN]' },
+  { pattern: /github_pat_[A-Za-z0-9_]{22,}/g, label: '[REDACTED:GITHUB_PAT]' },
+  { pattern: /sk-[A-Za-z0-9]{20,}/g, label: '[REDACTED:API_KEY]' },
+  { pattern: /AKIA[0-9A-Z]{16}/g, label: '[REDACTED:AWS_ACCESS_KEY]' },
+  { pattern: /Bearer\s+[A-Za-z0-9\-._~+/]+=*/g, label: '[REDACTED:BEARER_TOKEN]' },
+  { pattern: /-----BEGIN (?:RSA |EC |DSA )?PRIVATE KEY-----[\s\S]*?-----END (?:RSA |EC |DSA )?PRIVATE KEY-----/g, label: '[REDACTED:PRIVATE_KEY]' },
+  { pattern: /xox[bporas]-[A-Za-z0-9-]{10,}/g, label: '[REDACTED:SLACK_TOKEN]' },
+];
+
+// Redact secrets from text
+function redactSecrets(text) {
+  if (typeof text !== 'string') return text;
+  let redacted = text;
+  for (const { pattern, label } of SECRET_PATTERNS) {
+    redacted = redacted.replace(pattern, label);
+  }
+  return redacted;
+}
+
 // Topic detection keywords
 const TOPIC_KEYWORDS = {
   legal: ['法務', '法的', 'legal', '契約', '利用規約'],
@@ -249,10 +273,11 @@ function formatToMarkdown(conversations) {
   const lines = [];
 
   for (const conv of conversations) {
+    const safeContent = redactSecrets(conv.content);
     if (conv.role === 'user') {
-      lines.push(`**User**: ${conv.content}\n`);
+      lines.push(`**User**: ${safeContent}\n`);
     } else if (conv.role === 'assistant') {
-      lines.push(`**Claude**: ${conv.content}\n`);
+      lines.push(`**Claude**: ${safeContent}\n`);
     }
   }
 
