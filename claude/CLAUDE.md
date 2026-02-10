@@ -41,6 +41,10 @@ Always cite sources. If unverified, state "unverified".
 
 - Use git worktree for file changes
 - For extensions, see `/claude-code-guide`
+- Resume named sessions: `claude --resume <name>`
+- Use `/rewind` to undo recent changes
+- Use `/memory` to manage persistent context
+- Use `/keybindings` to view/edit keyboard shortcuts
 
 ## Plan Review
 

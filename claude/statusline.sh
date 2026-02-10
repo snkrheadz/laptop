@@ -9,6 +9,12 @@
 
 input=$(cat)
 
+# Check jq dependency
+if ! command -v jq &>/dev/null; then
+    echo "[statusline] jq not found"
+    exit 0
+fi
+
 # === Helper function: Format number to K notation ===
 format_k() {
     local num=$1
@@ -50,16 +56,21 @@ if [ ! -f "$USAGE_FILE" ]; then
     echo '{"sessions":{}}' > "$USAGE_FILE"
 fi
 
-# Update session cost and calculate daily total
+# Update session cost and calculate daily total (with file lock for concurrent writes)
+LOCK_FILE="$USAGE_FILE.lock"
+exec 200>"$LOCK_FILE"
+flock -w 2 200 2>/dev/null || true
+
+jq --arg sid "$SESSION_ID" --argjson cost "$COST" '
+    .sessions[$sid] = $cost
+' "$USAGE_FILE" > "$USAGE_FILE.tmp" 2>/dev/null && mv "$USAGE_FILE.tmp" "$USAGE_FILE"
+
 DAILY_TOTAL=$(jq --arg sid "$SESSION_ID" --argjson cost "$COST" '
     .sessions[$sid] = $cost |
     [.sessions | to_entries[] | .value] | add // 0
-' "$USAGE_FILE")
+' "$USAGE_FILE" 2>/dev/null || echo "0")
 
-# Update file (save session info)
-jq --arg sid "$SESSION_ID" --argjson cost "$COST" '
-    .sessions[$sid] = $cost
-' "$USAGE_FILE" > "$USAGE_FILE.tmp" && mv "$USAGE_FILE.tmp" "$USAGE_FILE"
+exec 200>&-
 
 # Cost display
 DAILY_DISPLAY=$(printf '$%.2f' "$DAILY_TOTAL")
