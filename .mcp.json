@@ -1,9 +1,0 @@
-{
-  "mcpServers": {
-    "devin": {
-      "command": "npx",
-      "args": ["-y", "devin-mcp-server"],
-      "env": {}
-    }
-  }
-}
