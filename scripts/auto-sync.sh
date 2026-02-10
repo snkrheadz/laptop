@@ -22,7 +22,7 @@ fi
 # Update Brewfile
 log "Updating Brewfile..."
 if command -v brew &>/dev/null; then
-    brew bundle dump --force --file=Brewfile 2>/dev/null || true
+    brew bundle dump --force --no-vscode --file=Brewfile 2>/dev/null || true
 fi
 
 # Run gitleaks scan (fail silently if not installed)
