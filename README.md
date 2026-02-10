@@ -59,15 +59,14 @@ laptop/
 │   ├── .aliases            # Shell aliases
 │   ├── functions/          # Custom zsh functions (5)
 │   └── configs/            # Modular configs
-│       ├── pre/            # Loaded first
 │       ├── *.zsh           # Main configs (color, editor, history, etc.)
-│       └── post/           # Loaded last (PATH, completion)
+│       └── post/           # Loaded last (PATH, completion, mise)
 │
 ├── git/                    # Git configuration
 │   ├── .gitconfig          # Main git config
 │   ├── .gitignore          # Global gitignore
 │   ├── .gitmessage         # Commit message template
-│   └── .git_template/      # Git hooks template
+│   └── .git_template       # Git hooks template
 │
 ├── ghostty/                # Ghostty terminal config
 ├── iterm2/                 # iTerm2 settings plist
@@ -81,11 +80,11 @@ laptop/
 │   ├── CLAUDE.md           # User global instructions
 │   ├── settings.json       # Hooks, plugins, permissions
 │   ├── statusline.sh       # Custom status line script
-│   ├── hooks/              # PostToolUse hooks (2)
-│   ├── agents/             # Subagents (17)
-│   └── skills/             # Custom skills (9)
+│   ├── hooks/              # Lifecycle hooks (4)
+│   ├── agents/             # Subagents (18)
+│   └── skills/             # Custom skills (10)
 │
-├── .claude/                # Local skills (project-specific, 14)
+├── .claude/                # Local skills (project-specific, 15)
 │   └── skills/             # Not symlinked to ~/.claude/
 │
 ├── scripts/
@@ -274,9 +273,9 @@ alias deploy="./scripts/deploy-work.sh"
 
 ```
 1. zsh/functions/*        # Custom functions
-2. zsh/configs/pre/*      # Pre-configs
+2. zsh/configs/pre/*      # Pre-configs (code exists in .zshrc but directory unused)
 3. zsh/configs/*.zsh      # Main configs
-4. zsh/configs/post/*     # Post-configs (PATH, completion)
+4. zsh/configs/post/*     # Post-configs (PATH, completion, mise)
 5. ~/.aliases             # Shell aliases
 6. oh-my-zsh              # Plugins: git, zsh-autosuggestions
 ```
@@ -300,10 +299,12 @@ claude/
 ├── CLAUDE.md           # User global instructions
 ├── settings.json       # Hooks, plugins, permissions
 ├── statusline.sh       # Custom status line script
-├── hooks/              # PostToolUse hooks (2)
-│   ├── validate-shell.sh   # shellcheck validation
-│   └── save-to-obsidian.js # Obsidian integration
-├── agents/             # Subagents (17)
+├── hooks/              # Lifecycle hooks (4)
+│   ├── validate-shell.sh   # PostToolUse: shellcheck validation
+│   ├── save-to-obsidian.js # Stop: Obsidian integration (secret redaction)
+│   ├── session-context.sh  # SessionStart: project context injection
+│   └── pre-tool-guard.sh   # PreToolUse: sensitive file access blocking
+├── agents/             # Subagents (18)
 │   ├── verify-shell.md, verify-app.md, build-validator.md
 │   ├── code-architect.md, code-simplifier.md, oncall-guide.md
 │   ├── aws-best-practices-advisor.md, gcp-best-practices-advisor.md
@@ -311,7 +312,8 @@ claude/
 │   ├── strategic-research-analyst.md, nano-banana-pro-prompt-generator.md
 │   ├── state-machine-diagram.md, migration-assistant.md
 │   ├── diagnose-dotfiles.md, verify-subagent-result.md
-└── skills/             # Custom skills (9)
+│   ├── pdm-reviewer.md
+└── skills/             # Custom skills (10)
     ├── claude-code-guide/  # Claude Code extension guide
     ├── db-query/           # Database query helper
     ├── first-principles/   # First principles analysis
@@ -320,6 +322,7 @@ claude/
     ├── quick-commit/       # Fast commit workflow
     ├── review-changes/     # Code review helper
     ├── techdebt/           # Tech debt analysis
+    ├── trace-dataflow/     # Data flow tracing
     └── test-and-fix/       # Test and fix workflow
 ```
 
@@ -330,9 +333,9 @@ claude/
 | `CLAUDE.md` | User global instructions (workflow, best practices, prohibitions) |
 | `settings.json` | Hooks, plugins, permissions, Obsidian integration |
 | `statusline.sh` | Custom status line showing model, cost, context |
-| `hooks/` | PostToolUse hooks for shellcheck and Obsidian |
-| `agents/` | 17 specialized subagents for various tasks |
-| `skills/` | 9 custom skills for common workflows |
+| `hooks/` | 4 lifecycle hooks (PostToolUse, Stop, SessionStart, PreToolUse) |
+| `agents/` | 18 specialized subagents for various tasks |
+| `skills/` | 10 custom skills for common workflows |
 
 ### Status Line
 
@@ -343,10 +346,12 @@ Displays in Claude Code CLI:
 
 ### Hooks
 
-| Hook | Description |
-|------|-------------|
-| `validate-shell.sh` | Runs shellcheck on `.sh` files after Write/Edit |
-| `save-to-obsidian.js` | Saves conversation context to Obsidian |
+| Hook | Lifecycle Event | Description |
+|------|----------------|-------------|
+| `validate-shell.sh` | PostToolUse | Runs shellcheck on `.sh` files after Write/Edit |
+| `save-to-obsidian.js` | Stop | Saves conversation context to Obsidian (secret redaction) |
+| `session-context.sh` | SessionStart | Injects project context at session start |
+| `pre-tool-guard.sh` | PreToolUse | Blocks access to sensitive files |
 
 ### Key Subagents
 
@@ -370,7 +375,7 @@ Displays in Claude Code CLI:
 
 ### Local Skills (Project-specific)
 
-The `.claude/skills/` directory contains 14 project-specific skills that are **only available in this repository** (not symlinked to `~/.claude/`). These skills are tailored for managing this dotfiles repository.
+The `.claude/skills/` directory contains 15 project-specific skills that are **only available in this repository** (not symlinked to `~/.claude/`). These skills are tailored for managing this dotfiles repository.
 
 | Skill | Description |
 |-------|-------------|
@@ -384,6 +389,7 @@ The `.claude/skills/` directory contains 14 project-specific skills that are **o
 | `launchd-manage` | Auto-sync launchd agent management (start/stop/logs) |
 | `mise-runtime` | Runtime management with mise (Go, Node.js, Python, Ruby) |
 | `new-machine-setup` | New machine setup guide (macOS → dotfiles) |
+| `pdm-review` | Plan/design review from business perspective (PdM review) |
 | `security-check` | Security scanning (gitleaks, pre-commit, secrets) |
 | `symlink-manage` | Symlink status check and repair (broken link detection) |
 | `tmux-config` | tmux configuration (.tmux.conf, keybindings) |
