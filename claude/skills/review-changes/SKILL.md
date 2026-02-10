@@ -4,6 +4,7 @@ description: "Review changes before commit. Analyzes diff and identifies issues,
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob
 model: sonnet
+context: fork
 ---
 
 # Change Review Skill

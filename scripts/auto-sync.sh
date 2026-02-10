@@ -50,10 +50,19 @@ fi
 log "Staging changes..."
 git add -A
 
+# Run gitleaks on staged files (catch secrets before commit)
+if command -v gitleaks &>/dev/null; then
+    if ! gitleaks detect --staged --source="$DOTFILES_DIR" 2>/dev/null; then
+        log "ERROR: gitleaks detected secrets in staged files. Aborting commit."
+        git reset HEAD 2>/dev/null || true
+        exit 1
+    fi
+fi
+
 # Create commit
 COMMIT_MSG="chore: auto-sync dotfiles $(date '+%Y-%m-%d %H:%M')"
 log "Creating commit: $COMMIT_MSG"
-git commit -m "$COMMIT_MSG" --no-verify 2>/dev/null || true
+git commit -m "$COMMIT_MSG" 2>/dev/null || true
 
 # Push to remote
 log "Pushing to remote..."
