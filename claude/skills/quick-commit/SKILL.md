@@ -4,6 +4,7 @@ description: "Quick commit. Stages changes, generates commit message, and execut
 user-invocable: true
 allowed-tools: Bash, Read, Grep
 model: haiku
+context: fork
 ---
 
 # Quick Commit

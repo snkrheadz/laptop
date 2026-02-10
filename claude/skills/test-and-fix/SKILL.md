@@ -4,6 +4,7 @@ description: "Test execution and automatic repair loop on failure. Runs tests, a
 user-invocable: true
 allowed-tools: Read, Edit, Bash, Grep, Glob
 model: sonnet
+context: fork
 ---
 
 # Test Execution & Auto-Repair
