@@ -4,6 +4,7 @@ description: "Technical debt detection and fix suggestions. Detects duplicate co
 user-invocable: true
 allowed-tools: Read, Grep, Glob, Bash
 model: sonnet
+context: fork
 ---
 
 # Technical Debt Reporter
