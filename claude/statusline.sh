@@ -1,6 +1,6 @@
 #!/bin/bash
 # Claude Code Status Line Script
-# Displays: Model | Directory | Git Branch | Daily Cost | Token Info | Context Info
+# Displays: Model | Dir+Branch | Duration | Cost(session/daily) | Lines | Cache% | Context Bar
 #
 # Installation:
 #   1. Symlink to ~/.claude/statusline.sh
@@ -9,106 +9,176 @@
 
 input=$(cat)
 
-# Check jq dependency
 if ! command -v jq &>/dev/null; then
-    echo "[statusline] jq not found"
+    echo "jq not found"
     exit 0
 fi
 
-# === Helper function: Format number to K notation ===
-format_k() {
-    local num=$1
-    if [ "$num" -ge 1000 ]; then
-        awk "BEGIN {printf \"%.1fk\", $num/1000}"
+# === ANSI Colors ===
+RED=$'\033[31m'
+YELLOW=$'\033[33m'
+GREEN=$'\033[32m'
+RESET=$'\033[0m'
+
+# === Extract all values in a single jq call ===
+eval "$(echo "$input" | jq -r '
+  "MODEL=" + (.model.display_name // "Unknown" | @sh),
+  "CURRENT_DIR=" + (.workspace.current_dir // "." | @sh),
+  "COST=" + (.cost.total_cost_usd // 0 | tostring | @sh),
+  "SESSION_ID=" + (.session_id // "unknown" | @sh),
+  "DURATION_MS=" + (.cost.total_duration_ms // 0 | tostring | @sh),
+  "LINES_ADDED=" + (.cost.total_lines_added // 0 | tostring | @sh),
+  "LINES_REMOVED=" + (.cost.total_lines_removed // 0 | tostring | @sh),
+  "USED_PCT=" + (.context_window.used_percentage // 0 | tostring | @sh),
+  "CTX_SIZE=" + (.context_window.context_window_size // 0 | tostring | @sh),
+  "EXCEEDS_200K=" + (.exceeds_200k_tokens // false | tostring | @sh),
+  "INPUT_TOKENS=" + (.context_window.current_usage.input_tokens // 0 | tostring | @sh),
+  "CACHE_READ=" + (.context_window.current_usage.cache_read_input_tokens // 0 | tostring | @sh),
+  "CACHE_CREATE=" + (.context_window.current_usage.cache_creation_input_tokens // 0 | tostring | @sh),
+  "VIM_MODE=" + (.vim.mode // "" | @sh),
+  "AGENT_NAME=" + (.agent.name // "" | @sh)
+')" 2>/dev/null
+
+# Fallback defaults if jq parsing failed
+: "${MODEL:=Unknown}" "${CURRENT_DIR:=.}" "${COST:=0}" "${SESSION_ID:=unknown}"
+: "${DURATION_MS:=0}" "${LINES_ADDED:=0}" "${LINES_REMOVED:=0}"
+: "${USED_PCT:=0}" "${CTX_SIZE:=0}" "${EXCEEDS_200K:=false}"
+: "${INPUT_TOKENS:=0}" "${CACHE_READ:=0}" "${CACHE_CREATE:=0}"
+
+DIR_NAME="${CURRENT_DIR##*/}"
+
+# === Git branch with 5s cache ===
+GIT_BRANCH=""
+CACHE_FILE="/tmp/statusline-git-${DIR_NAME}"
+if [ -f "$CACHE_FILE" ] && [ $(($(date +%s) - $(stat -f%m "$CACHE_FILE" 2>/dev/null || echo 0))) -lt 5 ]; then
+    GIT_BRANCH=$(<"$CACHE_FILE")
+else
+    if git -C "$CURRENT_DIR" rev-parse --git-dir &>/dev/null; then
+        GIT_BRANCH=$(git -C "$CURRENT_DIR" branch --show-current 2>/dev/null)
+    fi
+    printf '%s' "$GIT_BRANCH" > "$CACHE_FILE"
+fi
+
+BRANCH_DISPLAY=""
+if [ -n "$GIT_BRANCH" ]; then
+    if [ ${#GIT_BRANCH} -gt 20 ]; then
+        GIT_BRANCH="${GIT_BRANCH:0:17}..."
+    fi
+    BRANCH_DISPLAY=" 🌿${GIT_BRANCH}"
+fi
+
+# === Duration formatting ===
+format_duration() {
+    local ms=$1
+    local secs=$((ms / 1000))
+    if [ "$secs" -ge 3600 ]; then
+        printf '%dh%dm' $((secs / 3600)) $((secs % 3600 / 60))
+    elif [ "$secs" -ge 60 ]; then
+        printf '%dm' $((secs / 60))
     else
-        echo "$num"
+        printf '%ds' "$secs"
     fi
 }
 
-# JSON parsing (requires jq)
-MODEL=$(echo "$input" | jq -r '.model.display_name // "Unknown"')
-CURRENT_DIR=$(echo "$input" | jq -r '.workspace.current_dir // "."')
-COST=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
-SESSION_ID=$(echo "$input" | jq -r '.session_id // "unknown"')
-
-# Extract directory name only
-DIR_NAME="${CURRENT_DIR##*/}"
-
-# Get Git branch
-GIT_BRANCH=""
-if git -C "$CURRENT_DIR" rev-parse --git-dir > /dev/null 2>&1; then
-    BRANCH=$(git -C "$CURRENT_DIR" branch --show-current 2>/dev/null)
-    if [ -n "$BRANCH" ]; then
-        GIT_BRANCH=" | 🌿 $BRANCH"
-    fi
-fi
-
-# === Daily cumulative cost calculation ===
+# === Daily cumulative cost tracking ===
 TODAY=$(date +%Y-%m-%d)
 USAGE_DIR="$HOME/.claude/usage"
 USAGE_FILE="$USAGE_DIR/$TODAY.json"
-
-# Create directory
 mkdir -p "$USAGE_DIR"
 
-# Initialize today's file if it doesn't exist
 if [ ! -f "$USAGE_FILE" ]; then
     echo '{"sessions":{}}' > "$USAGE_FILE"
 fi
 
-# Update session cost and calculate daily total (with file lock for concurrent writes)
 LOCK_FILE="$USAGE_FILE.lock"
 exec 200>"$LOCK_FILE"
 flock -w 2 200 2>/dev/null || true
 
-jq --arg sid "$SESSION_ID" --argjson cost "$COST" '
-    .sessions[$sid] = $cost
-' "$USAGE_FILE" > "$USAGE_FILE.tmp" 2>/dev/null && mv "$USAGE_FILE.tmp" "$USAGE_FILE"
+jq --arg sid "$SESSION_ID" --argjson cost "$COST" \
+    '.sessions[$sid] = $cost' "$USAGE_FILE" > "$USAGE_FILE.tmp" 2>/dev/null \
+    && mv "$USAGE_FILE.tmp" "$USAGE_FILE"
 
-DAILY_TOTAL=$(jq --arg sid "$SESSION_ID" --argjson cost "$COST" '
-    .sessions[$sid] = $cost |
-    [.sessions | to_entries[] | .value] | add // 0
-' "$USAGE_FILE" 2>/dev/null || echo "0")
+DAILY_TOTAL=$(jq '[.sessions | to_entries[] | .value] | add // 0' "$USAGE_FILE" 2>/dev/null || echo "0")
 
 exec 200>&-
 
-# Cost display
-DAILY_DISPLAY=$(printf '$%.2f' "$DAILY_TOTAL")
+# === Build output segments ===
+SEGMENTS=()
 
-# === Token and Context calculation ===
-CONTEXT_SIZE=$(echo "$input" | jq -r '.context_window.context_window_size // 0')
-USAGE=$(echo "$input" | jq -r '.context_window.current_usage // null')
+# [1] Model
+SEGMENTS+=("$MODEL")
 
-TOKEN_DISPLAY=""
-CONTEXT_DISPLAY=""
+# [2] Directory + Branch
+SEGMENTS+=("${DIR_NAME}${BRANCH_DISPLAY}")
 
-if [ "$USAGE" != "null" ] && [ "$CONTEXT_SIZE" != "0" ]; then
-    # Extract token values
-    INPUT_TOKENS=$(echo "$USAGE" | jq -r '.input_tokens // 0')
-    OUTPUT_TOKENS=$(echo "$USAGE" | jq -r '.output_tokens // 0')
-    CACHE_CREATE=$(echo "$USAGE" | jq -r '.cache_creation_input_tokens // 0')
-    CACHE_READ=$(echo "$USAGE" | jq -r '.cache_read_input_tokens // 0')
+# [3] Session duration
+SEGMENTS+=("⏱ $(format_duration "$DURATION_MS")")
 
-    # Calculate total tokens
-    TOTAL_TOKENS=$((INPUT_TOKENS + OUTPUT_TOKENS + CACHE_CREATE + CACHE_READ))
+# [4] Cost: session / daily
+SEGMENTS+=("💰$(printf '$%.2f/$%.2f' "$COST" "$DAILY_TOTAL")")
 
-    # Token display: 🎫 In:8.5k Out:1.2k C:2.0k Tot:11.7k
-    TOKEN_DISPLAY="🎫 In:$(format_k "$INPUT_TOKENS") Out:$(format_k "$OUTPUT_TOKENS") C:$(format_k "$CACHE_READ") Tot:$(format_k "$TOTAL_TOKENS")"
-
-    # Context percentage calculation
-    CONTEXT_PERCENT=$((TOTAL_TOKENS * 100 / CONTEXT_SIZE))
-
-    # Usable context = ~95% of context_window_size (Claude's internal limit)
-    USABLE_SIZE=$((CONTEXT_SIZE * 95 / 100))
-    USABLE_PERCENT=$((TOTAL_TOKENS * 100 / USABLE_SIZE))
-
-    # Context display: 🧠 200.0k 8% (9%)
-    CONTEXT_DISPLAY="🧠 $(format_k "$CONTEXT_SIZE") ${CONTEXT_PERCENT}% (${USABLE_PERCENT}%)"
+# [5] Lines changed (skip if zero)
+if [ "$LINES_ADDED" -gt 0 ] || [ "$LINES_REMOVED" -gt 0 ]; then
+    SEGMENTS+=("+${LINES_ADDED}-${LINES_REMOVED}")
 fi
 
-# Final output
-if [ -n "$TOKEN_DISPLAY" ] && [ -n "$CONTEXT_DISPLAY" ]; then
-    echo "[$MODEL] 📁 $DIR_NAME$GIT_BRANCH | 💰 $DAILY_DISPLAY | $TOKEN_DISPLAY | $CONTEXT_DISPLAY"
-else
-    echo "[$MODEL] 📁 $DIR_NAME$GIT_BRANCH | 💰 $DAILY_DISPLAY"
+# [6] Cache hit ratio (skip if no data yet)
+TOTAL_INPUT=$((INPUT_TOKENS + CACHE_READ + CACHE_CREATE))
+if [ "$TOTAL_INPUT" -gt 0 ]; then
+    CACHE_PCT=$((CACHE_READ * 100 / TOTAL_INPUT))
+    SEGMENTS+=("Cache:${CACHE_PCT}%")
 fi
+
+# [7] Context usage with progress bar and color
+if [ "$CTX_SIZE" -gt 0 ]; then
+    PCT=${USED_PCT%%.*}
+    PCT=${PCT:-0}
+
+    # Format context window size
+    if [ "$CTX_SIZE" -ge 1000000 ]; then
+        CTX_LABEL="$((CTX_SIZE / 1000000))M"
+    elif [ "$CTX_SIZE" -ge 1000 ]; then
+        CTX_LABEL="$((CTX_SIZE / 1000))k"
+    else
+        CTX_LABEL="$CTX_SIZE"
+    fi
+
+    # Build progress bar (10 chars wide)
+    BAR_WIDTH=10
+    FILLED=$((PCT * BAR_WIDTH / 100))
+    [ "$FILLED" -gt "$BAR_WIDTH" ] && FILLED=$BAR_WIDTH
+    EMPTY=$((BAR_WIDTH - FILLED))
+    BAR=""
+    for ((i = 0; i < FILLED; i++)); do BAR+="█"; done
+    for ((i = 0; i < EMPTY; i++)); do BAR+="░"; done
+
+    # Icon + color based on usage level
+    if [ "$EXCEEDS_200K" = "true" ]; then
+        SEGMENTS+=("🔴 ${CTX_LABEL}+ ${PCT}% ${RED}${BAR}${RESET}")
+    elif [ "$PCT" -ge 80 ]; then
+        SEGMENTS+=("⚠️ ${CTX_LABEL} ${PCT}% ${RED}${BAR}${RESET}")
+    elif [ "$PCT" -ge 60 ]; then
+        SEGMENTS+=("🧠 ${CTX_LABEL} ${PCT}% ${YELLOW}${BAR}${RESET}")
+    else
+        SEGMENTS+=("🧠 ${CTX_LABEL} ${PCT}% ${GREEN}${BAR}${RESET}")
+    fi
+fi
+
+# [8] Vim mode (if active)
+if [ -n "$VIM_MODE" ]; then
+    SEGMENTS+=("$VIM_MODE")
+fi
+
+# [9] Agent name (if running as subagent)
+if [ -n "$AGENT_NAME" ]; then
+    SEGMENTS+=("🤖${AGENT_NAME}")
+fi
+
+# === Join segments with " | " and output ===
+OUTPUT=""
+for ((i = 0; i < ${#SEGMENTS[@]}; i++)); do
+    [ $i -gt 0 ] && OUTPUT+=" | "
+    OUTPUT+="${SEGMENTS[$i]}"
+done
+
+printf '%s\n' "$OUTPUT"
