@@ -1,5 +1,7 @@
 ---
 description: "セキュリティスキャン実行。gitleaks、pre-commitフック、秘密情報検出。トリガー: security, gitleaks, pre-commit, secrets, scan"
+model: haiku
+context: fork
 allowed-tools:
   - Bash
   - Read

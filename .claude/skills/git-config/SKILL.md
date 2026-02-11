@@ -1,5 +1,6 @@
 ---
 description: "Git設定ファイル管理。.gitconfig、.gitmessage、.gitignoreの確認・編集。トリガー: git config, gitconfig, gitmessage, gitignore, git設定"
+model: sonnet
 allowed-tools:
   - Bash
   - Read

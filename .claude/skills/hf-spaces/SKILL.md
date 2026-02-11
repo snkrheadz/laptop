@@ -1,5 +1,7 @@
 ---
 description: "HuggingFace Spaces search. Find research prototypes, demos, and model implementations. Triggers: huggingface, hf spaces, demo, gradio, streamlit, model demo"
+model: sonnet
+context: fork
 allowed-tools:
   - WebSearch
   - WebFetch

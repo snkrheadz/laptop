@@ -1,5 +1,6 @@
 ---
 description: "新マシンセットアップガイド。macOS初期設定からdotfiles適用までの手順案内。トリガー: 新マシン, setup, 移行, 新しいMac, セットアップ"
+model: sonnet
 allowed-tools:
   - Bash
   - Read

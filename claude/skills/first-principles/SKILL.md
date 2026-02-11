@@ -4,6 +4,7 @@ description: "Rethink from design principles. Go back to fundamentals when stuck
 user-invocable: true
 allowed-tools: Read, Grep, Glob, WebSearch
 model: sonnet
+context: fork
 ---
 
 # First Principles Thinking

@@ -1,5 +1,7 @@
 ---
 description: "バックアップ確認とロールバック。dotfiles設定を以前の状態に復元。トリガー: rollback, backup, restore, 復元, 元に戻す"
+model: haiku
+context: fork
 allowed-tools:
   - Bash
   - Read

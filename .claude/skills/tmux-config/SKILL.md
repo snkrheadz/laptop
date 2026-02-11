@@ -1,5 +1,6 @@
 ---
 description: "tmux設定管理。.tmux.confの確認・編集、キーバインド設定。トリガー: tmux, tmux.conf, ターミナル分割, セッション"
+model: sonnet
 allowed-tools:
   - Bash
   - Read

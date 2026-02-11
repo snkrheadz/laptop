@@ -1,5 +1,6 @@
 ---
 description: "Claude Code設定管理。settings.json、hooks、agents、skillsの確認・編集。トリガー: claude設定, hooks, settings, claude config, エージェント設定"
+model: sonnet
 allowed-tools:
   - Bash
   - Read

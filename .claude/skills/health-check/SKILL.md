@@ -1,5 +1,7 @@
 ---
 description: "dotfiles全体の健全性チェック。シンボリックリンク、設定ファイル、依存関係の状態確認。トリガー: 健全性, 診断, check, health, dotfiles状態"
+model: sonnet
+context: fork
 allowed-tools:
   - Bash
   - Read
