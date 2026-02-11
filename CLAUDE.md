@@ -63,7 +63,7 @@ mise use go@1.24.3                        # Install/use specific version
 │   ├── settings.json   # Claude Code settings (hooks, plugins, permissions)
 │   ├── statusline.sh   # Status line display script
 │   ├── CLAUDE.md       # User global instructions
-│   ├── hooks/          # Lifecycle hooks (4): validate-shell.sh, save-to-obsidian.js,
+│   ├── hooks/          # Lifecycle hooks (3): validate-shell.sh,
 │   │                   #   session-context.sh, pre-tool-guard.sh
 │   ├── agents/         # Subagents (18): verify-shell, code-architect, build-validator,
 │   │                   #   aws-best-practices-advisor, diagnose-dotfiles, pdm-reviewer, etc.
@@ -120,9 +120,8 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `statusline.sh` - Status line display script
 - `CLAUDE.md` - User global instructions
 
-**Hooks** (4):
+**Hooks** (3):
 - `hooks/validate-shell.sh` - PostToolUse hook for shellcheck
-- `hooks/save-to-obsidian.js` - Saves context to Obsidian (with secret redaction)
 - `hooks/session-context.sh` - SessionStart hook for project context injection
 - `hooks/pre-tool-guard.sh` - PreToolUse hook for sensitive file access blocking
 

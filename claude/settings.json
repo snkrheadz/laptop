@@ -109,17 +109,6 @@
         ]
       }
     ],
-    "Stop": [
-      {
-        "matcher": ".*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node ~/.claude/hooks/save-to-obsidian.js"
-          }
-        ]
-      }
-    ],
     "Notification": [
       {
         "matcher": ".*",
