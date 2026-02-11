@@ -4,6 +4,7 @@ description: "Database query and analysis support. Creates, executes, and analyz
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob
 model: sonnet
+context: fork
 ---
 
 # Database Query & Analysis Skill

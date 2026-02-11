@@ -1,5 +1,7 @@
 ---
 description: "auto-sync launchd管理。dotfiles自動同期の状態確認・起動・停止・ログ確認。トリガー: launchd, auto-sync, 自動同期, 同期, sync agent"
+model: haiku
+context: fork
 allowed-tools:
   - Bash
   - Read

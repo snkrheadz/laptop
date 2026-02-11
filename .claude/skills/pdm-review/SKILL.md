@@ -1,5 +1,6 @@
 ---
 description: "Review Plans/designs/PRs from business perspective. Evaluate alignment with goals. Triggers: pdm-review, business review, PdM review, ROI check"
+model: sonnet
 allowed-tools:
   - Task
   - Read

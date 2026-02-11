@@ -1,5 +1,7 @@
 ---
 description: "シンボリックリンクの状態確認・再作成。リンク切れの検出と修復。トリガー: symlink, link, リンク切れ, リンク, シンボリック"
+model: haiku
+context: fork
 allowed-tools:
   - Bash
   - Read

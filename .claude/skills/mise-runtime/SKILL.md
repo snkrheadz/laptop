@@ -1,5 +1,6 @@
 ---
 description: "ランタイム管理（mise）。Go, Node.js, Python, Rubyのバージョン管理。トリガー: mise, runtime, node, go, python, ruby, version"
+model: sonnet
 allowed-tools:
   - Bash
   - Read

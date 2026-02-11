@@ -1,5 +1,7 @@
 ---
 description: "Homebrewパッケージ管理。パッケージの追加・削除・検索、Brewfile更新。トリガー: brew, homebrew, package, cask, install, uninstall"
+model: haiku
+context: fork
 allowed-tools:
   - Bash
   - Read

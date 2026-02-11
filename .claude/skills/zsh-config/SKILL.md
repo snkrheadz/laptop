@@ -1,5 +1,6 @@
 ---
 description: "zsh設定管理。関数・config・aliasの追加・編集・確認。トリガー: zsh, shell, alias, function, config, zshrc"
+model: sonnet
 allowed-tools:
   - Bash
   - Read

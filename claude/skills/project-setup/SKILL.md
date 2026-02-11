@@ -4,6 +4,7 @@ description: "Set up Claude Code configuration for projects. Detects structure a
 user-invocable: true
 allowed-tools: Read, Bash, Glob, Grep, Write
 model: sonnet
+context: fork
 ---
 
 # Project Setup Skill

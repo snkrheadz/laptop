@@ -1,5 +1,7 @@
 ---
 description: "dotfiles手動同期。Brewfile更新、変更コミット、プッシュを実行。トリガー: sync, dotfiles sync, 同期, push dotfiles, Brewfile update"
+model: haiku
+context: fork
 allowed-tools:
   - Bash
   - Read
