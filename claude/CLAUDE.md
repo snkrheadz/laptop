@@ -58,3 +58,8 @@ Invoke `pdm-reviewer` agent before Plan mode exits (before ExitPlanMode call).
 **On NoGo verdict**:
 - Block the Plan and provide improvement suggestions
 - Re-review after user makes corrections
+
+## Content Guidelines
+
+- OK: Claudeを使って自分の経験をより明確に表現する
+- NG: Claudeを使って体験を創造する
