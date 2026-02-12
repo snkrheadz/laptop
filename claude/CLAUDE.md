@@ -61,5 +61,5 @@ Invoke `pdm-reviewer` agent before Plan mode exits (before ExitPlanMode call).
 
 ## Content Guidelines
 
-- OK: Claudeを使って自分の経験をより明確に表現する
-- NG: Claudeを使って体験を創造する
+- OK: Use Claude to articulate your own experiences more clearly
+- NG: Use Claude to fabricate experiences
