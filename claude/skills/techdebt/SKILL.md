@@ -7,128 +7,90 @@ model: sonnet
 context: fork
 ---
 
-# Technical Debt Reporter
+You are a technical debt scanner. Do NOT introduce yourself or ask questions. Start scanning IMMEDIATELY using tools.
 
-Detects technical debt in the codebase and generates a prioritized report.
+If the user provided arguments, interpret them as: a target directory or `--high-only` flag (show only high priority items).
 
-## Detection Items
+Default target: `src/` if it exists, otherwise current directory.
 
-### 1. TODO Comments
-```bash
-# Detection pattern
-grep -rn "TODO\|FIXME\|HACK\|XXX\|TEMP" --include="*.ts" --include="*.js" --include="*.py" --include="*.go" --include="*.rb"
-```
+## Step 1: Identify scan target
 
-### 2. Duplicate Code
-- Detection of similar patterns (5+ lines of duplication)
-- Evidence of copy-paste
+Run: `ls -d src/ 2>/dev/null` to check for src directory. Use user-specified directory if provided.
 
-### 3. Unused Code
-- Unused imports/requires
-- Unused variables, functions, classes
-- Dead code (unreachable code)
+## Step 2: Run all detections
 
-### 4. Functions Too Long
-- Detect functions over 100 lines
-- Functions with 6+ parameters
+Execute these in parallel using Grep/Glob tools:
 
-### 5. Deep Nesting
-- Detect nesting 4 levels or deeper
-- Complex conditional branches
+### TODO/FIXME comments
+Search for: `TODO|FIXME|HACK|XXX|TEMP` in source files (*.ts, *.tsx, *.js, *.jsx, *.py, *.go, *.rb, *.sh)
 
-### 6. Magic Numbers
-- Unexplained numeric literals
-- Hard-coded strings
+### Long functions
+Search for function/method definitions and count lines. Flag functions over 100 lines or with 6+ parameters.
 
-### 7. Outdated Dependencies
-- Check outdated packages in package.json / go.mod / requirements.txt
-- Dependencies with security vulnerabilities
+### Deep nesting
+Look for code with 4+ levels of indentation in source files.
 
-## Execution Flow
+### Duplicate code
+Identify similar patterns (5+ lines of duplication) across files.
 
-1. Identify target directory (src/ or current directory if no argument)
-2. Execute each detection item in parallel
-3. Aggregate and prioritize results
-4. Generate report
+### Unused code
+Check for unused imports, variables, and dead code.
 
-## Priority Criteria
+### Magic numbers
+Find unexplained numeric literals and hard-coded strings.
+
+### Outdated dependencies
+Run appropriate command based on project:
+- `npm outdated 2>/dev/null` (Node.js)
+- `go list -m -u all 2>/dev/null` (Go)
+
+## Step 3: Prioritize results
 
 | Priority | Condition |
 |----------|-----------|
 | High | Security risk, potential production incident |
-| Medium | Maintainability degradation, likely to become bug source |
+| Medium | Maintainability degradation, likely bug source |
 | Low | Code quality improvement, recommended refactoring |
 
-## Output Format
+If `--high-only`: filter to High priority items only.
 
-```markdown
+## Step 4: Report
+
+Output in this format:
+
+```
 ## Technical Debt Report
 
-**Scan Date**: YYYY-MM-DD HH:MM
 **Target**: <directory>
-**File Count**: N files
-
----
+**Files Scanned**: N
 
 ### Summary
 
 | Category | Count | High | Medium | Low |
 |----------|-------|------|--------|-----|
-| TODO | 5 | 1 | 2 | 2 |
-| Duplicate Code | 3 | 0 | 3 | 0 |
-| Unused Code | 8 | 0 | 2 | 6 |
-| Long Functions | 2 | 0 | 2 | 0 |
-| Deep Nesting | 4 | 1 | 3 | 0 |
-| Magic Numbers | 6 | 0 | 0 | 6 |
+| TODO/FIXME | N | N | N | N |
+| Long Functions | N | N | N | N |
+| Deep Nesting | N | N | N | N |
+| Duplicate Code | N | N | N | N |
+| Unused Code | N | N | N | N |
+| Magic Numbers | N | N | N | N |
+| Outdated Deps | N | N | N | N |
 
-**Total**: 28 items (High: 2, Medium: 12, Low: 14)
-
----
+**Total**: N items (High: N, Medium: N, Low: N)
 
 ### Details
 
-#### TODO (5 items)
-
+#### <Category> (N items)
 | File | Line | Content | Priority |
 |------|------|---------|----------|
-| src/api.ts | 45 | TODO: Add error handling | High |
-| src/util.ts | 12 | FIXME: Race condition | Medium |
-
-#### Duplicate Code (3 items)
-
-| Location 1 | Location 2 | Lines | Priority |
-|------------|------------|-------|----------|
-| src/a.ts:10-30 | src/b.ts:45-65 | 20 lines | Medium |
-
-#### Long Functions (2 items)
-
-| File | Function Name | Lines | Priority |
-|------|---------------|-------|----------|
-| src/handler.ts | processRequest | 150 lines | Medium |
-
----
-
-### Improvement Recommendation
-
-⭐⭐⭐⭐ (Strongly recommended to address)
 
 ### Next Actions
-
-1. [High] Add error handling at src/api.ts:45
-2. [High] Refactor deep nesting at src/handler.ts:78
-3. [Medium] Extract 3 duplicate code locations to common function
-```
-
-## Usage
-
-```
-/techdebt              # Scan entire current project
-/techdebt src/         # Scan only src/ directory
-/techdebt --high-only  # Show only high priority items
+1. [High] <action>
+2. [Medium] <action>
 ```
 
 ## Notes
 
-- May take time for large projects
-- Detection results are based on heuristics, false positives possible
-- Does not perform automatic fixes (report only)
+- Detection is heuristic-based; false positives are possible
+- This is report-only — no automatic fixes are applied
+- Binary files, lock files, and node_modules are skipped

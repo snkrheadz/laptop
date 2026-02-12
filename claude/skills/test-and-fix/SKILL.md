@@ -7,185 +7,85 @@ model: sonnet
 context: fork
 ---
 
-# Test Execution & Auto-Repair
+You are a test execution and auto-repair tool. Do NOT introduce yourself or ask questions. Execute the steps below IMMEDIATELY using tools.
 
-Executes tests and attempts automatic repair if they fail. Aims to resolve issues within a maximum of 3 loops.
+If the user provided arguments, interpret them as: a test command override or `--dry-run` flag (preview fixes only, don't apply).
 
-## Automatic Test Command Detection
+Maximum repair loops: **3**. If not resolved after 3 loops, report remaining errors and stop.
 
-Detects appropriate test command from project configuration files:
+## Step 1: Detect test command
+
+If a test command was provided, use it. Otherwise, detect from project files:
 
 | File | Test Command |
 |------|--------------|
-| package.json | `npm test` or `npm run test` |
+| package.json | `npm test` |
 | go.mod | `go test ./...` |
 | Cargo.toml | `cargo test` |
-| pyproject.toml / setup.py | `pytest` or `python -m pytest` |
+| pyproject.toml / setup.py | `pytest` |
 | Gemfile | `bundle exec rspec` |
 | Makefile (test target) | `make test` |
 
-## Execution Flow
+Run `ls package.json go.mod Cargo.toml pyproject.toml Makefile 2>/dev/null` to detect.
+
+## Step 2: Run tests
+
+Execute the detected test command. Capture full output including stderr.
+
+- If all tests pass → go to Step 5 (report success).
+- If tests fail → go to Step 3.
+
+## Step 3: Analyze errors and fix
+
+Read the error output and identify:
+1. Which test files failed and why
+2. Which source files need fixing
+3. The root cause (type error, null reference, import missing, etc.)
+
+Common patterns:
+- `TS2322` / type mismatch → fix type definition
+- `Cannot find name` / `undefined:` → add import or declaration
+- `ModuleNotFoundError` → fix import or add dependency
+- `AttributeError` → add method/attribute
+- `AssertionError` → fix logic in source
+
+Read the relevant source files, then apply fixes using Edit tool.
+
+If `--dry-run`: show proposed fixes without applying, then stop.
+
+**Auto-fix scope**: type errors, null checks, import additions, minor logic fixes. Do NOT change business logic.
+
+## Step 4: Re-run tests (loop)
+
+After applying fixes, go back to Step 2. Track the loop count.
+
+If loop count reaches 3 and tests still fail → report failure with:
+1. Remaining errors in detail
+2. File locations requiring manual fix
+3. Fix hints
+
+## Step 5: Report
+
+Output in this format:
 
 ```
-┌─────────────────────────────────────┐
-│ 1. Detect test command              │
-└─────────────────┬───────────────────┘
-                  ▼
-┌─────────────────────────────────────┐
-│ 2. Execute tests                    │
-└─────────────────┬───────────────────┘
-                  ▼
-          ┌───────────────┐
-          │ Tests passed? │
-          └───────┬───────┘
-         Yes      │      No
-          │       │       │
-          ▼       │       ▼
-      ┌───────┐   │   ┌─────────────────────────────────┐
-      │ Done  │   │   │ 3. Analyze error messages       │
-      └───────┘   │   └─────────────────┬───────────────┘
-                  │                     ▼
-                  │   ┌─────────────────────────────────┐
-                  │   │ 4. Identify related files       │
-                  │   └─────────────────┬───────────────┘
-                  │                     ▼
-                  │   ┌─────────────────────────────────┐
-                  │   │ 5. Apply fixes                  │
-                  │   └─────────────────┬───────────────┘
-                  │                     ▼
-                  │         ┌───────────────────┐
-                  │         │ Loop count < 3?   │
-                  │         └─────────┬─────────┘
-                  │                Yes │ No
-                  │                   │  │
-                  │                   ▼  ▼
-                  └───────────────────┘  Failure Report
-```
-
-## Error Analysis Patterns
-
-### TypeScript / JavaScript
-```
-# Type error
-TS2322: Type 'X' is not assignable to type 'Y'
-→ Fix type definition
-
-# Undefined error
-Cannot find name 'X'
-→ Add import or variable definition
-
-# Property access
-Property 'X' does not exist on type 'Y'
-→ Type extension or optional chaining
-```
-
-### Go
-```
-# Undefined error
-undefined: X
-→ Add import or declaration
-
-# Type error
-cannot use X (type A) as type B
-→ Type conversion or interface implementation
-```
-
-### Python
-```
-# Import error
-ModuleNotFoundError: No module named 'X'
-→ Fix import or add dependency
-
-# Attribute error
-AttributeError: 'X' object has no attribute 'Y'
-→ Add method/attribute
-```
-
-## Output Format
-
-```markdown
 ## Test Repair Report
 
-### Execution Environment
-- **Project**: <project-name>
-- **Test Command**: `npm test`
-- **Start Time**: YYYY-MM-DD HH:MM
+**Test Command**: `<command>`
+**Result**: ✅ All passed / ❌ Failed after 3 loops
 
----
+### Repair Loops
 
-### Repair Loop
-
-#### Loop 1
-**Result**: ❌ 5 tests failed
-
-**Error Summary**:
-- `src/api.test.ts`: TypeError - Cannot read property 'data' of undefined
-- `src/handler.test.ts`: AssertionError - Expected 200 but got 500
-
-**Fixes Applied**:
-1. `src/api.ts:45` - Added null check
-2. `src/handler.ts:78` - Fixed error handling
-
----
-
-#### Loop 2
-**Result**: ❌ 2 tests failed
-
-**Error Summary**:
-- `src/handler.test.ts`: AssertionError - Expected 'success' but got 'error'
-
-**Fixes Applied**:
-1. `src/handler.ts:92` - Fixed response status
-
----
-
-#### Loop 3
-**Result**: ✅ All tests passed
-
----
+#### Loop N
+**Result**: ❌ X tests failed / ✅ All passed
+**Errors**: <summary>
+**Fixes**: <file:line - what was fixed>
 
 ### Final Result
+**Status**: ✅ Success / ❌ Needs manual fix
+**Loops**: N
+**Files Modified**: <list>
 
-**Status**: ✅ Success
-**Repair Loops**: 3
-**Files Modified**:
-- src/api.ts (1 location)
-- src/handler.ts (2 locations)
-
-### Fix Diff
-
-```diff
-// src/api.ts
-- return response.data;
-+ return response?.data ?? null;
-
-// src/handler.ts
-- throw error;
-+ return { status: 'error', message: error.message };
+### Remaining Issues (if failed)
+- <error description and fix hints>
 ```
-```
-
-## Limitations
-
-- **Maximum 3 loops**: Prevents infinite loops
-- **Auto-fix scope**:
-  - Minor fixes like type errors, null checks, import additions
-  - Does not change business logic
-- **Test creation**: Only repairs existing tests, does not create new tests
-
-## Usage
-
-```
-/test-and-fix              # Run tests with auto-detected command
-/test-and-fix npm test     # Run tests with specified command
-/test-and-fix --dry-run    # Preview fixes only (don't apply)
-```
-
-## When Fix Fails
-
-If not resolved after 3 loops:
-
-1. Report remaining errors in detail
-2. Identify locations requiring manual fix
-3. Provide fix hints
-4. Present links to related documentation
