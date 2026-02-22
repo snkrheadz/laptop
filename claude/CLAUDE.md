@@ -14,6 +14,12 @@
 | Medium (multiple files, research needed) | Delegate to Task agent |
 | Large (new feature, refactor) | Multiple agents in parallel |
 
+## Plan Mode
+<!-- rule-id: R-0013, added: 2026-02-23, trigger: Boris Cherny best practices analysis -->
+
+- 3ステップ以上 or アーキテクチャ決定を伴うタスク → plan modeに入る
+- 実装中に想定外の問題が発生したら、即座にSTOPしてre-planする
+
 ## Forbidden
 <!-- rule-id: R-0003, added: 2026-01-01, trigger: founding rule -->
 
@@ -28,6 +34,12 @@
   UI -> state -> query/params -> compute -> render
 - Don't "patch symptoms". Show the chain and prove where the value changes.
 - When fixed, verify with: (1) reproduction steps, (2) a targeted test, (3) typecheck/build.
+
+## Quality Gate
+<!-- rule-id: R-0014, added: 2026-02-23, trigger: Boris Cherny best practices analysis -->
+
+- タスク完了前に自問: 「staffエンジニアがこの変更をapproveするか？」
+- NOなら、完了とせず改善する
 
 ## Session exit
 <!-- rule-id: R-0005, added: 2026-01-01, trigger: founding rule -->
@@ -66,6 +78,13 @@ Always cite sources. If unverified, state "unverified".
 - テスト/ビルド/lint失敗が3回再発したら、governance-proposerでルール提案
 - `/governance-review` を月1回実行してルール鮮度を監査
 - CLAUDE.mdの全ルールにprovenance: `<!-- rule-id: XX, added: YYYY-MM-DD, trigger: description -->`
+
+## Self-Improvement Loop
+<!-- rule-id: R-0012, added: 2026-02-23, trigger: Boris Cherny best practices analysis -->
+
+- ユーザーから修正を受けたら、即座にauto memoryにパターンを記録する
+- 記録内容: 何を間違えたか、正しいパターン、再発防止ルール
+- セッション開始時にmemoryを確認し、過去の教訓を活かす
 
 ## Simplification
 <!-- rule-id: R-0011, added: 2026-02-22, trigger: Boris Cherny philosophy implementation -->
