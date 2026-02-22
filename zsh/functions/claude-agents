@@ -1,11 +1,15 @@
 claude-agents() {
-    local repo_root catalog_path
-    repo_root=$(dirname "$(dirname "$(readlink ~/.claude/settings.json)")")
+    local repo_root catalog_path resolved
+    # Resolve settings.json symlink to find repo root (requires absolute symlink from install.sh)
+    resolved=$(realpath ~/.claude/settings.json 2>/dev/null || readlink ~/.claude/settings.json)
+    repo_root=$(dirname "$(dirname "$resolved")")
     catalog_path="$repo_root/claude/agent-catalog"
     [ ! -d "$catalog_path" ] && echo "Error: Catalog not found at $catalog_path" && return 1
 
     case "$1" in
-        list)   ls "$catalog_path"/*.md 2>/dev/null | xargs -I{} basename {} .md ;;
+        list)   for f in "$catalog_path"/*.md; do
+                    [ -f "$f" ] && basename "$f" .md
+                done ;;
         add)    shift; mkdir -p .claude/agents
                 for a in "$@"; do
                     [ -f "$catalog_path/$a.md" ] && ln -sf "$catalog_path/$a.md" ".claude/agents/$a.md" && echo "Added: $a" \

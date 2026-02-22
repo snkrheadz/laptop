@@ -129,7 +129,7 @@ setup_claude_agents() {
         fi
     done
 
-    log_success "Claude agents configured (global: 2, catalog: $(find "$DOTFILES_DIR/claude/agent-catalog" -name '*.md' 2>/dev/null | wc -l | tr -d ' '))"
+    log_success "Claude agents configured (global: 2, catalog: $(find "$DOTFILES_DIR/claude/agent-catalog" -maxdepth 1 -name '*.md' 2>/dev/null | wc -l | tr -d ' '))"
 }
 
 # Create symbolic links
