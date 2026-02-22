@@ -71,9 +71,6 @@
       "Bash(rm -rf ~)",
       "Bash(sudo *)"
     ],
-    "additionalDirectories": [
-      "../worktrees/"
-    ],
     "allowUnsandboxedCommands": false
   },
   "hooks": {

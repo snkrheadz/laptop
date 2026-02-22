@@ -39,7 +39,7 @@ Always cite sources. If unverified, state "unverified".
 
 ## Workflow
 
-- Use git worktree for file changes
+- Use built-in EnterWorktree for file changes (not manual git worktree commands)
 - For extensions, see `/claude-code-guide`
 - Resume named sessions: `claude --resume <name>`
 - Use `/rewind` to undo recent changes
