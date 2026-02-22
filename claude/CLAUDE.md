@@ -17,8 +17,8 @@
 ## Plan Mode
 <!-- rule-id: R-0013, added: 2026-02-23, trigger: Boris Cherny best practices analysis -->
 
-- 3ステップ以上 or アーキテクチャ決定を伴うタスク → plan modeに入る
-- 実装中に想定外の問題が発生したら、即座にSTOPしてre-planする
+- Enter plan mode for tasks with 3+ steps or architectural decisions
+- If unexpected issues arise during implementation, STOP immediately and re-plan
 
 ## Forbidden
 <!-- rule-id: R-0003, added: 2026-01-01, trigger: founding rule -->
@@ -38,8 +38,8 @@
 ## Quality Gate
 <!-- rule-id: R-0014, added: 2026-02-23, trigger: Boris Cherny best practices analysis -->
 
-- タスク完了前に自問: 「staffエンジニアがこの変更をapproveするか？」
-- NOなら、完了とせず改善する
+- Before completing a task, ask yourself: "Would a staff engineer approve this change?"
+- If NO, do not mark as complete — improve it first
 
 ## Session exit
 <!-- rule-id: R-0005, added: 2026-01-01, trigger: founding rule -->
@@ -75,20 +75,20 @@ Always cite sources. If unverified, state "unverified".
 ## Governance
 <!-- rule-id: R-0010, added: 2026-02-22, trigger: Boris Cherny philosophy implementation -->
 
-- テスト/ビルド/lint失敗が3回再発したら、governance-proposerでルール提案
-- `/governance-review` を月1回実行してルール鮮度を監査
-- CLAUDE.mdの全ルールにprovenance: `<!-- rule-id: XX, added: YYYY-MM-DD, trigger: description -->`
+- If test/build/lint failures recur 3 times, propose a rule via governance-proposer
+- Run `/governance-review` monthly to audit rule freshness
+- All CLAUDE.md rules must have provenance: `<!-- rule-id: XX, added: YYYY-MM-DD, trigger: description -->`
 
 ## Self-Improvement Loop
 <!-- rule-id: R-0012, added: 2026-02-23, trigger: Boris Cherny best practices analysis -->
 
-- ユーザーから修正を受けたら、即座にauto memoryにパターンを記録する
-- 記録内容: 何を間違えたか、正しいパターン、再発防止ルール
-- セッション開始時にmemoryを確認し、過去の教訓を活かす
+- When corrected by the user, immediately record the pattern in auto memory
+- Record: what was wrong, the correct pattern, and a prevention rule
+- Check memory at session start to leverage past lessons
 
 ## Simplification
 <!-- rule-id: R-0011, added: 2026-02-22, trigger: Boris Cherny philosophy implementation -->
 
-- 単一モジュール: `/simplify-pipeline`
-- 複数モジュール: `/refactor-swarm`
-- 簡素化は動作を変えない。動作変更は別タスク
+- Single module: `/simplify-pipeline`
+- Multiple modules: `/refactor-swarm`
+- Simplification must not change behavior. Behavior changes are a separate task
