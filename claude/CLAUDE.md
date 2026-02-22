@@ -53,16 +53,6 @@ Always cite sources. If unverified, state "unverified".
 - Use `/memory` to manage persistent context
 - Use `/keybindings` to view/edit keyboard shortcuts
 
-## Plan Review
-<!-- rule-id: R-0008, added: 2026-02-05, updated: 2026-02-22, trigger: PdM perspective missing in plans -->
-
-`pdm-reviewer` はagent-catalogに配置。プロジェクト単位で `claude-agents` を使って有効化する。
-有効化済みプロジェクトでは、Plan mode終了前に `pdm-reviewer` を実行する。
-
-**Skip conditions**:
-- Bug fixes ≤5 lines
-- Documentation-only changes
-- User explicitly requests skip
 
 ## Content Guidelines
 <!-- rule-id: R-0009, added: 2026-01-01, trigger: founding rule -->

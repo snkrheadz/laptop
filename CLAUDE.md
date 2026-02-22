@@ -66,14 +66,13 @@ mise use go@1.24.3                        # Install/use specific version
 │   ├── hooks/          # Lifecycle hooks (3): validate-shell.sh,
 │   │                   #   session-context.sh, pre-tool-guard.sh
 │   ├── agents/         # Global agents (1): verify-subagent-result
-│   ├── agent-catalog/  # Opt-in agents (20): available via `claude-agents` function
+│   ├── agent-catalog/  # Opt-in agents (19): available via `claude-agents` function
 │   │                   #   dev: build-validator, code-architect, code-simplifier, verify-app, verify-shell
 │   │                   #   cloud: aws-best-practices-advisor, gcp-best-practices-advisor
 │   │                   #   research: arxiv-ai-researcher, gemini-api-researcher, huggingface-spaces-researcher
 │   │                   #   other: strategic-research-analyst, nano-banana-pro-prompt-generator,
 │   │                   #     state-machine-diagram, migration-assistant, oncall-guide,
-│   │                   #     diagnose-dotfiles, side-job-researcher, governance-proposer, rule-auditor,
-│   │                   #     pdm-reviewer
+│   │                   #     diagnose-dotfiles, side-job-researcher, governance-proposer, rule-auditor
 │   └── skills/         # Skills (14): claude-code-guide, quick-commit, merge-pr,
 │                       #   review-changes, test-and-fix, db-query, trace-dataflow,
 │                       #   project-setup, first-principles, techdebt, governance-review,
@@ -82,7 +81,7 @@ mise use go@1.24.3                        # Install/use specific version
 ├── .claude/            # Project-local config (NOT symlinked to ~/.claude/)
 │   ├── agents/         # Project agents (3): diagnose-dotfiles, verify-shell, build-validator
 │   │                   #   (symlinks to claude/agent-catalog/ via `claude-agents preset dotfiles`)
-│   └── skills/         # Local skills (15): brew-manage, health-check, zsh-config, pdm-review, etc.
+│   └── skills/         # Local skills (14): brew-manage, health-check, zsh-config, etc.
 │
 ├── .github/
 │   └── workflows/main.yml  # CI/CD (gitleaks + shellcheck)
@@ -139,7 +138,7 @@ The `claude/` directory contains Claude Code settings managed by this repository
 **Global Agents** (1, always loaded):
 - `verify-subagent-result` - SubAgent verification (R-0006)
 
-**Agent Catalog** (20, opt-in via `claude-agents` function):
+**Agent Catalog** (19, opt-in via `claude-agents` function):
 - `verify-shell`, `verify-app`, `build-validator` - Verification
 - `code-architect`, `code-simplifier` - Code design
 - `aws-best-practices-advisor`, `gcp-best-practices-advisor` - Cloud
@@ -148,7 +147,6 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `state-machine-diagram`, `migration-assistant`, `oncall-guide`
 - `diagnose-dotfiles`, `side-job-researcher`
 - `governance-proposer`, `rule-auditor`
-- `pdm-reviewer` - Plan review (プロジェクト単位で有効化)
 
 **Skills** (14):
 - `claude-code-guide` - Claude Code extension documentation
@@ -179,7 +177,7 @@ These skills are **only available in this repository** (not symlinked to `~/.cla
 - `launchd-manage` - Auto-sync launchd management
 - `mise-runtime` - Runtime management (mise)
 - `new-machine-setup` - New machine setup guide
-- `pdm-review` - Plan/design review from business perspective
+
 - `security-check` - Security scanning
 - `symlink-manage` - Symlink management
 - `tmux-config` - tmux configuration
