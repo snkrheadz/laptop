@@ -31,6 +31,26 @@ Determine project type based on detection results:
 | `Cargo.toml` | Rust | rustfmt |
 | `pyproject.toml` | Python | ruff |
 
+### Step 1.5: Agent Selection (Optional)
+
+Ask the user if they want to configure project-specific agents.
+If yes, ask what type of project:
+
+| Preset | Agents |
+|--------|--------|
+| dev | build-validator, code-architect, code-simplifier, verify-app, verify-shell |
+| aws | aws-best-practices-advisor, build-validator, state-machine-diagram |
+| gcp | gcp-best-practices-advisor, build-validator, state-machine-diagram |
+| research | arxiv-ai-researcher, strategic-research-analyst, huggingface-spaces-researcher, gemini-api-researcher |
+| minimal | (none) |
+| custom | (let user pick from catalog) |
+
+Execute:
+```bash
+# [Bash] Apply agent preset
+claude-agents preset <selected>
+```
+
 ### Step 2: Create Directory
 
 ```bash

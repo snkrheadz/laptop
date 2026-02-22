@@ -105,6 +105,15 @@
             "command": "~/.claude/hooks/validate-shell.sh"
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/post-verify-rule-proposal.sh"
+          }
+        ]
       }
     ],
     "Notification": [
