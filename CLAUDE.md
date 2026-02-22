@@ -62,7 +62,7 @@ mise use go@1.24.3                        # Install/use specific version
 ├── claude/             # Claude Code config → ~/.claude/
 │   ├── settings.json   # Claude Code settings (hooks, plugins, permissions)
 │   ├── statusline.sh   # Status line display script
-│   ├── CLAUDE.md       # User global instructions
+│   ├── CLAUDE.md       # User global instructions (14 rules: R-0001〜R-0014)
 │   ├── hooks/          # Lifecycle hooks (3): validate-shell.sh,
 │   │                   #   session-context.sh, pre-tool-guard.sh
 │   ├── agents/         # Global agents (1): verify-subagent-result
@@ -128,7 +128,12 @@ The `claude/` directory contains Claude Code settings managed by this repository
 **Managed files** (symlinked to `~/.claude/`):
 - `settings.json` - Hooks, plugins, permissions, statusLine config
 - `statusline.sh` - Status line display script
-- `CLAUDE.md` - User global instructions
+- `CLAUDE.md` - User global instructions (14 rules: R-0001〜R-0014)
+  - R-0001: Principles, R-0002: Delegation, R-0013: Plan Mode
+  - R-0003: Forbidden, R-0004: Debugging rule, R-0014: Quality Gate
+  - R-0005: Session exit, R-0006: SubAgent, R-0007: Workflow
+  - R-0009: Content Guidelines, R-0010: Governance
+  - R-0012: Self-Improvement Loop, R-0011: Simplification
 
 **Hooks** (3):
 - `hooks/validate-shell.sh` - PostToolUse hook for shellcheck
