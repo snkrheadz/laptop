@@ -77,15 +77,17 @@ laptop/
 ├── bin/                    # Executable scripts (tat)
 ├── raycast/                # Raycast settings export
 ├── claude/                 # Claude Code configuration → ~/.claude/
-│   ├── CLAUDE.md           # User global instructions
+│   ├── CLAUDE.md           # User global instructions (14 rules: R-0001〜R-0014)
 │   ├── settings.json       # Hooks, plugins, permissions
 │   ├── statusline.sh       # Custom status line script
-│   ├── hooks/              # Lifecycle hooks (4)
-│   ├── agents/             # Subagents (18)
-│   └── skills/             # Custom skills (10)
+│   ├── hooks/              # Lifecycle hooks (3)
+│   ├── agents/             # Global agents (1): verify-subagent-result
+│   ├── agent-catalog/      # Opt-in agents (19): via `claude-agents` function
+│   └── skills/             # Custom skills (14)
 │
-├── .claude/                # Local skills (project-specific, 15)
-│   └── skills/             # Not symlinked to ~/.claude/
+├── .claude/                # Project-local config (NOT symlinked to ~/.claude/)
+│   ├── agents/             # Project agents (3): symlinks to agent-catalog/
+│   └── skills/             # Local skills (15)
 │
 ├── scripts/
 │   └── auto-sync.sh        # Hourly auto-sync script
@@ -296,46 +298,50 @@ This repository manages Claude Code settings via symlinks to `~/.claude/`:
 
 ```text
 claude/
-├── CLAUDE.md           # User global instructions
+├── CLAUDE.md           # User global instructions (14 rules: R-0001〜R-0014)
 ├── settings.json       # Hooks, plugins, permissions
 ├── statusline.sh       # Custom status line script
-├── hooks/              # Lifecycle hooks (4)
+├── hooks/              # Lifecycle hooks (3)
 │   ├── validate-shell.sh   # PostToolUse: shellcheck validation
-│   ├── save-to-obsidian.js # Stop: Obsidian integration (secret redaction)
 │   ├── session-context.sh  # SessionStart: project context injection
 │   └── pre-tool-guard.sh   # PreToolUse: sensitive file access blocking
-├── agents/             # Subagents (18)
-│   ├── verify-shell.md, verify-app.md, build-validator.md
-│   ├── code-architect.md, code-simplifier.md, oncall-guide.md
-│   ├── aws-best-practices-advisor.md, gcp-best-practices-advisor.md
-│   ├── arxiv-ai-researcher.md, gemini-api-researcher.md, huggingface-spaces-researcher.md
-│   ├── strategic-research-analyst.md, nano-banana-pro-prompt-generator.md
-│   ├── state-machine-diagram.md, migration-assistant.md
-│   ├── diagnose-dotfiles.md, verify-subagent-result.md
-│   ├── pdm-reviewer.md
-└── skills/             # Custom skills (10)
+├── agents/             # Global agents (1, always loaded)
+│   └── verify-subagent-result.md
+├── agent-catalog/      # Opt-in agents (19, via `claude-agents` function)
+│   ├── dev: build-validator, code-architect, code-simplifier, verify-app, verify-shell
+│   ├── cloud: aws-best-practices-advisor, gcp-best-practices-advisor
+│   ├── research: arxiv-ai-researcher, gemini-api-researcher, huggingface-spaces-researcher
+│   └── other: strategic-research-analyst, nano-banana-pro-prompt-generator,
+│         state-machine-diagram, migration-assistant, oncall-guide,
+│         diagnose-dotfiles, side-job-researcher, governance-proposer, rule-auditor
+└── skills/             # Custom skills (14)
     ├── claude-code-guide/  # Claude Code extension guide
     ├── db-query/           # Database query helper
     ├── first-principles/   # First principles analysis
+    ├── governance-review/  # Governance rule freshness audit
     ├── merge-pr/           # PR merge automation
     ├── project-setup/      # Project setup wizard
     ├── quick-commit/       # Fast commit workflow
+    ├── refactor-swarm/     # Multi-module simplification
     ├── review-changes/     # Code review helper
+    ├── rule-history/       # Governance rule history
+    ├── simplify-pipeline/  # Single module simplification
     ├── techdebt/           # Tech debt analysis
-    ├── trace-dataflow/     # Data flow tracing
-    └── test-and-fix/       # Test and fix workflow
+    ├── test-and-fix/       # Test and fix workflow
+    └── trace-dataflow/     # Data flow tracing
 ```
 
 ### Managed Components
 
 | Component | Description |
 |-----------|-------------|
-| `CLAUDE.md` | User global instructions (workflow, best practices, prohibitions) |
-| `settings.json` | Hooks, plugins, permissions, Obsidian integration |
+| `CLAUDE.md` | User global instructions (14 rules: R-0001〜R-0014) |
+| `settings.json` | Hooks, plugins, permissions |
 | `statusline.sh` | Custom status line showing model, cost, context |
-| `hooks/` | 4 lifecycle hooks (PostToolUse, Stop, SessionStart, PreToolUse) |
-| `agents/` | 18 specialized subagents for various tasks |
-| `skills/` | 10 custom skills for common workflows |
+| `hooks/` | 3 lifecycle hooks (PostToolUse, SessionStart, PreToolUse) |
+| `agents/` | 1 global agent (verify-subagent-result) |
+| `agent-catalog/` | 19 opt-in agents via `claude-agents` function |
+| `skills/` | 14 custom skills for common workflows |
 
 ### Status Line
 
@@ -349,11 +355,10 @@ Displays in Claude Code CLI:
 | Hook | Lifecycle Event | Description |
 |------|----------------|-------------|
 | `validate-shell.sh` | PostToolUse | Runs shellcheck on `.sh` files after Write/Edit |
-| `save-to-obsidian.js` | Stop | Saves conversation context to Obsidian (secret redaction) |
 | `session-context.sh` | SessionStart | Injects project context at session start |
 | `pre-tool-guard.sh` | PreToolUse | Blocks access to sensitive files |
 
-### Key Subagents
+### Key Agents (from Agent Catalog)
 
 | Agent | Purpose |
 |-------|---------|
@@ -361,9 +366,12 @@ Displays in Claude Code CLI:
 | `verify-app` | Application verification |
 | `build-validator` | Build validation |
 | `code-architect` | Architecture design |
+| `code-simplifier` | Code simplification |
 | `aws-best-practices-advisor` | AWS guidance |
 | `gcp-best-practices-advisor` | GCP guidance |
 | `diagnose-dotfiles` | Dotfiles troubleshooting |
+| `governance-proposer` | Governance rule proposals |
+| `rule-auditor` | Rule freshness auditing |
 
 ### Available Skills
 
@@ -372,6 +380,10 @@ Displays in Claude Code CLI:
 - `/merge-pr` - PR merge with worktree cleanup
 - `/review-changes` - Code review helper
 - `/test-and-fix` - Run tests and fix failures
+- `/governance-review` - Governance rule freshness audit
+- `/simplify-pipeline` - Single module simplification
+- `/refactor-swarm` - Multi-module simplification
+- `/rule-history` - Governance rule history
 
 ### Local Skills (Project-specific)
 
