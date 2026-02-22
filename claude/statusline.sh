@@ -1,6 +1,7 @@
 #!/bin/bash
 # Claude Code Status Line Script
-# Displays: Model | Dir+Branch | Duration | Cost(session/daily) | Lines | Cache% | Context Bar
+# Displays: Model | Dir+Branch | Duration | Cost(session/daily) | Lines | Tokens(I/O/CR/CC) | Context Bar
+# Token labels: I=Input, O=Output, CR=CacheRead, CC=CacheCreate
 #
 # Installation:
 #   1. Symlink to ~/.claude/statusline.sh
@@ -35,6 +36,10 @@ eval "$(echo "$input" | jq -r '
   "INPUT_TOKENS=" + (.context_window.current_usage.input_tokens // 0 | tostring | @sh),
   "CACHE_READ=" + (.context_window.current_usage.cache_read_input_tokens // 0 | tostring | @sh),
   "CACHE_CREATE=" + (.context_window.current_usage.cache_creation_input_tokens // 0 | tostring | @sh),
+  "OUTPUT_TOKENS=" + (.context_window.current_usage.output_tokens // 0 | tostring | @sh),
+  "TOTAL_INPUT_TOKENS=" + (.context_window.total_input_tokens // 0 | tostring | @sh),
+  "TOTAL_OUTPUT_TOKENS=" + (.context_window.total_output_tokens // 0 | tostring | @sh),
+  "REMAINING_PCT=" + (.context_window.remaining_percentage // 0 | tostring | @sh),
   "VIM_MODE=" + (.vim.mode // "" | @sh),
   "AGENT_NAME=" + (.agent.name // "" | @sh)
 ')" 2>/dev/null
@@ -44,6 +49,7 @@ eval "$(echo "$input" | jq -r '
 : "${DURATION_MS:=0}" "${LINES_ADDED:=0}" "${LINES_REMOVED:=0}"
 : "${USED_PCT:=0}" "${CTX_SIZE:=0}" "${EXCEEDS_200K:=false}"
 : "${INPUT_TOKENS:=0}" "${CACHE_READ:=0}" "${CACHE_CREATE:=0}"
+: "${OUTPUT_TOKENS:=0}" "${TOTAL_INPUT_TOKENS:=0}" "${TOTAL_OUTPUT_TOKENS:=0}" "${REMAINING_PCT:=0}"
 
 DIR_NAME="${CURRENT_DIR##*/}"
 
@@ -80,6 +86,18 @@ format_duration() {
     fi
 }
 
+# === Format token count: 500→500, 8000→8k, 1500000→1.5M ===
+format_tokens() {
+    local n=$1
+    if [ "$n" -ge 1000000 ]; then
+        awk -v n="$n" 'BEGIN { printf "%.1fM", n/1000000 }'
+    elif [ "$n" -ge 1000 ]; then
+        printf '%dk' $((n / 1000))
+    else
+        printf '%d' "$n"
+    fi
+}
+
 # === Daily cumulative cost tracking ===
 TODAY=$(date +%Y-%m-%d)
 USAGE_DIR="$HOME/.claude/usage"
@@ -95,7 +113,9 @@ exec 200>"$LOCK_FILE"
 flock -w 2 200 2>/dev/null || true
 
 jq --arg sid "$SESSION_ID" --argjson cost "$COST" \
-    '.sessions[$sid] = $cost' "$USAGE_FILE" > "$USAGE_FILE.tmp" 2>/dev/null \
+    --argjson tin "$TOTAL_INPUT_TOKENS" --argjson tout "$TOTAL_OUTPUT_TOKENS" \
+    '.sessions[$sid] = $cost | .tokens[$sid] = {in: $tin, out: $tout}' \
+    "$USAGE_FILE" > "$USAGE_FILE.tmp" 2>/dev/null \
     && mv "$USAGE_FILE.tmp" "$USAGE_FILE"
 
 DAILY_TOTAL=$(jq '[.sessions | to_entries[] | .value] | add // 0' "$USAGE_FILE" 2>/dev/null || echo "0")
@@ -122,11 +142,10 @@ if [ "$LINES_ADDED" -gt 0 ] || [ "$LINES_REMOVED" -gt 0 ]; then
     SEGMENTS+=("+${LINES_ADDED}-${LINES_REMOVED}")
 fi
 
-# [6] Cache hit ratio (skip if no data yet)
+# [6] Token breakdown: I:Xk O:Xk CR:Xk CC:Xk (skip if no API call yet)
 TOTAL_INPUT=$((INPUT_TOKENS + CACHE_READ + CACHE_CREATE))
-if [ "$TOTAL_INPUT" -gt 0 ]; then
-    CACHE_PCT=$((CACHE_READ * 100 / TOTAL_INPUT))
-    SEGMENTS+=("Cache:${CACHE_PCT}%")
+if [ "$TOTAL_INPUT" -gt 0 ] || [ "$OUTPUT_TOKENS" -gt 0 ]; then
+    SEGMENTS+=("I:$(format_tokens "$INPUT_TOKENS") O:$(format_tokens "$OUTPUT_TOKENS") CR:$(format_tokens "$CACHE_READ") CC:$(format_tokens "$CACHE_CREATE")")
 fi
 
 # [7] Context usage with progress bar and color
@@ -152,15 +171,19 @@ if [ "$CTX_SIZE" -gt 0 ]; then
     for ((i = 0; i < FILLED; i++)); do BAR+="█"; done
     for ((i = 0; i < EMPTY; i++)); do BAR+="░"; done
 
+    # Remaining tokens
+    REMAINING_TOKENS=$((CTX_SIZE * REMAINING_PCT / 100))
+    LEFT_LABEL="$(format_tokens "$REMAINING_TOKENS") left"
+
     # Icon + color based on usage level
     if [ "$EXCEEDS_200K" = "true" ]; then
-        SEGMENTS+=("🔴 ${CTX_LABEL}+ ${PCT}% ${RED}${BAR}${RESET}")
+        SEGMENTS+=("🔴 ${CTX_LABEL}+ ${PCT}% ${RED}${BAR}${RESET} ${LEFT_LABEL}")
     elif [ "$PCT" -ge 80 ]; then
-        SEGMENTS+=("⚠️ ${CTX_LABEL} ${PCT}% ${RED}${BAR}${RESET}")
+        SEGMENTS+=("⚠️ ${CTX_LABEL} ${PCT}% ${RED}${BAR}${RESET} ${LEFT_LABEL}")
     elif [ "$PCT" -ge 60 ]; then
-        SEGMENTS+=("🧠 ${CTX_LABEL} ${PCT}% ${YELLOW}${BAR}${RESET}")
+        SEGMENTS+=("🧠 ${CTX_LABEL} ${PCT}% ${YELLOW}${BAR}${RESET} ${LEFT_LABEL}")
     else
-        SEGMENTS+=("🧠 ${CTX_LABEL} ${PCT}% ${GREEN}${BAR}${RESET}")
+        SEGMENTS+=("🧠 ${CTX_LABEL} ${PCT}% ${GREEN}${BAR}${RESET} ${LEFT_LABEL}")
     fi
 fi
 
