@@ -65,14 +65,15 @@ mise use go@1.24.3                        # Install/use specific version
 │   ├── CLAUDE.md       # User global instructions
 │   ├── hooks/          # Lifecycle hooks (3): validate-shell.sh,
 │   │                   #   session-context.sh, pre-tool-guard.sh
-│   ├── agents/         # Global agents (2): pdm-reviewer, verify-subagent-result
-│   ├── agent-catalog/  # Opt-in agents (19): available via `claude-agents` function
+│   ├── agents/         # Global agents (1): verify-subagent-result
+│   ├── agent-catalog/  # Opt-in agents (20): available via `claude-agents` function
 │   │                   #   dev: build-validator, code-architect, code-simplifier, verify-app, verify-shell
 │   │                   #   cloud: aws-best-practices-advisor, gcp-best-practices-advisor
 │   │                   #   research: arxiv-ai-researcher, gemini-api-researcher, huggingface-spaces-researcher
 │   │                   #   other: strategic-research-analyst, nano-banana-pro-prompt-generator,
 │   │                   #     state-machine-diagram, migration-assistant, oncall-guide,
-│   │                   #     diagnose-dotfiles, side-job-researcher, governance-proposer, rule-auditor
+│   │                   #     diagnose-dotfiles, side-job-researcher, governance-proposer, rule-auditor,
+│   │                   #     pdm-reviewer
 │   └── skills/         # Skills (14): claude-code-guide, quick-commit, merge-pr,
 │                       #   review-changes, test-and-fix, db-query, trace-dataflow,
 │                       #   project-setup, first-principles, techdebt, governance-review,
@@ -135,11 +136,10 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `hooks/session-context.sh` - SessionStart hook for project context injection
 - `hooks/pre-tool-guard.sh` - PreToolUse hook for sensitive file access blocking
 
-**Global Agents** (2, always loaded):
-- `pdm-reviewer` - Plan review (R-0008)
+**Global Agents** (1, always loaded):
 - `verify-subagent-result` - SubAgent verification (R-0006)
 
-**Agent Catalog** (19, opt-in via `claude-agents` function):
+**Agent Catalog** (20, opt-in via `claude-agents` function):
 - `verify-shell`, `verify-app`, `build-validator` - Verification
 - `code-architect`, `code-simplifier` - Code design
 - `aws-best-practices-advisor`, `gcp-best-practices-advisor` - Cloud
@@ -148,6 +148,7 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `state-machine-diagram`, `migration-assistant`, `oncall-guide`
 - `diagnose-dotfiles`, `side-job-researcher`
 - `governance-proposer`, `rule-auditor`
+- `pdm-reviewer` - Plan review (プロジェクト単位で有効化)
 
 **Skills** (14):
 - `claude-code-guide` - Claude Code extension documentation
