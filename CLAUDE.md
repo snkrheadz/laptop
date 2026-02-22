@@ -67,6 +67,7 @@ mise use go@1.24.3                        # Install/use specific version
 │   │                   #   session-context.sh, pre-tool-guard.sh
 │   ├── agents/         # Subagents (18): verify-shell, code-architect, build-validator,
 │   │                   #   aws-best-practices-advisor, diagnose-dotfiles, pdm-reviewer, etc.
+│   │                   #   Worktree isolation: code-simplifier, build-validator, verify-app
 │   └── skills/         # Skills (10): claude-code-guide, quick-commit, merge-pr,
 │                       #   review-changes, test-and-fix, db-query, trace-dataflow, etc.
 │
