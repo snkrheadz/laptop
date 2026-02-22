@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 claude-agents() {
     local repo_root catalog_path resolved
     # Resolve settings.json symlink to find repo root (requires absolute symlink from install.sh)
