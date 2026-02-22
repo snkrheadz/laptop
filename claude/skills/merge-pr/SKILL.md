@@ -26,5 +26,7 @@ Execute PR merge and worktree cleanup in one command.
 
 ## Notes
 
-- If executed from within a worktree, automatically moves to main repo
+- If executed from within a worktree (built-in `.claude/worktrees/` or manual), automatically detects and moves to main repo
 - Ensure no uncommitted changes before merging
+- Built-in worktreeの自動クリーンアップはディレクトリ削除のみ。PR merge・リモートブランチ削除・main更新はこのskillが担当
+- Built-in worktree内から実行する場合、step 3 (`git worktree remove`) は自動クリーンアップ済みなら不要。削除前にworktreeの存在を確認する
