@@ -112,6 +112,14 @@ setup_claude_agents() {
 
     mkdir -p "$HOME/.claude/agents"
 
+    # Clean up stale symlinks from agents moved to catalog
+    for link in "$HOME/.claude/agents"/*.md; do
+        if [ -L "$link" ] && [ ! -e "$link" ]; then
+            rm "$link"
+            log_info "Cleaned up stale symlink: $(basename "$link")"
+        fi
+    done
+
     # Dynamically find all agent files (*.md files in agents directory)
     for agent_file in "$DOTFILES_DIR/claude/agents"/*.md; do
         if [ -f "$agent_file" ]; then
@@ -121,7 +129,7 @@ setup_claude_agents() {
         fi
     done
 
-    log_success "Claude agents configured"
+    log_success "Claude agents configured (global: 2, catalog: $(find "$DOTFILES_DIR/claude/agent-catalog" -name '*.md' 2>/dev/null | wc -l | tr -d ' '))"
 }
 
 # Create symbolic links
@@ -333,6 +341,7 @@ main() {
     echo "  1. Restart your terminal or run: source ~/.zshrc"
     echo "  2. Add your API keys to ~/.secrets.env"
     echo "  3. Run 'rollback.sh' if you need to restore previous settings"
+    echo "  4. Run 'claude-agents preset dev' in each project to add agents"
     echo ""
 }
 

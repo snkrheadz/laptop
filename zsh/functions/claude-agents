@@ -1,0 +1,29 @@
+claude-agents() {
+    local repo_root catalog_path
+    repo_root=$(dirname "$(dirname "$(readlink ~/.claude/settings.json)")")
+    catalog_path="$repo_root/claude/agent-catalog"
+    [ ! -d "$catalog_path" ] && echo "Error: Catalog not found at $catalog_path" && return 1
+
+    case "$1" in
+        list)   ls "$catalog_path"/*.md 2>/dev/null | xargs -I{} basename {} .md ;;
+        add)    shift; mkdir -p .claude/agents
+                for a in "$@"; do
+                    [ -f "$catalog_path/$a.md" ] && ln -sf "$catalog_path/$a.md" ".claude/agents/$a.md" && echo "Added: $a" \
+                        || echo "Not found: $a"
+                done ;;
+        remove) shift; for a in "$@"; do rm -f ".claude/agents/$a.md" && echo "Removed: $a"; done ;;
+        preset) shift
+                case "$1" in
+                    dev)      claude-agents add build-validator code-architect code-simplifier verify-app verify-shell ;;
+                    aws)      claude-agents add aws-best-practices-advisor build-validator state-machine-diagram ;;
+                    gcp)      claude-agents add gcp-best-practices-advisor build-validator state-machine-diagram ;;
+                    research) claude-agents add arxiv-ai-researcher strategic-research-analyst huggingface-spaces-researcher gemini-api-researcher ;;
+                    dotfiles) claude-agents add diagnose-dotfiles verify-shell build-validator ;;
+                    writing)  claude-agents add nano-banana-pro-prompt-generator strategic-research-analyst ;;
+                    ops)      claude-agents add oncall-guide build-validator verify-app ;;
+                    all)      claude-agents add $(claude-agents list | tr '\n' ' ') ;;
+                    *)        echo "Presets: dev, aws, gcp, research, dotfiles, writing, ops, all" ;;
+                esac ;;
+        *)      echo "Usage: claude-agents {list|add|remove|preset} [args...]" ;;
+    esac
+}

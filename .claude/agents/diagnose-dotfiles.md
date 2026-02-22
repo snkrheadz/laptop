@@ -1,0 +1,1 @@
+../../claude/agent-catalog/diagnose-dotfiles.md

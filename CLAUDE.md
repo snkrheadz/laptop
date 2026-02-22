@@ -44,7 +44,7 @@ mise use go@1.24.3                        # Install/use specific version
 │   ├── .zshrc          # Main zsh config (loads functions → configs → aliases → oh-my-zsh)
 │   ├── .aliases        # Shell aliases
 │   ├── functions/      # Custom zsh functions: _git_delete_branch, change-extension,
-│   │                   #   envup, mcd, pr-merge
+│   │                   #   envup, mcd, pr-merge, claude-agents
 │   └── configs/        # Modular zsh configs
 │       ├── *.zsh       # Main configs (color, editor, history, etc.)
 │       └── post/       # Loaded last (path.zsh, completion.zsh, mise.zsh)
@@ -65,13 +65,22 @@ mise use go@1.24.3                        # Install/use specific version
 │   ├── CLAUDE.md       # User global instructions
 │   ├── hooks/          # Lifecycle hooks (3): validate-shell.sh,
 │   │                   #   session-context.sh, pre-tool-guard.sh
-│   ├── agents/         # Subagents (18): verify-shell, code-architect, build-validator,
-│   │                   #   aws-best-practices-advisor, diagnose-dotfiles, pdm-reviewer, etc.
-│   │                   #   Worktree isolation: code-simplifier, build-validator, verify-app
-│   └── skills/         # Skills (10): claude-code-guide, quick-commit, merge-pr,
-│                       #   review-changes, test-and-fix, db-query, trace-dataflow, etc.
+│   ├── agents/         # Global agents (2): pdm-reviewer, verify-subagent-result
+│   ├── agent-catalog/  # Opt-in agents (19): available via `claude-agents` function
+│   │                   #   dev: build-validator, code-architect, code-simplifier, verify-app, verify-shell
+│   │                   #   cloud: aws-best-practices-advisor, gcp-best-practices-advisor
+│   │                   #   research: arxiv-ai-researcher, gemini-api-researcher, huggingface-spaces-researcher
+│   │                   #   other: strategic-research-analyst, nano-banana-pro-prompt-generator,
+│   │                   #     state-machine-diagram, migration-assistant, oncall-guide,
+│   │                   #     diagnose-dotfiles, side-job-researcher, governance-proposer, rule-auditor
+│   └── skills/         # Skills (14): claude-code-guide, quick-commit, merge-pr,
+│                       #   review-changes, test-and-fix, db-query, trace-dataflow,
+│                       #   project-setup, first-principles, techdebt, governance-review,
+│                       #   simplify-pipeline, refactor-swarm, rule-history
 │
-├── .claude/            # Local skills (project-specific, NOT symlinked)
+├── .claude/            # Project-local config (NOT symlinked to ~/.claude/)
+│   ├── agents/         # Project agents (3): diagnose-dotfiles, verify-shell, build-validator
+│   │                   #   (symlinks to claude/agent-catalog/ via `claude-agents preset dotfiles`)
 │   └── skills/         # Local skills (15): brew-manage, health-check, zsh-config, pdm-review, etc.
 │
 ├── .github/
@@ -126,24 +135,32 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `hooks/session-context.sh` - SessionStart hook for project context injection
 - `hooks/pre-tool-guard.sh` - PreToolUse hook for sensitive file access blocking
 
-**Agents** (18):
-- `verify-shell`, `verify-app`, `build-validator` - Verification agents
-- `code-architect`, `code-simplifier` - Code design agents
-- `aws-best-practices-advisor`, `gcp-best-practices-advisor` - Cloud guidance
-- `arxiv-ai-researcher`, `gemini-api-researcher`, `huggingface-spaces-researcher` - Research agents
+**Global Agents** (2, always loaded):
+- `pdm-reviewer` - Plan review (R-0008)
+- `verify-subagent-result` - SubAgent verification (R-0006)
+
+**Agent Catalog** (19, opt-in via `claude-agents` function):
+- `verify-shell`, `verify-app`, `build-validator` - Verification
+- `code-architect`, `code-simplifier` - Code design
+- `aws-best-practices-advisor`, `gcp-best-practices-advisor` - Cloud
+- `arxiv-ai-researcher`, `gemini-api-researcher`, `huggingface-spaces-researcher` - Research
 - `strategic-research-analyst`, `nano-banana-pro-prompt-generator`
 - `state-machine-diagram`, `migration-assistant`, `oncall-guide`
-- `diagnose-dotfiles`, `verify-subagent-result`
-- `pdm-reviewer`
+- `diagnose-dotfiles`, `side-job-researcher`
+- `governance-proposer`, `rule-auditor`
 
-**Skills** (10):
+**Skills** (14):
 - `claude-code-guide` - Claude Code extension documentation
 - `db-query` - Database query helper
 - `first-principles` - First principles analysis
+- `governance-review` - Governance rule freshness audit
 - `merge-pr` - PR merge with worktree cleanup
-- `project-setup` - Project setup wizard
+- `project-setup` - Project setup wizard (with agent selection)
 - `quick-commit` - Fast commit workflow
+- `refactor-swarm` - Multi-module simplification
 - `review-changes` - Code review helper
+- `rule-history` - Governance rule history
+- `simplify-pipeline` - Single module simplification
 - `techdebt` - Tech debt analysis
 - `test-and-fix` - Test and fix workflow
 - `trace-dataflow` - Data flow tracing
