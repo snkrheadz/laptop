@@ -173,9 +173,9 @@ create_symlinks() {
     # claude hooks
     mkdir -p "$HOME/.claude/hooks"
     safe_ln "$DOTFILES_DIR/claude/hooks/validate-shell.sh" "$HOME/.claude/hooks/validate-shell.sh"
-    safe_ln "$DOTFILES_DIR/claude/hooks/save-to-obsidian.js" "$HOME/.claude/hooks/save-to-obsidian.js"
     safe_ln "$DOTFILES_DIR/claude/hooks/session-context.sh" "$HOME/.claude/hooks/session-context.sh"
     safe_ln "$DOTFILES_DIR/claude/hooks/pre-tool-guard.sh" "$HOME/.claude/hooks/pre-tool-guard.sh"
+    safe_ln "$DOTFILES_DIR/claude/hooks/post-verify-rule-proposal.sh" "$HOME/.claude/hooks/post-verify-rule-proposal.sh"
 
     # claude CLAUDE.md (user global)
     safe_ln "$DOTFILES_DIR/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"

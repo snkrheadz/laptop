@@ -63,8 +63,8 @@ mise use go@1.24.3                        # Install/use specific version
 │   ├── settings.json   # Claude Code settings (hooks, plugins, permissions)
 │   ├── statusline.sh   # Status line display script
 │   ├── CLAUDE.md       # User global instructions (14 rules: R-0001〜R-0014)
-│   ├── hooks/          # Lifecycle hooks (3): validate-shell.sh,
-│   │                   #   session-context.sh, pre-tool-guard.sh
+│   ├── hooks/          # Lifecycle hooks (4): validate-shell.sh,
+│   │                   #   session-context.sh, pre-tool-guard.sh, post-verify-rule-proposal.sh
 │   ├── agents/         # Global agents (1): verify-subagent-result
 │   ├── agent-catalog/  # Opt-in agents (19): available via `claude-agents` function
 │   │                   #   dev: build-validator, code-architect, code-simplifier, verify-app, verify-shell
@@ -135,10 +135,11 @@ The `claude/` directory contains Claude Code settings managed by this repository
   - R-0009: Content Guidelines, R-0010: Governance
   - R-0012: Self-Improvement Loop, R-0011: Simplification
 
-**Hooks** (3):
+**Hooks** (4):
 - `hooks/validate-shell.sh` - PostToolUse hook for shellcheck
 - `hooks/session-context.sh` - SessionStart hook for project context injection
 - `hooks/pre-tool-guard.sh` - PreToolUse hook for sensitive file access blocking
+- `hooks/post-verify-rule-proposal.sh` - PostToolUse hook for governance failure capture
 
 **Global Agents** (1, always loaded):
 - `verify-subagent-result` - SubAgent verification (R-0006)
