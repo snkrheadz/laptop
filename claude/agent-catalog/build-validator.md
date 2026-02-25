@@ -2,7 +2,7 @@
 name: build-validator
 description: "Build validation agent. Verifies builds pass before commit/PR. Runs type checking, linting, and builds to detect issues early. Triggers: validate build, pre-CI check, build validation, CI check"
 tools: Bash, Read, Grep, Glob
-model: haiku
+model: sonnet
 isolation: worktree
 ---
 

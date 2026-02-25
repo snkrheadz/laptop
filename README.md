@@ -80,7 +80,7 @@ laptop/
 │   ├── CLAUDE.md           # User global instructions (14 rules: R-0001〜R-0014)
 │   ├── settings.json       # Hooks, plugins, permissions
 │   ├── statusline.sh       # Custom status line script
-│   ├── hooks/              # Lifecycle hooks (3)
+│   ├── hooks/              # Lifecycle hooks (4)
 │   ├── agents/             # Global agents (1): verify-subagent-result
 │   ├── agent-catalog/      # Opt-in agents (19): via `claude-agents` function
 │   └── skills/             # Custom skills (14)
@@ -301,10 +301,11 @@ claude/
 ├── CLAUDE.md           # User global instructions (14 rules: R-0001〜R-0014)
 ├── settings.json       # Hooks, plugins, permissions
 ├── statusline.sh       # Custom status line script
-├── hooks/              # Lifecycle hooks (3)
-│   ├── validate-shell.sh   # PostToolUse: shellcheck validation
-│   ├── session-context.sh  # SessionStart: project context injection
-│   └── pre-tool-guard.sh   # PreToolUse: sensitive file access blocking
+├── hooks/              # Lifecycle hooks (4)
+│   ├── validate-shell.sh           # PostToolUse: shellcheck validation
+│   ├── session-context.sh          # SessionStart: project context injection
+│   ├── pre-tool-guard.sh           # PreToolUse: sensitive file access blocking
+│   └── post-verify-rule-proposal.sh # PostToolUse: governance failure capture
 ├── agents/             # Global agents (1, always loaded)
 │   └── verify-subagent-result.md
 ├── agent-catalog/      # Opt-in agents (19, via `claude-agents` function)
@@ -338,7 +339,7 @@ claude/
 | `CLAUDE.md` | User global instructions (14 rules: R-0001〜R-0014) |
 | `settings.json` | Hooks, plugins, permissions |
 | `statusline.sh` | Custom status line showing model, cost, context |
-| `hooks/` | 3 lifecycle hooks (PostToolUse, SessionStart, PreToolUse) |
+| `hooks/` | 4 lifecycle hooks (PostToolUse x2, SessionStart, PreToolUse) |
 | `agents/` | 1 global agent (verify-subagent-result) |
 | `agent-catalog/` | 19 opt-in agents via `claude-agents` function |
 | `skills/` | 14 custom skills for common workflows |
@@ -357,6 +358,7 @@ Displays in Claude Code CLI:
 | `validate-shell.sh` | PostToolUse | Runs shellcheck on `.sh` files after Write/Edit |
 | `session-context.sh` | SessionStart | Injects project context at session start |
 | `pre-tool-guard.sh` | PreToolUse | Blocks access to sensitive files |
+| `post-verify-rule-proposal.sh` | PostToolUse | Captures governance failures for rule proposals |
 
 ### Key Agents (from Agent Catalog)
 
