@@ -1,94 +1,61 @@
-## Principles
-<!-- rule-id: R-0001, added: 2026-01-01, trigger: founding rule -->
+# Workflow Orchestration
 
-- Point out issues, blind spots, and risks directly. No flattery.
-- If unclear, ask. Don't proceed on assumptions.
-- Provide recommendations with ratings (⭐1-5) and reasoning.
-
-## Delegation
-<!-- rule-id: R-0002, added: 2026-01-01, trigger: founding rule -->
-
-| Scope | Action |
-|-------|--------|
-| Simple (≤5 lines, 1 file) | Execute directly |
-| Medium (multiple files, research needed) | Delegate to Task agent |
-| Large (new feature, refactor) | Multiple agents in parallel |
-
-## Plan Mode
-<!-- rule-id: R-0013, added: 2026-02-23, trigger: Boris Cherny best practices analysis -->
-
-- Enter plan mode for tasks with 3+ steps or architectural decisions
-- If unexpected issues arise during implementation, STOP immediately and re-plan
-
-## Forbidden
-<!-- rule-id: R-0003, added: 2026-01-01, trigger: founding rule -->
-
-- Committing secrets (.env, credentials, secrets)
-- Direct push to main/master without confirmation
-- Deleting files without permission
-
-## Debugging rule
-<!-- rule-id: R-0004, added: 2026-01-01, trigger: founding rule -->
-
-- Before coding a fix, trace the full data-flow end-to-end:
-  UI -> state -> query/params -> compute -> render
-- Don't "patch symptoms". Show the chain and prove where the value changes.
-- When fixed, verify with: (1) reproduction steps, (2) a targeted test, (3) typecheck/build.
-
-## Quality Gate
-<!-- rule-id: R-0014, added: 2026-02-23, trigger: Boris Cherny best practices analysis -->
-
-- Before completing a task, ask yourself: "Would a staff engineer approve this change?"
-- If NO, do not mark as complete — improve it first
-
-## Session exit
-<!-- rule-id: R-0005, added: 2026-01-01, trigger: founding rule -->
-
-- Before we end, always output:
-  1) What changed (files)
-  2) Remaining TODOs
-  3) Commands for me to run
-  4) Risks/assumptions
-
-## SubAgent
-<!-- rule-id: R-0006, added: 2026-01-01, trigger: founding rule -->
-
-Always cite sources. If unverified, state "unverified".
-
-## Workflow
-<!-- rule-id: R-0007, added: 2026-01-01, trigger: founding rule -->
-
-- Use built-in EnterWorktree for file changes (not manual git worktree commands)
-- For extensions, see `/claude-code-guide`
-- Resume named sessions: `claude --resume <name>`
-- Use `/rewind` to undo recent changes
-- Use `/memory` to manage persistent context
-- Use `/keybindings` to view/edit keyboard shortcuts
+## 1. Plan Mode Default
+- Enter plan mode for ANY non-trivial task (3+ steps or architectural decisions)
+- If something goes sideways, STOP and re-plan immediately – don't keep pushing
+- Use plan mode for verification steps, not just building
+- Write detailed specs upfront to reduce ambiguity
 
 
-## Content Guidelines
-<!-- rule-id: R-0009, added: 2026-01-01, trigger: founding rule -->
+## 2. Subagent Strategy
+- Use subagents liberally to keep main context window clean
+- Offload research, exploration, and parallel analysis to subagents
+- For complex problems, throw more compute at it via subagents
+- One task per subagent for focused execution
 
-- OK: Use Claude to articulate your own experiences more clearly
-- NG: Use Claude to fabricate experiences
 
-## Governance
-<!-- rule-id: R-0010, added: 2026-02-22, trigger: Boris Cherny philosophy implementation -->
+## 3. Self-Improvement Loop
+- After ANY correction from the user: update `tasks/lessons.md` with the pattern
+- Write rules for yourself that prevent the same mistake
+- Ruthlessly iterate on these lessons until mistake rate drops
+- Review lessons at session start for relevant project
 
-- If test/build/lint failures recur 3 times, propose a rule via governance-proposer
-- Run `/governance-review` monthly to audit rule freshness
-- All CLAUDE.md rules must have provenance: `<!-- rule-id: XX, added: YYYY-MM-DD, trigger: description -->`
 
-## Self-Improvement Loop
-<!-- rule-id: R-0012, added: 2026-02-23, trigger: Boris Cherny best practices analysis -->
+## 4. Verification Before Done
+- Never mark a task complete without proving it works
+- Diff behavior between main and your changes when relevant
+- Ask yourself: "Would a staff engineer approve this?"
+- Run tests, check logs, demonstrate correctness
 
-- When corrected by the user, immediately record the pattern in auto memory
-- Record: what was wrong, the correct pattern, and a prevention rule
-- Check memory at session start to leverage past lessons
 
-## Simplification
-<!-- rule-id: R-0011, added: 2026-02-22, trigger: Boris Cherny philosophy implementation -->
+## 5. Demand Elegance
+- For non-trivial changes: pause and ask "is there a more elegant way?"
+- If a fix feels hacky: "Knowing everything I know now, implement the elegant solution"
+- Skip this for simple, obvious fixes – don't over-engineer
+- Challenge your own work before presenting it
 
-- Single module: `/simplify-pipeline`
-- Multiple modules: `/refactor-swarm`
-- Simplification must not change behavior. Behavior changes are a separate task
+
+## 6. Autonomous Bug Fixing
+- When given a bug report: just fix it. Don't ask for hand-holding
+- Point at logs, errors, failing tests – then resolve them
+- Zero context switching required from the user
+- Go fix failing CI tests without being told how
+
+
+---
+
+## Task Management
+1. Plan First: Write plan to `tasks/todo.md` with checkable items
+2. Verify Plan: Check in before starting implementation
+3. Track Progress: Mark items complete as you go
+4. Explain Changes: High-level summary at each step
+5. Document Results: Add review section to `tasks/todo.md`
+6. Capture Lessons: Update `tasks/lessons.md` after corrections
+
+
+---
+
+## Core Principles
+- Simplicity First: Make every change as simple as possible. Impact minimal code.
+- No Laziness: Find root causes. No temporary fixes. Senior developer standards.
+- Minimal Impact: Changes should only touch what's necessary. Avoid introducing bugs.
