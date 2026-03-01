@@ -63,8 +63,8 @@ mise use go@1.24.3                        # Install/use specific version
 │   ├── settings.json   # Claude Code settings (hooks, plugins, permissions)
 │   ├── statusline.sh   # Status line display script
 │   ├── CLAUDE.md       # User global instructions (Workflow Orchestration)
-│   ├── hooks/          # Lifecycle hooks (4): validate-shell.sh,
-│   │                   #   session-context.sh, pre-tool-guard.sh, post-verify-rule-proposal.sh
+│   ├── hooks/          # Lifecycle hooks (5): validate-shell.sh,
+│   │                   #   session-context.sh, pre-tool-guard.sh, post-failure-proposal.sh, pre-compact-save.sh
 │   ├── agents/         # Global agents (1): verify-subagent-result
 │   ├── agent-catalog/  # Opt-in agents (19): available via `claude-agents` function
 │   │                   #   dev: build-validator, code-architect, code-simplifier, verify-app, verify-shell
@@ -129,15 +129,21 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `settings.json` - Hooks, plugins, permissions, statusLine config
 - `statusline.sh` - Status line display script
 - `CLAUDE.md` - User global instructions (Workflow Orchestration)
-  - Plan Mode Default, Subagent Strategy, Self-Improvement Loop
+  - Plan Mode Default, Subagent Strategy, Self-Improvement Loop (+ Memory Separation)
   - Verification Before Done, Demand Elegance, Autonomous Bug Fixing
   - Task Management, Core Principles
 
-**Hooks** (4):
+**Hooks** (5):
 - `hooks/validate-shell.sh` - PostToolUse hook for shellcheck
-- `hooks/session-context.sh` - SessionStart hook for project context injection
+- `hooks/session-context.sh` - SessionStart hook for project context injection (+ PreCompact context restore)
 - `hooks/pre-tool-guard.sh` - PreToolUse hook for sensitive file access blocking
-- `hooks/post-verify-rule-proposal.sh` - PostToolUse hook for governance failure capture
+- `hooks/post-failure-proposal.sh` - PostToolUseFailure hook for governance failure capture (Bash/Write/Edit)
+- `hooks/pre-compact-save.sh` - PreCompact hook for working state preservation
+
+**Memory Architecture**:
+- Auto-Memory (`~/.claude/memory/`): tool patterns, environment info, API knowledge (auto-managed)
+- `tasks/lessons.md`: user corrections, mistake patterns, project-specific rules (explicit)
+- Rule: "corrected by user → lessons.md, discovered preference → auto-memory"
 
 **Global Agents** (1, always loaded):
 - `verify-subagent-result` - SubAgent verification
