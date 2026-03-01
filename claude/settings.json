@@ -157,5 +157,9 @@
     "document-skills@anthropic-agent-skills": true,
     "ralph-loop@claude-plugins-official": true
   },
-  "language": "japanese"
+  "language": "japanese",
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  }
 }
