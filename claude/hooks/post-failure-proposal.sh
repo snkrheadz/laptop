@@ -57,7 +57,7 @@ proposals_dir="$HOME/.claude/governance/proposals"
 mkdir -p "$proposals_dir"
 
 timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-proposal_file="$proposals_dir/$(echo "$timestamp" | tr -d ':T-' | cut -c1-15).json"
+proposal_file="$proposals_dir/$(echo "$timestamp" | tr -dc '0-9').json"
 
 # Truncate error to avoid massive files and write proposal as proper JSON in one jq call
 echo "$error" | head -50 | jq -Rsn \

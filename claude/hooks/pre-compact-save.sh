@@ -37,7 +37,7 @@ eval "$(echo "$input" | jq -r '
     fi
 
     # Include custom instructions hint if CLAUDE.md exists
-    if head -1 "$cwd/CLAUDE.md" > /dev/null 2>&1; then
+    if [[ -f "$cwd/CLAUDE.md" ]]; then
         echo "## Project Instructions"
         echo "CLAUDE.md exists at: $cwd/CLAUDE.md"
         echo ""
