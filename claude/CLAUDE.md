@@ -20,6 +20,11 @@
 - Ruthlessly iterate on these lessons until mistake rate drops
 - Review lessons at session start for relevant project
 
+### Memory Separation
+- **Auto-Memory** (`~/.claude/memory/`): tool patterns, environment info, API knowledge → let Claude Code manage automatically
+- **tasks/lessons.md**: user corrections, mistake patterns, project-specific rules → record explicitly
+- Rule: "corrected by user → lessons.md, discovered preference → auto-memory"
+
 
 ## 4. Verification Before Done
 - Never mark a task complete without proving it works

@@ -105,13 +105,26 @@
             "command": "~/.claude/hooks/validate-shell.sh"
           }
         ]
-      },
+      }
+    ],
+    "PostToolUseFailure": [
       {
-        "matcher": "Bash",
+        "matcher": "Bash|Write|Edit",
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/post-verify-rule-proposal.sh"
+            "command": "~/.claude/hooks/post-failure-proposal.sh"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/pre-compact-save.sh"
           }
         ]
       }
