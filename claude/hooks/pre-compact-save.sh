@@ -7,9 +7,12 @@ input=$(cat)
 
 context_file="$HOME/.claude/pre-compact-context.md"
 
-# Extract available fields from PreCompact input
-cwd=$(echo "$input" | jq -r '.cwd // "unknown"' 2>/dev/null)
-summary=$(echo "$input" | jq -r '.summary // ""' 2>/dev/null)
+# Extract available fields from PreCompact input in one jq call
+cwd="" summary=""
+eval "$(echo "$input" | jq -r '
+  @sh "cwd=\(.cwd // "unknown")",
+  @sh "summary=\(.summary // "")"
+' 2>/dev/null)"
 
 # Build context snapshot
 {
@@ -26,19 +29,17 @@ summary=$(echo "$input" | jq -r '.summary // ""' 2>/dev/null)
         echo ""
     fi
 
-    # Include tasks/todo.md if it exists in the working directory
-    todo_file="$cwd/tasks/todo.md"
-    if [[ -f "$todo_file" ]]; then
+    # Include tasks/todo.md if available in the working directory
+    if todo_content=$(head -50 "$cwd/tasks/todo.md" 2>/dev/null); then
         echo "## Active Tasks (tasks/todo.md)"
-        head -50 "$todo_file"
+        echo "$todo_content"
         echo ""
     fi
 
-    # Include custom instructions hint
-    claude_md="$cwd/CLAUDE.md"
-    if [[ -f "$claude_md" ]]; then
+    # Include custom instructions hint if CLAUDE.md exists
+    if [[ -f "$cwd/CLAUDE.md" ]]; then
         echo "## Project Instructions"
-        echo "CLAUDE.md exists at: $claude_md"
+        echo "CLAUDE.md exists at: $cwd/CLAUDE.md"
         echo ""
     fi
 } > "$context_file"
