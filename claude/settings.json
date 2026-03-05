@@ -3,6 +3,10 @@
     "ENABLE_TOOL_SEARCH": "auto:15",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
   "permissions": {
     "allow": [
       "Read(~/.claude/**)",
@@ -157,9 +161,5 @@
     "document-skills@anthropic-agent-skills": true,
     "ralph-loop@claude-plugins-official": true
   },
-  "language": "japanese",
-  "attribution": {
-    "commit": "",
-    "pr": ""
-  }
+  "language": "japanese"
 }
