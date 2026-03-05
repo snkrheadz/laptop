@@ -83,7 +83,7 @@ laptop/
 │   ├── hooks/              # Lifecycle hooks (4)
 │   ├── agents/             # Global agents (1): verify-subagent-result
 │   ├── agent-catalog/      # Opt-in agents (19): via `claude-agents` function
-│   └── skills/             # Custom skills (14)
+│   └── skills/             # Custom skills (15)
 │
 ├── .claude/                # Project-local config (NOT symlinked to ~/.claude/)
 │   ├── agents/             # Project agents (3): symlinks to agent-catalog/
@@ -315,7 +315,7 @@ claude/
 │   └── other: strategic-research-analyst, nano-banana-pro-prompt-generator,
 │         state-machine-diagram, migration-assistant, oncall-guide,
 │         diagnose-dotfiles, side-job-researcher, governance-proposer, rule-auditor
-└── skills/             # Custom skills (14)
+└── skills/             # Custom skills (15)
     ├── claude-code-guide/  # Claude Code extension guide
     ├── db-query/           # Database query helper
     ├── first-principles/   # First principles analysis
@@ -329,7 +329,8 @@ claude/
     ├── simplify-pipeline/  # Single module simplification
     ├── techdebt/           # Tech debt analysis
     ├── test-and-fix/       # Test and fix workflow
-    └── trace-dataflow/     # Data flow tracing
+    ├── trace-dataflow/     # Data flow tracing
+    └── gws-workspace/      # Google Workspace CLI operations
 ```
 
 ### Managed Components
@@ -342,7 +343,7 @@ claude/
 | `hooks/` | 4 lifecycle hooks (PostToolUse x2, SessionStart, PreToolUse) |
 | `agents/` | 1 global agent (verify-subagent-result) |
 | `agent-catalog/` | 19 opt-in agents via `claude-agents` function |
-| `skills/` | 14 custom skills for common workflows |
+| `skills/` | 15 custom skills for common workflows |
 
 ### Status Line
 
@@ -386,6 +387,7 @@ Displays in Claude Code CLI:
 - `/simplify-pipeline` - Single module simplification
 - `/refactor-swarm` - Multi-module simplification
 - `/rule-history` - Governance rule history
+- `/gws` - Google Workspace CLI operations
 
 ### Local Skills (Project-specific)
 

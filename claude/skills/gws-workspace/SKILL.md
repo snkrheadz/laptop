@@ -1,6 +1,6 @@
 ---
 name: gws-workspace
-description: "Google Workspace CLI (gws) operations. Drive, Gmail, Calendar, Sheets, Docs, Tasks, Chat management. Triggers: /gws, google workspace, drive, gmail, calendar, sheets, docs, google tasks, chat"
+description: "Google Workspace CLI (gws) operations. Manage Drive, Gmail, Calendar, Sheets, Docs, Tasks, Chat via gws command. Triggers: /gws, gws command, google workspace cli"
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob
 model: sonnet
