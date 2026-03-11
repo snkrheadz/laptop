@@ -13,6 +13,7 @@ theme = Catppuccin Frappe
 window-inherit-working-directory = true
 window-padding-x = 10
 window-padding-y = 10
+window-padding-balance = false
 window-decoration = true
 
 # Background
