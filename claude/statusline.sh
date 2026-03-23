@@ -1,7 +1,8 @@
 #!/bin/bash
 # Claude Code Status Line Script
-# Displays: Model | Dir+Branch | Duration | Cost(session/daily) | Lines | Tokens(I/O/CR/CC) | Context Bar
-# Token labels: I=Input, O=Output, CR=CacheRead, CC=CacheCreate
+# Displays: Model | Dir+Branch | Duration | Cost(session/daily) | Lines | Braille Token Bar
+# Token bar: 🧠 ⣿⣿⡇⠀⠀ PCT% IN:⣿⡇ CR:⣿⣿ OUT:⡀⠀ Nk left
+#   Braille dots (⠀–⣿) show fill level; TrueColor gradient green→yellow→red by context %
 #
 # Installation:
 #   1. Symlink to ~/.claude/statusline.sh
@@ -16,10 +17,47 @@ if ! command -v jq &>/dev/null; then
 fi
 
 # === ANSI Colors ===
-RED=$'\033[31m'
-YELLOW=$'\033[33m'
-GREEN=$'\033[32m'
 RESET=$'\033[0m'
+
+# === Braille Dots helpers (matches Pattern 5 sample) ===
+# BRAILLE[0]=space(empty) … BRAILLE[7]=⣿(full)
+BRAILLE=(' ' '⣀' '⣄' '⣤' '⣦' '⣶' '⣷' '⣿')
+DIM=$'\033[2m'
+
+# TrueColor gradient matching the Python sample:
+#   pct<50 : r=int(pct*5.1), g=200, b=80  (green)
+#   pct>=50: r=255, g=max(200-(pct-50)*4,0), b=60  (orange→red)
+gradient() {
+    local pct=$1 r g
+    if [ "$pct" -lt 50 ]; then
+        r=$((pct * 51 / 10))
+        printf '\033[38;2;%d;200;80m' "$r"
+    else
+        g=$((200 - (pct - 50) * 4))
+        [ "$g" -lt 0 ] && g=0
+        printf '\033[38;2;255;%d;60m' "$g"
+    fi
+}
+
+# Build Braille bar matching the Python braille_bar() logic exactly
+braille_bar() {
+    local pct=$1 width=${2:-8} bar="" i idx frac_num
+    [ "$pct" -lt 0 ] && pct=0
+    [ "$pct" -gt 100 ] && pct=100
+    for ((i = 0; i < width; i++)); do
+        if [ $((pct * width)) -ge $((100 * (i + 1))) ]; then
+            bar+="${BRAILLE[7]}"
+        elif [ $((pct * width)) -le $((100 * i)) ]; then
+            bar+="${BRAILLE[0]}"
+        else
+            frac_num=$((pct * width - 100 * i))
+            idx=$((frac_num * 7 / 100))
+            [ "$idx" -gt 7 ] && idx=7
+            bar+="${BRAILLE[$idx]}"
+        fi
+    done
+    printf '%s' "$bar"
+}
 
 # === Extract all values in a single jq call ===
 eval "$(echo "$input" | jq -r '
@@ -41,7 +79,9 @@ eval "$(echo "$input" | jq -r '
   "TOTAL_OUTPUT_TOKENS=" + (.context_window.total_output_tokens // 0 | tostring | @sh),
   "REMAINING_PCT=" + (.context_window.remaining_percentage // 0 | tostring | @sh),
   "VIM_MODE=" + (.vim.mode // "" | @sh),
-  "AGENT_NAME=" + (.agent.name // "" | @sh)
+  "AGENT_NAME=" + (.agent.name // "" | @sh),
+  "FIVE_HOUR_PCT=" + (.rate_limits.five_hour.used_percentage // -1 | tostring | @sh),
+  "SEVEN_DAY_PCT=" + (.rate_limits.seven_day.used_percentage // -1 | tostring | @sh)
 ')" 2>/dev/null
 
 # Fallback defaults if jq parsing failed
@@ -50,6 +90,7 @@ eval "$(echo "$input" | jq -r '
 : "${USED_PCT:=0}" "${CTX_SIZE:=0}" "${EXCEEDS_200K:=false}"
 : "${INPUT_TOKENS:=0}" "${CACHE_READ:=0}" "${CACHE_CREATE:=0}"
 : "${OUTPUT_TOKENS:=0}" "${TOTAL_INPUT_TOKENS:=0}" "${TOTAL_OUTPUT_TOKENS:=0}" "${REMAINING_PCT:=0}"
+: "${FIVE_HOUR_PCT:=-1}" "${SEVEN_DAY_PCT:=-1}"
 
 DIR_NAME="${CURRENT_DIR##*/}"
 
@@ -142,49 +183,29 @@ if [ "$LINES_ADDED" -gt 0 ] || [ "$LINES_REMOVED" -gt 0 ]; then
     SEGMENTS+=("+${LINES_ADDED}-${LINES_REMOVED}")
 fi
 
-# [6] Token breakdown: I:Xk O:Xk CR:Xk CC:Xk (skip if no API call yet)
-TOTAL_INPUT=$((INPUT_TOKENS + CACHE_READ + CACHE_CREATE))
-if [ "$TOTAL_INPUT" -gt 0 ] || [ "$OUTPUT_TOKENS" -gt 0 ]; then
-    SEGMENTS+=("I:$(format_tokens "$INPUT_TOKENS") O:$(format_tokens "$OUTPUT_TOKENS") CR:$(format_tokens "$CACHE_READ") CC:$(format_tokens "$CACHE_CREATE")")
-fi
-
-# [7] Context usage with progress bar and color
+# [6] Braille context bar — matches Python fmt(): {DIM}label{R} {gradient_bar} {pct}%
 if [ "$CTX_SIZE" -gt 0 ]; then
     PCT=${USED_PCT%%.*}
     PCT=${PCT:-0}
+    CTX_COLOR=$(gradient "$PCT")
+    CTX_BAR=$(braille_bar "$PCT" 8)
+    SEGMENTS+=("${DIM}ctx${RESET} ${CTX_COLOR}${CTX_BAR}${RESET} ${PCT}%")
+fi
 
-    # Format context window size
-    if [ "$CTX_SIZE" -ge 1000000 ]; then
-        CTX_LABEL="$((CTX_SIZE / 1000000))M"
-    elif [ "$CTX_SIZE" -ge 1000 ]; then
-        CTX_LABEL="$((CTX_SIZE / 1000))k"
-    else
-        CTX_LABEL="$CTX_SIZE"
-    fi
+# [7] 5h rate limit bar (only if data exists)
+if [ "$FIVE_HOUR_PCT" -ge 0 ] 2>/dev/null; then
+    FH_PCT=${FIVE_HOUR_PCT%%.*}
+    FH_COLOR=$(gradient "$FH_PCT")
+    FH_BAR=$(braille_bar "$FH_PCT" 8)
+    SEGMENTS+=("${DIM}5h${RESET} ${FH_COLOR}${FH_BAR}${RESET} ${FH_PCT}%")
+fi
 
-    # Build progress bar (10 chars wide)
-    BAR_WIDTH=10
-    FILLED=$((PCT * BAR_WIDTH / 100))
-    [ "$FILLED" -gt "$BAR_WIDTH" ] && FILLED=$BAR_WIDTH
-    EMPTY=$((BAR_WIDTH - FILLED))
-    BAR=""
-    for ((i = 0; i < FILLED; i++)); do BAR+="█"; done
-    for ((i = 0; i < EMPTY; i++)); do BAR+="░"; done
-
-    # Remaining tokens
-    REMAINING_TOKENS=$((CTX_SIZE * REMAINING_PCT / 100))
-    LEFT_LABEL="$(format_tokens "$REMAINING_TOKENS") left"
-
-    # Icon + color based on usage level
-    if [ "$EXCEEDS_200K" = "true" ]; then
-        SEGMENTS+=("🔴 ${CTX_LABEL}+ ${PCT}% ${RED}${BAR}${RESET} ${LEFT_LABEL}")
-    elif [ "$PCT" -ge 80 ]; then
-        SEGMENTS+=("⚠️ ${CTX_LABEL} ${PCT}% ${RED}${BAR}${RESET} ${LEFT_LABEL}")
-    elif [ "$PCT" -ge 60 ]; then
-        SEGMENTS+=("🧠 ${CTX_LABEL} ${PCT}% ${YELLOW}${BAR}${RESET} ${LEFT_LABEL}")
-    else
-        SEGMENTS+=("🧠 ${CTX_LABEL} ${PCT}% ${GREEN}${BAR}${RESET} ${LEFT_LABEL}")
-    fi
+# [8] 7d rate limit bar (only if data exists)
+if [ "$SEVEN_DAY_PCT" -ge 0 ] 2>/dev/null; then
+    SD_PCT=${SEVEN_DAY_PCT%%.*}
+    SD_COLOR=$(gradient "$SD_PCT")
+    SD_BAR=$(braille_bar "$SD_PCT" 8)
+    SEGMENTS+=("${DIM}7d${RESET} ${SD_COLOR}${SD_BAR}${RESET} ${SD_PCT}%")
 fi
 
 # [8] Vim mode (if active)

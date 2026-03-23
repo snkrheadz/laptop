@@ -3,6 +3,10 @@
     "ENABLE_TOOL_SEARCH": "auto:15",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
   "permissions": {
     "allow": [
       "Read(~/.claude/**)",
@@ -73,6 +77,7 @@
     ],
     "allowUnsandboxedCommands": false
   },
+  "model": "sonnet",
   "hooks": {
     "SessionStart": [
       {
@@ -155,11 +160,18 @@
     "typescript-lsp@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
     "document-skills@anthropic-agent-skills": true,
-    "ralph-loop@claude-plugins-official": true
+    "ralph-loop@claude-plugins-official": true,
+    "autoresearch@autoresearch": true
+  },
+  "extraKnownMarketplaces": {
+    "autoresearch": {
+      "source": {
+        "source": "github",
+        "repo": "uditgoenka/autoresearch"
+      }
+    }
   },
   "language": "japanese",
-  "attribution": {
-    "commit": "",
-    "pr": ""
-  }
+  "voiceEnabled": true,
+  "skipAutoPermissionPrompt": true
 }
