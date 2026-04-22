@@ -12,3 +12,4 @@ ruby = "3.4.8"
 auto_install = true
 # Trust all config files
 trusted_config_paths = ["~"]
+idiomatic_version_file_enable_tools = ["terraform"]
