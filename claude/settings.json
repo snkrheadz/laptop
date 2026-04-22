@@ -171,6 +171,5 @@
   },
   "language": "japanese",
   "skipAutoPermissionPrompt": true,
-  "voiceEnabled": true,
-  "model": "sonnet"
+  "voiceEnabled": true
 }
