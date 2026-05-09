@@ -73,10 +73,10 @@ mise use go@1.24.3                        # Install/use specific version
 │   │                   #   other: strategic-research-analyst, nano-banana-pro-prompt-generator,
 │   │                   #     state-machine-diagram, migration-assistant, oncall-guide,
 │   │                   #     diagnose-dotfiles, side-job-researcher, governance-proposer, rule-auditor
-│   └── skills/         # Skills (14): claude-code-guide, quick-commit, merge-pr,
+│   └── skills/         # Skills (15): claude-code-guide, quick-commit, merge-pr,
 │                       #   review-changes, test-and-fix, db-query, trace-dataflow,
 │                       #   project-setup, first-principles, techdebt, governance-review,
-│                       #   simplify-pipeline, refactor-swarm, rule-history
+│                       #   simplify-pipeline, refactor-swarm, rule-history, html-output
 │
 ├── .claude/            # Project-local config (NOT symlinked to ~/.claude/)
 │   ├── agents/         # Project agents (3): diagnose-dotfiles, verify-shell, build-validator
@@ -158,11 +158,12 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `diagnose-dotfiles`, `side-job-researcher`
 - `governance-proposer`, `rule-auditor`
 
-**Skills** (14):
+**Skills** (15):
 - `claude-code-guide` - Claude Code extension documentation
 - `db-query` - Database query helper
 - `first-principles` - First principles analysis
 - `governance-review` - Governance rule freshness audit
+- `html-output` - Generate rich HTML artifacts (specs, reviews, designs, reports, editors)
 - `merge-pr` - PR merge with worktree cleanup
 - `project-setup` - Project setup wizard (with agent selection)
 - `quick-commit` - Fast commit workflow
