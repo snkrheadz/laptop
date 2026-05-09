@@ -85,3 +85,9 @@ venv/
 .claude/*
 !.claude/skills/
 !.claude/agents/
+
+# Generated HTML artifacts (html-output skill)
+artifacts/
+
+# Working state (workflow orchestration)
+tasks/
