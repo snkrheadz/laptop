@@ -85,19 +85,23 @@ Mentally check off the **required elements for this mode** before writing a sing
 
 ## Step 4: Generate the file
 
-- Output path: `./artifacts/<YYYY-MM-DD>-<kebab-slug>.html` (create dir if missing).
-- Single self-contained HTML file. Inline `<style>` and `<script>`. CDN allowed only if absolutely required (e.g. `chart.js`); pin the version.
-- Include `<meta name="viewport" ...>` for responsive layout.
-- Include a `prefers-color-scheme: dark` media query for dark-mode parity.
+- **Output directory**: resolve via `ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"` then write to `$ROOT/artifacts/`. Never use a bare `./artifacts/` — CWD-dependent paths land outside the project when invoked from `~`.
+- **Filename**: `<YYYY-MM-DD>-<kebab-slug>.html` where `<kebab-slug>` is the topic lowercased, non-alphanumerics replaced with `-`, collapsed runs of `-`, trimmed to ≤50 chars. Append `-2`, `-3`, … on collision.
+- Single self-contained HTML file. Inline `<style>` and `<script>`. CDN allowed only if absolutely required (e.g. `https://cdn.jsdelivr.net/npm/chart.js@4.4.1`); pin a specific version, never `@latest`.
+- Include `<meta name="viewport" content="width=device-width, initial-scale=1">` for responsive layout.
+- Include a `@media (prefers-color-scheme: dark)` block for dark-mode parity.
 - For `editor` mode, the export button writes to the clipboard via `navigator.clipboard.writeText`.
 
 ## Step 5: Verify and report
 
-Run in parallel:
+Run these checks in parallel; abort and regenerate if any required check fails:
 
 - `wc -c <file>` — flag if >500KB (likely bloated)
 - `grep -oE 'https?://[^"'\'']+' <file> | sort -u` — list every external URL so the user can audit
-- Print: `open ./artifacts/<file>.html` so the user can launch it on macOS
+- **Required**: `grep -q 'name="viewport"' <file>` — viewport meta present
+- **Required**: `grep -q 'prefers-color-scheme' <file>` — dark-mode block present
+- **Required for `editor` mode**: `grep -q 'navigator.clipboard' <file>` — export button wired up
+- Print: `open <file>` so the user can launch it on macOS
 
 Then output a short report:
 
