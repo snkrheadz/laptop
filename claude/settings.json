@@ -75,6 +75,7 @@
       "Bash(rm -rf ~)",
       "Bash(sudo *)"
     ],
+    "defaultMode": "auto",
     "allowUnsandboxedCommands": false
   },
   "hooks": {
@@ -170,6 +171,10 @@
     }
   },
   "language": "japanese",
-  "skipAutoPermissionPrompt": true,
-  "voiceEnabled": true
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
+  },
+  "preferredNotifChannel": "ghostty",
+  "skipAutoPermissionPrompt": true
 }
