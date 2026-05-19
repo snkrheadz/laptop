@@ -73,10 +73,11 @@ mise use go@1.24.3                        # Install/use specific version
 │   │                   #   other: strategic-research-analyst, nano-banana-pro-prompt-generator,
 │   │                   #     state-machine-diagram, migration-assistant, oncall-guide,
 │   │                   #     diagnose-dotfiles, side-job-researcher, governance-proposer, rule-auditor
-│   └── skills/         # Skills (15): claude-code-guide, quick-commit, merge-pr,
-│                       #   review-changes, test-and-fix, db-query, trace-dataflow,
-│                       #   project-setup, first-principles, techdebt, governance-review,
-│                       #   simplify-pipeline, refactor-swarm, rule-history, html-output
+│   ├── skills/         # Skills (15): claude-code-guide, quick-commit, merge-pr,
+│   │                   #   review-changes, test-and-fix, db-query, trace-dataflow,
+│   │                   #   project-setup, first-principles, techdebt, governance-review,
+│   │                   #   simplify-pipeline, refactor-swarm, rule-history, html-output
+│   └── commands/       # Custom slash commands (1): implement-with-notes
 │
 ├── .claude/            # Project-local config (NOT symlinked to ~/.claude/)
 │   ├── agents/         # Project agents (3): diagnose-dotfiles, verify-shell, build-validator
@@ -174,6 +175,9 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `techdebt` - Tech debt analysis
 - `test-and-fix` - Test and fix workflow
 - `trace-dataflow` - Data flow tracing
+
+**Commands** (1) - Custom slash commands in `claude/commands/`, symlinked to `~/.claude/commands/`:
+- `implement-with-notes` - Implement a spec while keeping running implementation notes (decisions, tradeoffs, deltas)
 
 **Local Skills** (15) - Project-specific, in `.claude/skills/`:
 

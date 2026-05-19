@@ -132,6 +132,32 @@ setup_claude_agents() {
     log_success "Claude agents configured (global: 2, catalog: $(find "$DOTFILES_DIR/claude/agent-catalog" -maxdepth 1 -name '*.md' 2>/dev/null | wc -l | tr -d ' '))"
 }
 
+# Create symlinks for all managed slash command files
+setup_claude_commands() {
+    log_info "Setting up Claude commands..."
+
+    mkdir -p "$HOME/.claude/commands"
+
+    # Clean up stale symlinks
+    for link in "$HOME/.claude/commands"/*.md; do
+        if [ -L "$link" ] && [ ! -e "$link" ]; then
+            rm "$link"
+            log_info "Cleaned up stale symlink: $(basename "$link")"
+        fi
+    done
+
+    # Dynamically find all command files (*.md files in commands directory)
+    for command_file in "$DOTFILES_DIR/claude/commands"/*.md; do
+        if [ -f "$command_file" ]; then
+            local command_name
+            command_name=$(basename "$command_file")
+            safe_ln "$command_file" "$HOME/.claude/commands/$command_name"
+        fi
+    done
+
+    log_success "Claude commands configured ($(find "$DOTFILES_DIR/claude/commands" -maxdepth 1 -name '*.md' 2>/dev/null | wc -l | tr -d ' ') commands)"
+}
+
 # Create symbolic links
 create_symlinks() {
     log_info "Creating symbolic links..."
@@ -330,6 +356,7 @@ main() {
     create_symlinks
     setup_claude_agents
     setup_claude_skills
+    setup_claude_commands
     install_brew_packages
     setup_mise
     setup_security
