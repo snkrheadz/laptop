@@ -176,5 +176,7 @@
     "mode": "hold"
   },
   "preferredNotifChannel": "ghostty",
-  "skipAutoPermissionPrompt": true
+  "agentPushNotifEnabled": true,
+  "skipAutoPermissionPrompt": true,
+  "voiceEnabled": true
 }
