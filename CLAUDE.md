@@ -78,11 +78,11 @@ mise use go@1.24.3                        # Install/use specific version
 │   │                   #   other: strategic-research-analyst, nano-banana-pro-prompt-generator,
 │   │                   #     state-machine-diagram, migration-assistant, oncall-guide,
 │   │                   #     diagnose-dotfiles, side-job-researcher, governance-proposer, rule-auditor
-│   ├── skills/         # Skills (18): claude-code-guide, quick-commit, merge-pr,
-│   │                   #   review-changes, pr-review, test-and-fix, db-query, trace-dataflow,
-│   │                   #   project-setup, first-principles, techdebt, governance-review,
-│   │                   #   simplify-pipeline, refactor-swarm, rule-history, html-output,
-│   │                   #   task-definition-sheet, teach-session
+│   ├── skills/         # Skills (19): claude-code-guide, quick-commit, merge-pr,
+│   │                   #   review-changes, pr-review, review-inbox, test-and-fix, db-query,
+│   │                   #   trace-dataflow, project-setup, first-principles, techdebt,
+│   │                   #   governance-review, simplify-pipeline, refactor-swarm, rule-history,
+│   │                   #   html-output, task-definition-sheet, teach-session
 │   └── commands/       # Custom slash commands (1): implement-with-notes
 │
 ├── .claude/            # Project-local config (NOT symlinked to ~/.claude/)
@@ -166,7 +166,7 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `diagnose-dotfiles`, `side-job-researcher`
 - `governance-proposer`, `rule-auditor`
 
-**Skills** (18):
+**Skills** (19):
 - `claude-code-guide` - Claude Code extension documentation
 - `db-query` - Database query helper
 - `first-principles` - First principles analysis
@@ -174,6 +174,7 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `html-output` - Generate rich HTML artifacts (specs, reviews, designs, reports, editors)
 - `merge-pr` - PR merge with worktree cleanup
 - `pr-review` - Adversarial Architect-Reviewer for a PR/diff (fan-out → verify gate → synthesize)
+- `review-inbox` - Triage PRs where you are the requested reviewer (inbox → /pr-review → draft → confirm → COMMENT review). JA/EN selectable, default JA.
 - `project-setup` - Project setup wizard (with agent selection)
 - `quick-commit` - Fast commit workflow
 - `refactor-swarm` - Multi-module simplification
