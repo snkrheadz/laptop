@@ -158,6 +158,32 @@ setup_claude_commands() {
     log_success "Claude commands configured ($(find "$DOTFILES_DIR/claude/commands" -maxdepth 1 -name '*.md' 2>/dev/null | wc -l | tr -d ' ') commands)"
 }
 
+# Create symlinks for Claude core files (statusline, hooks, CLAUDE.md, settings.json)
+setup_claude_core() {
+    log_info "Setting up Claude core files..."
+
+    mkdir -p "$HOME/.claude"
+    mkdir -p "$HOME/.claude/usage"
+    safe_ln "$DOTFILES_DIR/claude/statusline.sh" "$HOME/.claude/statusline.sh"
+
+    # claude hooks
+    mkdir -p "$HOME/.claude/hooks"
+    rm -f "$HOME/.claude/hooks/post-verify-rule-proposal.sh"  # cleanup stale hook (replaced by post-failure-proposal.sh)
+    safe_ln "$DOTFILES_DIR/claude/hooks/validate-shell.sh" "$HOME/.claude/hooks/validate-shell.sh"
+    safe_ln "$DOTFILES_DIR/claude/hooks/session-context.sh" "$HOME/.claude/hooks/session-context.sh"
+    safe_ln "$DOTFILES_DIR/claude/hooks/pre-tool-guard.sh" "$HOME/.claude/hooks/pre-tool-guard.sh"
+    safe_ln "$DOTFILES_DIR/claude/hooks/post-failure-proposal.sh" "$HOME/.claude/hooks/post-failure-proposal.sh"
+    safe_ln "$DOTFILES_DIR/claude/hooks/pre-compact-save.sh" "$HOME/.claude/hooks/pre-compact-save.sh"
+
+    # claude CLAUDE.md (user global)
+    safe_ln "$DOTFILES_DIR/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+
+    # claude settings.json
+    safe_ln "$DOTFILES_DIR/claude/settings.json" "$HOME/.claude/settings.json"
+
+    log_success "Claude core files configured"
+}
+
 # Create symbolic links
 create_symlinks() {
     log_info "Creating symbolic links..."
@@ -191,25 +217,8 @@ create_symlinks() {
     mkdir -p "$HOME/.config/mise"
     safe_ln "$DOTFILES_DIR/mise/config.toml" "$HOME/.config/mise/config.toml"
 
-    # claude
-    mkdir -p "$HOME/.claude"
-    mkdir -p "$HOME/.claude/usage"
-    safe_ln "$DOTFILES_DIR/claude/statusline.sh" "$HOME/.claude/statusline.sh"
-
-    # claude hooks
-    mkdir -p "$HOME/.claude/hooks"
-    rm -f "$HOME/.claude/hooks/post-verify-rule-proposal.sh"  # cleanup stale hook (replaced by post-failure-proposal.sh)
-    safe_ln "$DOTFILES_DIR/claude/hooks/validate-shell.sh" "$HOME/.claude/hooks/validate-shell.sh"
-    safe_ln "$DOTFILES_DIR/claude/hooks/session-context.sh" "$HOME/.claude/hooks/session-context.sh"
-    safe_ln "$DOTFILES_DIR/claude/hooks/pre-tool-guard.sh" "$HOME/.claude/hooks/pre-tool-guard.sh"
-    safe_ln "$DOTFILES_DIR/claude/hooks/post-failure-proposal.sh" "$HOME/.claude/hooks/post-failure-proposal.sh"
-    safe_ln "$DOTFILES_DIR/claude/hooks/pre-compact-save.sh" "$HOME/.claude/hooks/pre-compact-save.sh"
-
-    # claude CLAUDE.md (user global)
-    safe_ln "$DOTFILES_DIR/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
-
-    # claude settings.json
-    safe_ln "$DOTFILES_DIR/claude/settings.json" "$HOME/.claude/settings.json"
+    # claude (core: statusline, hooks, CLAUDE.md, settings.json)
+    setup_claude_core
 
     log_success "Symbolic links created"
 }
@@ -374,4 +383,7 @@ main() {
     echo ""
 }
 
-main "$@"
+# Only run main when executed directly, not when sourced (e.g. by scripts/sync-claude.sh)
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi

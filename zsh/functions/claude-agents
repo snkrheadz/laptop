@@ -24,10 +24,11 @@ claude-agents() {
                     gcp)      claude-agents add gcp-best-practices-advisor build-validator state-machine-diagram ;;
                     research) claude-agents add arxiv-ai-researcher strategic-research-analyst huggingface-spaces-researcher gemini-api-researcher ;;
                     dotfiles) claude-agents add diagnose-dotfiles verify-shell build-validator ;;
+                    review)   claude-agents add architecture-reviewer code-architect verify-app ;;
                     writing)  claude-agents add nano-banana-pro-prompt-generator strategic-research-analyst ;;
                     ops)      claude-agents add oncall-guide build-validator verify-app ;;
                     all)      claude-agents add $(claude-agents list | tr '\n' ' ') ;;
-                    *)        echo "Presets: dev, aws, gcp, research, dotfiles, writing, ops, all" ;;
+                    *)        echo "Presets: dev, aws, gcp, research, dotfiles, review, writing, ops, all" ;;
                 esac ;;
         *)      echo "Usage: claude-agents {list|add|remove|preset} [args...]" ;;
     esac
