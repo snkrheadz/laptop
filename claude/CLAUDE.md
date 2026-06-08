@@ -7,11 +7,26 @@
 - Write detailed specs upfront to reduce ambiguity
 
 
-## 2. Subagent Strategy
+## 2. Subagent & Orchestration Strategy
 - Use subagents liberally to keep main context window clean
 - Offload research, exploration, and parallel analysis to subagents
-- For complex problems, throw more compute at it via subagents
 - One task per subagent for focused execution
+
+### Scaling rule: single agent → team → dynamic workflow
+Match the orchestration primitive to the shape of the work:
+- **Single subagent** (`Agent` tool) – one focused task: research, a scoped edit,
+  one file's analysis. Default for most delegation.
+- **Agent Team** (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`) – a few long-lived agents
+  collaborating on a shared task list with dependencies (e.g. `refactor-swarm`
+  partitioned by module). Use when work needs coordination/hand-off across roles.
+- **Dynamic Workflow** (`Workflow` tool / "ultracode") – fan out tens to hundreds of
+  agents deterministically (pipeline/parallel, verify gates, loop-until-dry). Use for
+  breadth that one context can't hold: codebase-wide audit, migration over many sites,
+  adversarial review with independent verifiers.
+
+**Decision rule:** one bounded task → subagent; coordinated multi-role work → Team;
+wide fan-out + verify/synthesize → Workflow. For long autonomous runs, prefer encoding
+the fan-out in a Workflow over hand-spawning agents each turn.
 
 
 ## 3. Self-Improvement Loop
@@ -31,6 +46,20 @@
 - Diff behavior between main and your changes when relevant
 - Ask yourself: "Would a staff engineer approve this?"
 - Run tests, check logs, demonstrate correctness
+
+### End-to-end self-verification (required for autonomous runs)
+Before looping unattended, make sure there is a way to verify the change end to end
+without a human in the loop — this is what lets `/goal` and `/loop` self-terminate
+honestly instead of declaring success blind:
+- **This repo (dotfiles):** `source ~/.zshrc` loads clean, `shellcheck` passes,
+  `pre-commit run --all-files` is green, and the `health-check` skill reports no broken
+  symlinks. Use the `verify-shell` / `verify-app` agents and `test-and-fix` skill as the
+  closing gate of any autonomous pass.
+- **Other project types:** wire up the equivalent loop — start the real server/service
+  for backend work, a browser/UI driver for web, a simulator MCP for mobile — so Claude
+  observes real behavior, not just exit codes.
+If no end-to-end check exists yet, build it first; an autonomous loop without a
+verification path is not safe to run.
 
 
 ## 5. Demand Elegance

@@ -137,7 +137,7 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `settings.json` - Hooks, plugins, permissions, statusLine config
 - `statusline.sh` - Status line display script
 - `CLAUDE.md` - User global instructions (Workflow Orchestration)
-  - Plan Mode Default, Subagent Strategy, Self-Improvement Loop (+ Memory Separation)
+  - Plan Mode Default, Subagent & Orchestration Strategy, Self-Improvement Loop (+ Memory Separation)
   - Verification Before Done, Demand Elegance, Autonomous Bug Fixing
   - Loop Primitives (§7): `/goal` (condition) vs `/loop` (time) vs `autoresearch` (metric)
   - Task Management, Core Principles
