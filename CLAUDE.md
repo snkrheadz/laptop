@@ -12,6 +12,9 @@ macOS laptop setup repository with dotfiles management, auto-sync, and security 
 # Full installation (backup, symlinks, brew packages, security tools, auto-sync)
 ./install.sh
 
+# Sync ONLY Claude Code symlinks (~/.claude/*), skipping brew/mise/security/backup
+./scripts/sync-claude.sh
+
 # Rollback to previous configuration
 ./rollback.sh
 
@@ -37,7 +40,8 @@ mise use go@1.24.3                        # Install/use specific version
 ├── install.sh          # Main installer (creates backup, symlinks, installs packages)
 ├── rollback.sh         # Restore from backup
 ├── scripts/
-│   └── auto-sync.sh    # Hourly auto-sync via launchd
+│   ├── auto-sync.sh    # Hourly auto-sync via launchd
+│   └── sync-claude.sh  # Claude-only symlink sync (sources install.sh, skips brew/mise)
 ├── Brewfile            # Homebrew packages, casks, VSCode extensions
 │
 ├── zsh/                # Shell config → ~/.zshrc, ~/.aliases, ~/.zsh/
@@ -66,18 +70,19 @@ mise use go@1.24.3                        # Install/use specific version
 │   ├── hooks/          # Lifecycle hooks (5): validate-shell.sh,
 │   │                   #   session-context.sh, pre-tool-guard.sh, post-failure-proposal.sh, pre-compact-save.sh
 │   ├── agents/         # Global agents (1): verify-subagent-result
-│   ├── agent-catalog/  # Opt-in agents (19): available via `claude-agents` function
+│   ├── agent-catalog/  # Opt-in agents (20): available via `claude-agents` function
 │   │                   #   dev: build-validator, code-architect, code-simplifier, verify-app, verify-shell
+│   │                   #   review: architecture-reviewer (adversarial design reviewer, pairs with code-architect)
 │   │                   #   cloud: aws-best-practices-advisor, gcp-best-practices-advisor
 │   │                   #   research: arxiv-ai-researcher, gemini-api-researcher, huggingface-spaces-researcher
 │   │                   #   other: strategic-research-analyst, nano-banana-pro-prompt-generator,
 │   │                   #     state-machine-diagram, migration-assistant, oncall-guide,
 │   │                   #     diagnose-dotfiles, side-job-researcher, governance-proposer, rule-auditor
-│   ├── skills/         # Skills (16): claude-code-guide, quick-commit, merge-pr,
-│   │                   #   review-changes, test-and-fix, db-query, trace-dataflow,
+│   ├── skills/         # Skills (18): claude-code-guide, quick-commit, merge-pr,
+│   │                   #   review-changes, pr-review, test-and-fix, db-query, trace-dataflow,
 │   │                   #   project-setup, first-principles, techdebt, governance-review,
 │   │                   #   simplify-pipeline, refactor-swarm, rule-history, html-output,
-│   │                   #   task-definition-sheet
+│   │                   #   task-definition-sheet, teach-session
 │   └── commands/       # Custom slash commands (1): implement-with-notes
 │
 ├── .claude/            # Project-local config (NOT symlinked to ~/.claude/)
@@ -150,9 +155,10 @@ The `claude/` directory contains Claude Code settings managed by this repository
 **Global Agents** (1, always loaded):
 - `verify-subagent-result` - SubAgent verification
 
-**Agent Catalog** (19, opt-in via `claude-agents` function):
+**Agent Catalog** (20, opt-in via `claude-agents` function):
 - `verify-shell`, `verify-app`, `build-validator` - Verification
 - `code-architect`, `code-simplifier` - Code design
+- `architecture-reviewer` - Adversarial design reviewer (verify-half pair of `code-architect`)
 - `aws-best-practices-advisor`, `gcp-best-practices-advisor` - Cloud
 - `arxiv-ai-researcher`, `gemini-api-researcher`, `huggingface-spaces-researcher` - Research
 - `strategic-research-analyst`, `nano-banana-pro-prompt-generator`
@@ -160,13 +166,14 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `diagnose-dotfiles`, `side-job-researcher`
 - `governance-proposer`, `rule-auditor`
 
-**Skills** (16):
+**Skills** (18):
 - `claude-code-guide` - Claude Code extension documentation
 - `db-query` - Database query helper
 - `first-principles` - First principles analysis
 - `governance-review` - Governance rule freshness audit
 - `html-output` - Generate rich HTML artifacts (specs, reviews, designs, reports, editors)
 - `merge-pr` - PR merge with worktree cleanup
+- `pr-review` - Adversarial Architect-Reviewer for a PR/diff (fan-out → verify gate → synthesize)
 - `project-setup` - Project setup wizard (with agent selection)
 - `quick-commit` - Fast commit workflow
 - `refactor-swarm` - Multi-module simplification
@@ -174,6 +181,7 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `rule-history` - Governance rule history
 - `simplify-pipeline` - Single module simplification
 - `task-definition-sheet` - Business task definition sheet (業務定義シート) as A4 HTML
+- `teach-session` - Teaching/explanation session helper
 - `techdebt` - Tech debt analysis
 - `test-and-fix` - Test and fix workflow
 - `trace-dataflow` - Data flow tracing
