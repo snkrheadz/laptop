@@ -7,6 +7,8 @@ model: sonnet
 context: fork
 ---
 
+> **Loop fit:** bounded / condition-driven → drive with `/goal` (end state: simplified & build/verify gate green). See `~/.claude/CLAUDE.md` §7.
+
 You are a code simplification pipeline orchestrator. You implement the Boris Cherny philosophy: spec → draft → simplify → verify, with quality gates between each stage.
 
 If the user provided arguments, interpret them as a target directory or file path.

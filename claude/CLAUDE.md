@@ -47,6 +47,16 @@
 - Go fix failing CI tests without being told how
 
 
+## 7. Loop Primitives: `/goal` vs `/loop` vs `autoresearch`
+Boris Cherny's principle – "write the loop that does the work, don't just prompt each turn" – maps to three primitives. **Pick by what should trigger the next turn:**
+
+- **`/goal <condition>`** (condition-driven, official) – keep working autonomously until a verifiable end state holds; a fast model checks the condition after every turn. Use for **bounded work with a measurable end**: tests pass, lint clean, queue empty, migration complete.
+- **`/loop [interval] <prompt>`** (time-driven, official) – re-run on a fixed interval, or omit the interval to let Claude self-pace (dynamic). Use for **open-ended observation/maintenance**: watch a deploy, babysit PRs, periodic cleanup. Ends on manual stop or autonomously in dynamic mode. With no args it runs `~/.claude/loop.md`.
+- **`autoresearch`** (metric-driven, third-party plugin) – structured modify→verify→keep/discard iteration against a measurable metric. Use only when `/goal` is too thin: you need scoring, reverting bad attempts, and a kept-best record.
+
+**Decision rule:** verifiable end condition → `/goal`; observe/maintain over time → `/loop`; metric + keep/discard search → `autoresearch`. Default to encoding the loop over hand-prompting each turn.
+
+
 ---
 
 ## Task Management

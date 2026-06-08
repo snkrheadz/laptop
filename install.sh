@@ -83,6 +83,7 @@ create_backup() {
         "$HOME/.zsh"
         "$HOME/.claude/statusline.sh"
         "$HOME/.claude/CLAUDE.md"
+        "$HOME/.claude/loop.md"
         "$HOME/.claude/commands"
         "$HOME/.claude/hooks"
         "$HOME/.claude/agents/verify-shell.md"
@@ -177,6 +178,9 @@ setup_claude_core() {
 
     # claude CLAUDE.md (user global)
     safe_ln "$DOTFILES_DIR/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+
+    # claude loop.md (default no-arg /loop maintenance routine)
+    safe_ln "$DOTFILES_DIR/claude/loop.md" "$HOME/.claude/loop.md"
 
     # claude settings.json
     safe_ln "$DOTFILES_DIR/claude/settings.json" "$HOME/.claude/settings.json"
