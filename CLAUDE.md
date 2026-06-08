@@ -67,6 +67,7 @@ mise use go@1.24.3                        # Install/use specific version
 │   ├── settings.json   # Claude Code settings (hooks, plugins, permissions)
 │   ├── statusline.sh   # Status line display script
 │   ├── CLAUDE.md       # User global instructions (Workflow Orchestration)
+│   ├── loop.md         # Default no-arg `/loop` maintenance routine (project-agnostic)
 │   ├── hooks/          # Lifecycle hooks (5): validate-shell.sh,
 │   │                   #   session-context.sh, pre-tool-guard.sh, post-failure-proposal.sh, pre-compact-save.sh
 │   ├── agents/         # Global agents (1): verify-subagent-result
@@ -138,7 +139,9 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `CLAUDE.md` - User global instructions (Workflow Orchestration)
   - Plan Mode Default, Subagent Strategy, Self-Improvement Loop (+ Memory Separation)
   - Verification Before Done, Demand Elegance, Autonomous Bug Fixing
+  - Loop Primitives (§7): `/goal` (condition) vs `/loop` (time) vs `autoresearch` (metric)
   - Task Management, Core Principles
+- `loop.md` - Default routine for a no-arg `/loop`; for bounded work prefer `/goal` (see CLAUDE.md §7)
 
 **Hooks** (5):
 - `hooks/validate-shell.sh` - PostToolUse hook for shellcheck
