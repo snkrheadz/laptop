@@ -49,7 +49,7 @@ mise use go@1.24.3                        # Install/use specific version
 │   ├── .zshrc          # Main zsh config (loads functions → configs → aliases → oh-my-zsh)
 │   ├── .aliases        # Shell aliases
 │   ├── functions/      # Custom zsh functions: _git_delete_branch, change-extension,
-│   │                   #   envup, mcd, pr-merge, claude-agents
+│   │                   #   envup, mcd, pr-merge
 │   └── configs/        # Modular zsh configs
 │       ├── *.zsh       # Main configs (color, editor, history, etc.)
 │       └── post/       # Loaded last (path.zsh, completion.zsh, mise.zsh)
@@ -71,23 +71,16 @@ mise use go@1.24.3                        # Install/use specific version
 │   ├── loop.md         # Default no-arg `/loop` maintenance routine (project-agnostic)
 │   ├── hooks/          # Lifecycle hooks (5): validate-shell.sh,
 │   │                   #   session-context.sh, pre-tool-guard.sh, post-failure-proposal.sh, pre-compact-save.sh
-│   ├── agents/         # Global agents (1): verify-subagent-result
-│   ├── agent-catalog/  # Opt-in agents (20): available via `claude-agents` function
-│   │                   #   dev: build-validator, code-architect, code-simplifier, verify-app, verify-shell
-│   │                   #   review: architecture-reviewer (adversarial design reviewer, pairs with code-architect)
-│   │                   #   cloud: aws-best-practices-advisor, gcp-best-practices-advisor
-│   │                   #   research: arxiv-ai-researcher, gemini-api-researcher, huggingface-spaces-researcher
-│   │                   #   other: strategic-research-analyst, nano-banana-pro-prompt-generator,
-│   │                   #     state-machine-diagram, migration-assistant, oncall-guide,
-│   │                   #     diagnose-dotfiles, side-job-researcher, governance-proposer, rule-auditor
+│   ├── agents/         # Global agents (4): verify-subagent-result, governance-proposer,
+│   │                   #   rule-auditor, side-job-researcher (shareable agents migrated to
+│   │                   #   the snkrheadz/claude-skills marketplace — see the Agents section)
 │   ├── skills/         # Skills (2, governance only): governance-review, rule-history
 │   │                   #   (17 shareable skills migrated to the snkrheadz/claude-skills
 │   │                   #    marketplace — see the Skills section below)
 │   └── commands/       # Custom slash commands (1): implement-with-notes
 │
 ├── .claude/            # Project-local config (NOT symlinked to ~/.claude/)
-│   ├── agents/         # Project agents (3): diagnose-dotfiles, verify-shell, build-validator
-│   │                   #   (symlinks to claude/agent-catalog/ via `claude-agents preset dotfiles`)
+│   ├── agents/         # Project agents (1): diagnose-dotfiles (real file, dotfiles-specific)
 │   └── skills/         # Local skills (14): brew-manage, health-check, zsh-config, etc.
 │
 ├── .github/
@@ -154,19 +147,28 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `tasks/lessons.md`: user corrections, mistake patterns, project-specific rules (explicit)
 - Rule: "corrected by user → lessons.md, discovered preference → auto-memory"
 
-**Global Agents** (1, always loaded):
+**Global Agents** (4, always loaded — symlinked to `~/.claude/agents/`):
 - `verify-subagent-result` - SubAgent verification
+- `governance-proposer`, `rule-auditor` - Governance mechanism (pair with the
+  `governance-review` / `rule-history` skills, which also stay in dotfiles)
+- `side-job-researcher` - Personal side-job evaluation (kept here, not published to the
+  marketplace; pairs with the machine-local `side-job-search` skill)
 
-**Agent Catalog** (20, opt-in via `claude-agents` function):
-- `verify-shell`, `verify-app`, `build-validator` - Verification
-- `code-architect`, `code-simplifier` - Code design
-- `architecture-reviewer` - Adversarial design reviewer (verify-half pair of `code-architect`)
-- `aws-best-practices-advisor`, `gcp-best-practices-advisor` - Cloud
-- `arxiv-ai-researcher`, `gemini-api-researcher`, `huggingface-spaces-researcher` - Research
-- `strategic-research-analyst`, `nano-banana-pro-prompt-generator`
-- `state-machine-diagram`, `migration-assistant`, `oncall-guide`
-- `diagnose-dotfiles`, `side-job-researcher`
-- `governance-proposer`, `rule-auditor`
+**Project Agents** (1, dotfiles repo only — real file in `.claude/agents/`):
+- `diagnose-dotfiles` - Dotfiles troubleshooting (specific to this repo)
+
+**Shareable agents** now live in the **`snkrheadz/claude-skills`** marketplace
+(single source of truth) alongside the skills, enabled per role via
+`/plugin install <pack>@claude-skills`:
+- **eng** (11 agents): `code-architect`, `architecture-reviewer`, `code-simplifier`,
+  `build-validator`, `verify-app`, `verify-shell`, `migration-assistant`, `oncall-guide`,
+  `state-machine-diagram`, `aws-best-practices-advisor`, `gcp-best-practices-advisor`
+- **marketer**: `strategic-research-analyst`
+- **designer**: `nano-banana-pro-prompt-generator`
+- **research**: `arxiv-ai-researcher`, `gemini-api-researcher`, `huggingface-spaces-researcher`
+
+> Installing a pack makes its agents available in every project (global), replacing the
+> former per-project `claude-agents` opt-in (function and `agent-catalog/` removed).
 
 **Skills** (2, governance only — others migrated to the `snkrheadz/claude-skills` marketplace):
 - `governance-review` - Governance rule freshness audit
@@ -184,9 +186,7 @@ materialized by `scripts/sync-claude-plugins.sh`). They are namespaced as
   db-query, project-setup (+ code-architect/verify/build/migration/cloud agents)
 - **marketer**: strategic-research-analyst agent
 - **designer**: nano-banana-pro-prompt-generator agent
-
-> Agents still live in `agent-catalog/` (opt-in via `claude-agents`); migrating
-> the agent layer to the marketplace is a separate follow-up.
+- **research**: arxiv-ai-researcher, gemini-api-researcher, huggingface-spaces-researcher agents
 
 **Commands** (1) - Custom slash commands in `claude/commands/`, symlinked to `~/.claude/commands/`:
 - `implement-with-notes` - Implement a spec while keeping running implementation notes (decisions, tradeoffs, deltas)

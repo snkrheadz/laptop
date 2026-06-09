@@ -81,12 +81,12 @@ laptop/
 │   ├── settings.json       # Hooks, plugins, permissions
 │   ├── statusline.sh       # Custom status line script
 │   ├── hooks/              # Lifecycle hooks (4)
-│   ├── agents/             # Global agents (1): verify-subagent-result
-│   ├── agent-catalog/      # Opt-in agents (19): via `claude-agents` function
+│   ├── agents/             # Global agents (4): verify-subagent-result, governance-proposer,
+│   │                       #   rule-auditor, side-job-researcher (shareable → claude-skills marketplace)
 │   └── skills/             # Skills (2): governance-review, rule-history (others → claude-skills marketplace)
 │
 ├── .claude/                # Project-local config (NOT symlinked to ~/.claude/)
-│   ├── agents/             # Project agents (3): symlinks to agent-catalog/
+│   ├── agents/             # Project agents (1): diagnose-dotfiles (dotfiles-specific)
 │   └── skills/             # Local skills (15)
 │
 ├── scripts/
@@ -306,20 +306,17 @@ claude/
 │   ├── session-context.sh          # SessionStart: project context injection
 │   ├── pre-tool-guard.sh           # PreToolUse: sensitive file access blocking
 │   └── post-verify-rule-proposal.sh # PostToolUse: governance failure capture
-├── agents/             # Global agents (1, always loaded)
-│   └── verify-subagent-result.md
-├── agent-catalog/      # Opt-in agents (19, via `claude-agents` function)
-│   ├── dev: build-validator, code-architect, code-simplifier, verify-app, verify-shell
-│   ├── cloud: aws-best-practices-advisor, gcp-best-practices-advisor
-│   ├── research: arxiv-ai-researcher, gemini-api-researcher, huggingface-spaces-researcher
-│   └── other: strategic-research-analyst, nano-banana-pro-prompt-generator,
-│         state-machine-diagram, migration-assistant, oncall-guide,
-│         diagnose-dotfiles, side-job-researcher, governance-proposer, rule-auditor
+├── agents/             # Global agents (4, always loaded)
+│   ├── verify-subagent-result.md
+│   ├── governance-proposer.md   # pairs with governance-review/rule-history skills
+│   ├── rule-auditor.md
+│   └── side-job-researcher.md   # personal; not published to the marketplace
 └── skills/             # Skills (2): governance tooling only
     ├── governance-review/  # Governance rule freshness audit
     └── rule-history/       # Governance rule history
-    # Other shareable skills migrated to the snkrheadz/claude-skills marketplace
-    # (core/pm/eng packs); invoked as /<pack>:<skill> after `/plugin install`.
+    # Shareable skills AND agents migrated to the snkrheadz/claude-skills marketplace
+    # (core/pm/eng/marketer/designer/research packs); invoked as /<pack>:<skill> or
+    # enabled per role via `/plugin install <pack>@claude-skills`.
 ```
 
 ### Managed Components
@@ -330,9 +327,9 @@ claude/
 | `settings.json` | Hooks, plugins, permissions |
 | `statusline.sh` | Custom status line showing model, cost, context |
 | `hooks/` | 4 lifecycle hooks (PostToolUse x2, SessionStart, PreToolUse) |
-| `agents/` | 1 global agent (verify-subagent-result) |
-| `agent-catalog/` | 19 opt-in agents via `claude-agents` function |
+| `agents/` | 4 global agents (verify-subagent-result + governance + side-job) |
 | `skills/` | 2 governance skills (others → snkrheadz/claude-skills marketplace) |
+| role agents | eng/marketer/designer/research packs in the snkrheadz/claude-skills marketplace |
 
 ### Status Line
 
@@ -350,20 +347,24 @@ Displays in Claude Code CLI:
 | `pre-tool-guard.sh` | PreToolUse | Blocks access to sensitive files |
 | `post-verify-rule-proposal.sh` | PostToolUse | Captures governance failures for rule proposals |
 
-### Key Agents (from Agent Catalog)
+### Agents
+
+Global agents (live in this repo, symlinked to `~/.claude/agents/`, always loaded):
 
 | Agent | Purpose |
 |-------|---------|
-| `verify-shell` | Shell script verification |
-| `verify-app` | Application verification |
-| `build-validator` | Build validation |
-| `code-architect` | Architecture design |
-| `code-simplifier` | Code simplification |
-| `aws-best-practices-advisor` | AWS guidance |
-| `gcp-best-practices-advisor` | GCP guidance |
-| `diagnose-dotfiles` | Dotfiles troubleshooting |
+| `verify-subagent-result` | SubAgent result verification |
 | `governance-proposer` | Governance rule proposals |
 | `rule-auditor` | Rule freshness auditing |
+| `side-job-researcher` | Personal side-job evaluation (not published) |
+
+Project agent (real file in `.claude/agents/`, this repo only): `diagnose-dotfiles`.
+
+Role agents (eng/marketer/designer/research) ship via the **snkrheadz/claude-skills**
+marketplace; enable a pack with `/plugin install <pack>@claude-skills` to make its
+agents available in every project — e.g. `eng` provides `code-architect`,
+`architecture-reviewer`, `verify-shell`, `verify-app`, `build-validator`,
+`aws-/gcp-best-practices-advisor`, and more.
 
 ### Available Skills
 
