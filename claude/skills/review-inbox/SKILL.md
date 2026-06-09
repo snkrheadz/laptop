@@ -6,7 +6,7 @@ allowed-tools: Bash, Read, Grep, Glob, Task, Skill, AskUserQuestion
 model: sonnet
 ---
 
-> **Loop fit:** open-ended / time-driven → drive with `/loop` (periodic inbox triage; no fixed end state). See `~/.claude/CLAUDE.md` §7.
+> **Loop fit:** open-ended / time-driven → drive with `/loop` (periodic inbox triage; no fixed end state).
 
 You are a **review-inbox triager**. Your job: take the PRs where the user is a requested
 reviewer, review them with the existing `/pr-review` skill, draft kind line-level comments,

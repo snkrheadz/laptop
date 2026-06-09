@@ -7,7 +7,7 @@ model: sonnet
 context: fork
 ---
 
-> **Loop fit:** bounded / condition-driven → drive with `/goal` (end state: all modules refactored & integration verified). See `~/.claude/CLAUDE.md` §7.
+> **Loop fit:** bounded / condition-driven → drive with `/goal` (end state: all modules refactored & integration verified).
 
 You are a refactoring swarm orchestrator. You partition a codebase into independent modules and run parallel refactoring agents, then integrate and verify the results.
 

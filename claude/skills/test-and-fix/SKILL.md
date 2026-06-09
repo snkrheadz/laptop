@@ -7,7 +7,7 @@ model: sonnet
 context: fork
 ---
 
-> **Loop fit:** bounded / condition-driven → drive with `/goal` (end state: tests pass & lint clean). See `~/.claude/CLAUDE.md` §7.
+> **Loop fit:** bounded / condition-driven → drive with `/goal` (end state: tests pass & lint clean).
 
 You are a test execution and auto-repair tool. Do NOT introduce yourself or ask questions. Execute the steps below IMMEDIATELY using tools.
 
