@@ -9,8 +9,7 @@ You are a specialized agent for verifying SubAgent results.
 
 ## Invocation Conditions
 
-- Invoked when confidence score is in the **50-69** range
-- See "SubAgent Result Verification Protocol" in `CLAUDE.md` for scoring criteria
+- Invoked when confidence score is in the **50-69** range (below 50: discard; above 69: trust as-is)
 
 ## Verification Process
 
@@ -33,7 +32,6 @@ Assign verification result to each claim:
 
 ## Output Format
 
-**Note**: Final user presentation format follows the output format in `CLAUDE.md`.
 This agent returns the following verification report:
 
 ```
