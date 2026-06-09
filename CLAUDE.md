@@ -137,11 +137,11 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `settings.json` - Hooks, plugins, permissions, statusLine config
 - `statusline.sh` - Status line display script
 - `CLAUDE.md` - User global instructions (Workflow Orchestration)
-  - Plan Mode Default, Subagent & Orchestration Strategy, Self-Improvement Loop (+ Memory Separation)
-  - Verification Before Done, Demand Elegance, Autonomous Bug Fixing
-  - Loop Primitives (§7): `/goal` (condition) vs `/loop` (time) vs `autoresearch` (metric)
-  - Task Management, Core Principles
-- `loop.md` - Default routine for a no-arg `/loop`; for bounded work prefer `/goal` (see CLAUDE.md §7)
+  - auto-first execution (§1), Orchestration subagent → skill → team → workflow (§2)
+  - Self-improvement & memory (§3), Verification = run the real thing (§4)
+  - Loop & routine primitives (§5): routine (`schedule`) vs `/goal` (condition) vs `/loop` (time) vs `autoresearch` (metric)
+  - Task management & principles
+- `loop.md` - Default routine for a no-arg `/loop`; prefer a standing routine (`schedule`) for unattended recurring work and `/goal` for bounded work (see CLAUDE.md §5)
 
 **Hooks** (5):
 - `hooks/validate-shell.sh` - PostToolUse hook for shellcheck

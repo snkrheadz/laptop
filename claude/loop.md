@@ -16,5 +16,6 @@ force-push, merge, or anything destructive. Each pass:
    next. If nothing is actionable, say so and let the loop idle longer.
 
 **End the loop** when there is no pending work and all owned PRs are green. For bounded
-work with a single verifiable end state, prefer `/goal <condition>` over this loop
-(see `~/.claude/CLAUDE.md` §7 for the decision rule).
+work with a single verifiable end state, prefer `/goal <condition>` over this loop; for
+unattended recurring maintenance, prefer a standing **routine** (the `schedule` skill)
+over remembering to launch `/loop` (see `~/.claude/CLAUDE.md` §5 for the decision rule).
