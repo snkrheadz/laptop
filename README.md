@@ -83,7 +83,7 @@ laptop/
 │   ├── hooks/              # Lifecycle hooks (4)
 │   ├── agents/             # Global agents (1): verify-subagent-result
 │   ├── agent-catalog/      # Opt-in agents (19): via `claude-agents` function
-│   └── skills/             # Custom skills (14)
+│   └── skills/             # Skills (2): governance-review, rule-history (others → claude-skills marketplace)
 │
 ├── .claude/                # Project-local config (NOT symlinked to ~/.claude/)
 │   ├── agents/             # Project agents (3): symlinks to agent-catalog/
@@ -315,21 +315,11 @@ claude/
 │   └── other: strategic-research-analyst, nano-banana-pro-prompt-generator,
 │         state-machine-diagram, migration-assistant, oncall-guide,
 │         diagnose-dotfiles, side-job-researcher, governance-proposer, rule-auditor
-└── skills/             # Custom skills (14)
-    ├── claude-code-guide/  # Claude Code extension guide
-    ├── db-query/           # Database query helper
-    ├── first-principles/   # First principles analysis
+└── skills/             # Skills (2): governance tooling only
     ├── governance-review/  # Governance rule freshness audit
-    ├── merge-pr/           # PR merge automation
-    ├── project-setup/      # Project setup wizard
-    ├── quick-commit/       # Fast commit workflow
-    ├── refactor-swarm/     # Multi-module simplification
-    ├── review-changes/     # Code review helper
-    ├── rule-history/       # Governance rule history
-    ├── simplify-pipeline/  # Single module simplification
-    ├── techdebt/           # Tech debt analysis
-    ├── test-and-fix/       # Test and fix workflow
-    └── trace-dataflow/     # Data flow tracing
+    └── rule-history/       # Governance rule history
+    # Other shareable skills migrated to the snkrheadz/claude-skills marketplace
+    # (core/pm/eng packs); invoked as /<pack>:<skill> after `/plugin install`.
 ```
 
 ### Managed Components
@@ -342,7 +332,7 @@ claude/
 | `hooks/` | 4 lifecycle hooks (PostToolUse x2, SessionStart, PreToolUse) |
 | `agents/` | 1 global agent (verify-subagent-result) |
 | `agent-catalog/` | 19 opt-in agents via `claude-agents` function |
-| `skills/` | 14 custom skills for common workflows |
+| `skills/` | 2 governance skills (others → snkrheadz/claude-skills marketplace) |
 
 ### Status Line
 
@@ -377,15 +367,15 @@ Displays in Claude Code CLI:
 
 ### Available Skills
 
-- `/claude-code-guide` - Claude Code extension documentation
-- `/quick-commit` - Fast commit workflow
-- `/merge-pr` - PR merge with worktree cleanup
-- `/review-changes` - Code review helper
-- `/test-and-fix` - Run tests and fix failures
+Governance skills (live in this repo, symlinked to `~/.claude/skills/`):
+
 - `/governance-review` - Governance rule freshness audit
-- `/simplify-pipeline` - Single module simplification
-- `/refactor-swarm` - Multi-module simplification
 - `/rule-history` - Governance rule history
+
+All other shareable skills migrated to the **snkrheadz/claude-skills** marketplace
+(core / pm / eng packs) and are invoked as `/<pack>:<skill>` after
+`/plugin install <pack>@claude-skills` — e.g. `/eng:quick-commit`,
+`/eng:test-and-fix`, `/eng:refactor-swarm`, `/core:first-principles`.
 
 ### Local Skills (Project-specific)
 
