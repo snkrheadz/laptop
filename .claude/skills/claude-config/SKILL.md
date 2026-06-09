@@ -156,18 +156,36 @@ cat /Users/snkrheadz/ghq/github.com/snkrheadz/laptop/claude/statusline.sh
 | `tmux-config` | tmux |
 | `new-machine-setup` | 新マシン, setup |
 
-## Agents（ユーザーレベル）
+## Agents
+
+### Global（dotfiles 管理・`~/.claude/agents/` に symlink）
 
 | エージェント | 説明 |
 |-------------|------|
-| `verify-shell` | シェルスクリプト検証 |
-| `diagnose-dotfiles` | 問題診断 |
-| `migration-assistant` | 新マシン移行 |
+| `verify-subagent-result` | SubAgent 結果の検証 |
+| `governance-proposer` | ガバナンスルール提案 |
+| `rule-auditor` | ルール鮮度の監査 |
+
+### Project-local（このリポジトリのみ・`.claude/agents/` の実体ファイル）
+
+| エージェント | 説明 |
+|-------------|------|
+| `diagnose-dotfiles` | dotfiles の問題診断 |
+
+### Role agents（claude-skills マーケットプレイス経由）
+
+`verify-shell` / `verify-app` / `code-architect` / `migration-assistant` などの
+役割別 agent は `snkrheadz/claude-skills` のパック（eng/marketer/designer/research）に
+移行済み。`/plugin install <pack>@claude-skills` で有効化すると全プロジェクトで使える。
+
+> machine-local（dotfiles 非管理）の実体 agent が `~/.claude/agents/` に置かれることもある
+> （例: `side-job-researcher`）。これらは symlink ではないため install/sync で消えない。
 
 ## 注意事項
 
 - 設定変更後はClaude Code再起動が必要
 - settings.jsonの構文エラーに注意
 - hooksのコマンドは絶対パスを使用
-- agentsは `~/.claude/agents/` に配置
-- skillsはプロジェクトレベル（`.claude/skills/`）
+- global agents は dotfiles の `claude/agents/` → `~/.claude/agents/` に symlink
+- role agents はマーケットプレイスのパック install で全プロジェクト有効化
+- skills はプロジェクトレベル（`.claude/skills/`）またはマーケットプレイス（`/<pack>:<skill>`）

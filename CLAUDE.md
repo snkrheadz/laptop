@@ -71,9 +71,9 @@ mise use go@1.24.3                        # Install/use specific version
 │   ├── loop.md         # Default no-arg `/loop` maintenance routine (project-agnostic)
 │   ├── hooks/          # Lifecycle hooks (5): validate-shell.sh,
 │   │                   #   session-context.sh, pre-tool-guard.sh, post-failure-proposal.sh, pre-compact-save.sh
-│   ├── agents/         # Global agents (4): verify-subagent-result, governance-proposer,
-│   │                   #   rule-auditor, side-job-researcher (shareable agents migrated to
-│   │                   #   the snkrheadz/claude-skills marketplace — see the Agents section)
+│   ├── agents/         # Global agents (3): verify-subagent-result, governance-proposer,
+│   │                   #   rule-auditor (shareable agents migrated to the
+│   │                   #   snkrheadz/claude-skills marketplace — see the Agents section)
 │   ├── skills/         # Skills (2, governance only): governance-review, rule-history
 │   │                   #   (17 shareable skills migrated to the snkrheadz/claude-skills
 │   │                   #    marketplace — see the Skills section below)
@@ -147,15 +147,17 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `tasks/lessons.md`: user corrections, mistake patterns, project-specific rules (explicit)
 - Rule: "corrected by user → lessons.md, discovered preference → auto-memory"
 
-**Global Agents** (4, always loaded — symlinked to `~/.claude/agents/`):
+**Global Agents** (3, always loaded — symlinked to `~/.claude/agents/`):
 - `verify-subagent-result` - SubAgent verification
 - `governance-proposer`, `rule-auditor` - Governance mechanism (pair with the
   `governance-review` / `rule-history` skills, which also stay in dotfiles)
-- `side-job-researcher` - Personal side-job evaluation (kept here, not published to the
-  marketplace; pairs with the machine-local `side-job-search` skill)
 
 **Project Agents** (1, dotfiles repo only — real file in `.claude/agents/`):
 - `diagnose-dotfiles` - Dotfiles troubleshooting (specific to this repo)
+
+> `side-job-researcher` is personal and kept **machine-local** (a real file in
+> `~/.claude/agents/`, not dotfiles-managed), mirroring its machine-local
+> `side-job-search` skill — so it is not synced or published to the marketplace.
 
 **Shareable agents** now live in the **`snkrheadz/claude-skills`** marketplace
 (single source of truth) alongside the skills, enabled per role via
@@ -191,7 +193,7 @@ materialized by `scripts/sync-claude-plugins.sh`). They are namespaced as
 **Commands** (1) - Custom slash commands in `claude/commands/`, symlinked to `~/.claude/commands/`:
 - `implement-with-notes` - Implement a spec while keeping running implementation notes (decisions, tradeoffs, deltas)
 
-**Local Skills** (15) - Project-specific, in `.claude/skills/`:
+**Local Skills** (14) - Project-specific, in `.claude/skills/`:
 
 These skills are **only available in this repository** (not symlinked to `~/.claude/`):
 - `brew-manage` - Homebrew package management

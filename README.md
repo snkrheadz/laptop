@@ -81,13 +81,13 @@ laptop/
 │   ├── settings.json       # Hooks, plugins, permissions
 │   ├── statusline.sh       # Custom status line script
 │   ├── hooks/              # Lifecycle hooks (4)
-│   ├── agents/             # Global agents (4): verify-subagent-result, governance-proposer,
-│   │                       #   rule-auditor, side-job-researcher (shareable → claude-skills marketplace)
+│   ├── agents/             # Global agents (3): verify-subagent-result, governance-proposer,
+│   │                       #   rule-auditor (shareable role agents → claude-skills marketplace)
 │   └── skills/             # Skills (2): governance-review, rule-history (others → claude-skills marketplace)
 │
 ├── .claude/                # Project-local config (NOT symlinked to ~/.claude/)
 │   ├── agents/             # Project agents (1): diagnose-dotfiles (dotfiles-specific)
-│   └── skills/             # Local skills (15)
+│   └── skills/             # Local skills (14)
 │
 ├── scripts/
 │   └── auto-sync.sh        # Hourly auto-sync script
@@ -306,11 +306,11 @@ claude/
 │   ├── session-context.sh          # SessionStart: project context injection
 │   ├── pre-tool-guard.sh           # PreToolUse: sensitive file access blocking
 │   └── post-verify-rule-proposal.sh # PostToolUse: governance failure capture
-├── agents/             # Global agents (4, always loaded)
+├── agents/             # Global agents (3, always loaded)
 │   ├── verify-subagent-result.md
 │   ├── governance-proposer.md   # pairs with governance-review/rule-history skills
-│   ├── rule-auditor.md
-│   └── side-job-researcher.md   # personal; not published to the marketplace
+│   └── rule-auditor.md
+│   # side-job-researcher is personal → kept machine-local in ~/.claude/agents/ (not here)
 └── skills/             # Skills (2): governance tooling only
     ├── governance-review/  # Governance rule freshness audit
     └── rule-history/       # Governance rule history
@@ -327,7 +327,7 @@ claude/
 | `settings.json` | Hooks, plugins, permissions |
 | `statusline.sh` | Custom status line showing model, cost, context |
 | `hooks/` | 4 lifecycle hooks (PostToolUse x2, SessionStart, PreToolUse) |
-| `agents/` | 4 global agents (verify-subagent-result + governance + side-job) |
+| `agents/` | 3 global agents (verify-subagent-result + governance-proposer/rule-auditor) |
 | `skills/` | 2 governance skills (others → snkrheadz/claude-skills marketplace) |
 | role agents | eng/marketer/designer/research packs in the snkrheadz/claude-skills marketplace |
 
@@ -356,9 +356,11 @@ Global agents (live in this repo, symlinked to `~/.claude/agents/`, always loade
 | `verify-subagent-result` | SubAgent result verification |
 | `governance-proposer` | Governance rule proposals |
 | `rule-auditor` | Rule freshness auditing |
-| `side-job-researcher` | Personal side-job evaluation (not published) |
 
 Project agent (real file in `.claude/agents/`, this repo only): `diagnose-dotfiles`.
+Personal agents (machine-local real files in `~/.claude/agents/`, not dotfiles-managed):
+`side-job-researcher` — mirrors the machine-local `side-job-search` skill, so it is
+neither synced nor published.
 
 Role agents (eng/marketer/designer/research) ship via the **snkrheadz/claude-skills**
 marketplace; enable a pack with `/plugin install <pack>@claude-skills` to make its
@@ -380,7 +382,7 @@ All other shareable skills migrated to the **snkrheadz/claude-skills** marketpla
 
 ### Local Skills (Project-specific)
 
-The `.claude/skills/` directory contains 15 project-specific skills that are **only available in this repository** (not symlinked to `~/.claude/`). These skills are tailored for managing this dotfiles repository.
+The `.claude/skills/` directory contains 14 project-specific skills that are **only available in this repository** (not symlinked to `~/.claude/`). These skills are tailored for managing this dotfiles repository.
 
 | Skill | Description |
 |-------|-------------|

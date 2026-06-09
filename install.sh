@@ -86,9 +86,7 @@ create_backup() {
         "$HOME/.claude/loop.md"
         "$HOME/.claude/commands"
         "$HOME/.claude/hooks"
-        "$HOME/.claude/agents/verify-shell.md"
-        "$HOME/.claude/agents/diagnose-dotfiles.md"
-        "$HOME/.claude/agents/migration-assistant.md"
+        "$HOME/.claude/agents"
         "$HOME/.claude/settings.json"
         "$HOME/.claude/skills"
     )
@@ -113,7 +111,8 @@ setup_claude_agents() {
 
     mkdir -p "$HOME/.claude/agents"
 
-    # Clean up stale symlinks from agents moved to catalog
+    # Clean up broken symlinks left by agents that moved to the claude-skills
+    # marketplace (their dotfiles source files no longer exist)
     for link in "$HOME/.claude/agents"/*.md; do
         if [ -L "$link" ] && [ ! -e "$link" ]; then
             rm "$link"
