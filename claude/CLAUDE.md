@@ -61,7 +61,7 @@ leap: you stop talking to the agent and talk to the loop that prompts it.
 - **routine** (`schedule` skill → cloud cron agent) — **unattended and recurring; runs
   without you present.** This is the default for ongoing maintenance: have a routine pick
   up review requests, red CI on owned PRs, and stale bug reports on a schedule. Prefer a
-  standing routine over remembering to launch `/loop` yourself.
+  standing routine for unattended recurring work.
 - **`/goal <condition>`** — work until a verifiable end state holds (tests pass, queue
   empty, migration complete). Bounded work with a measurable end.
 - **`/loop [interval] <prompt>`** — fixed interval, or no interval to self-pace. For an
