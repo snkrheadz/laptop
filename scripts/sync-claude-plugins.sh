@@ -50,20 +50,22 @@ failures=0
 log_info "Reconciling marketplaces from extraKnownMarketplaces…"
 known_markets="$(claude plugin marketplace list 2>/dev/null || true)"
 
-while IFS=$'\t' read -r name source; do
+while IFS=$'\t' read -r name repo; do
     [[ -z "$name" ]] && continue
-    if [[ -z "$source" ]]; then
+    if [[ -z "$repo" ]]; then
         log_warning "  $name: no github repo / git url in source — skipping"
         continue
     fi
+    # Substring match against the (indented) `marketplace list` output; the bare
+    # name appears as e.g. "  ❯ claude-skills", so -Fx whole-line match would miss.
     if printf '%s\n' "$known_markets" | grep -qF "$name"; then
         log_info "  $name: already configured — skipping"
         continue
     fi
-    if claude plugin marketplace add "$source" >/dev/null 2>&1; then
-        log_success "  $name: added ($source)"
+    if claude plugin marketplace add "$repo" >/dev/null 2>&1; then
+        log_success "  $name: added ($repo)"
     else
-        log_error "  $name: failed to add ($source)"
+        log_error "  $name: failed to add ($repo)"
         failures=$((failures + 1))
     fi
 done < <(jq -r '

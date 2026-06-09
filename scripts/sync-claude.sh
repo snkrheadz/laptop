@@ -31,7 +31,11 @@ echo ""
 log_success "Claude symlinks synced!"
 
 # Also reconcile marketplace plugins declared in settings.json (best-effort).
-bash "$SCRIPT_DIR/sync-claude-plugins.sh" || log_warning "Plugin sync had issues"
+if command -v claude >/dev/null 2>&1; then
+    bash "$SCRIPT_DIR/sync-claude-plugins.sh" || log_warning "Plugin sync had issues"
+else
+    log_warning "claude CLI not found — skipping plugin sync"
+fi
 
 echo ""
 echo "Next steps:"
