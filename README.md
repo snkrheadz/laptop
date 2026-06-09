@@ -77,13 +77,15 @@ laptop/
 ├── bin/                    # Executable scripts (tat)
 ├── raycast/                # Raycast settings export
 ├── claude/                 # Claude Code configuration → ~/.claude/
-│   ├── CLAUDE.md           # User global instructions (14 rules: R-0001〜R-0014)
+│   ├── CLAUDE.md           # User global instructions (Workflow Orchestration, §1–5)
 │   ├── settings.json       # Hooks, plugins, permissions
 │   ├── statusline.sh       # Custom status line script
-│   ├── hooks/              # Lifecycle hooks (4)
+│   ├── loop.md             # Default no-arg /loop maintenance routine
+│   ├── hooks/              # Lifecycle hooks (5)
 │   ├── agents/             # Global agents (3): verify-subagent-result, governance-proposer,
 │   │                       #   rule-auditor (shareable role agents → claude-skills marketplace)
-│   └── skills/             # Skills (2): governance-review, rule-history (others → claude-skills marketplace)
+│   ├── skills/             # Skills (2): governance-review, rule-history (others → claude-skills marketplace)
+│   └── commands/           # Custom slash commands (1): implement-with-notes
 │
 ├── .claude/                # Project-local config (NOT symlinked to ~/.claude/)
 │   ├── agents/             # Project agents (1): diagnose-dotfiles (dotfiles-specific)
@@ -298,14 +300,16 @@ This repository manages Claude Code settings via symlinks to `~/.claude/`:
 
 ```text
 claude/
-├── CLAUDE.md           # User global instructions (14 rules: R-0001〜R-0014)
+├── CLAUDE.md           # User global instructions (Workflow Orchestration, §1–5)
 ├── settings.json       # Hooks, plugins, permissions
 ├── statusline.sh       # Custom status line script
-├── hooks/              # Lifecycle hooks (4)
+├── loop.md             # Default no-arg /loop maintenance routine
+├── hooks/              # Lifecycle hooks (5)
 │   ├── validate-shell.sh           # PostToolUse: shellcheck validation
-│   ├── session-context.sh          # SessionStart: project context injection
+│   ├── session-context.sh          # SessionStart: project context (+ PreCompact restore)
 │   ├── pre-tool-guard.sh           # PreToolUse: sensitive file access blocking
-│   └── post-verify-rule-proposal.sh # PostToolUse: governance failure capture
+│   ├── post-failure-proposal.sh    # PostToolUseFailure: governance failure capture
+│   └── pre-compact-save.sh         # PreCompact: working state preservation
 ├── agents/             # Global agents (3, always loaded)
 │   ├── verify-subagent-result.md
 │   ├── governance-proposer.md   # pairs with governance-review/rule-history skills
@@ -323,29 +327,44 @@ claude/
 
 | Component | Description |
 |-----------|-------------|
-| `CLAUDE.md` | User global instructions (14 rules: R-0001〜R-0014) |
+| `CLAUDE.md` | User global instructions (Workflow Orchestration, §1–5) |
 | `settings.json` | Hooks, plugins, permissions |
-| `statusline.sh` | Custom status line showing model, cost, context |
-| `hooks/` | 4 lifecycle hooks (PostToolUse x2, SessionStart, PreToolUse) |
+| `statusline.sh` | Status line: model, dir+branch, duration, cost (session/daily), lines, braille bars (ctx/5h/7d) |
+| `hooks/` | 5 lifecycle hooks (PostToolUse, SessionStart, PreToolUse, PostToolUseFailure, PreCompact) |
 | `agents/` | 3 global agents (verify-subagent-result + governance-proposer/rule-auditor) |
 | `skills/` | 2 governance skills (others → snkrheadz/claude-skills marketplace) |
 | role agents | eng/marketer/designer/research packs in the snkrheadz/claude-skills marketplace |
 
 ### Status Line
 
-Displays in Claude Code CLI:
+Displays in Claude Code CLI (segments joined by ` | `, conditional ones shown only when data exists):
+
 ```
-[Opus] 📁 laptop | 🌿 main | 💰 $5.20 (Today) | 📊 185k
+Opus 4.8 | laptop 🌿main | ⏱ 5m | 💰$0.50/$5.20 | +120-45 | ctx ⣿⣿⣄ 45% | 5h ⣄⠀⠀ 12% | 7d ⣶⠀⠀ 18%
 ```
+
+| Segment | Meaning |
+|---------|---------|
+| `Opus 4.8` | Model display name |
+| `laptop 🌿main` | Current directory + git branch |
+| `⏱ 5m` | Session duration |
+| `💰$0.50/$5.20` | Cost: this session / today's cumulative total |
+| `+120-45` | Lines added/removed (hidden when zero) |
+| `ctx ⣿⣿⣄ 45%` | Context window usage (braille bar, green→yellow→red gradient) |
+| `5h ⣄⠀⠀ 12%` | 5-hour rate limit usage (shown if available) |
+| `7d ⣶⠀⠀ 18%` | 7-day rate limit usage (shown if available) |
+
+Vim mode and `🤖<agent>` (subagent name) segments are appended when active.
 
 ### Hooks
 
 | Hook | Lifecycle Event | Description |
 |------|----------------|-------------|
 | `validate-shell.sh` | PostToolUse | Runs shellcheck on `.sh` files after Write/Edit |
-| `session-context.sh` | SessionStart | Injects project context at session start |
+| `session-context.sh` | SessionStart (+ PreCompact) | Injects project context at session start / restores it on compaction |
 | `pre-tool-guard.sh` | PreToolUse | Blocks access to sensitive files |
-| `post-verify-rule-proposal.sh` | PostToolUse | Captures governance failures for rule proposals |
+| `post-failure-proposal.sh` | PostToolUseFailure | Captures governance failures (Bash/Write/Edit) for rule proposals |
+| `pre-compact-save.sh` | PreCompact | Preserves working state before context compaction |
 
 ### Agents
 
@@ -396,7 +415,6 @@ The `.claude/skills/` directory contains 14 project-specific skills that are **o
 | `launchd-manage` | Auto-sync launchd agent management (start/stop/logs) |
 | `mise-runtime` | Runtime management with mise (Go, Node.js, Python, Ruby) |
 | `new-machine-setup` | New machine setup guide (macOS → dotfiles) |
-| `pdm-review` | Plan/design review from business perspective (PdM review) |
 | `security-check` | Security scanning (gitleaks, pre-commit, secrets) |
 | `symlink-manage` | Symlink status check and repair (broken link detection) |
 | `tmux-config` | tmux configuration (.tmux.conf, keybindings) |
