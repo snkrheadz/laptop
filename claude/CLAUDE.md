@@ -24,7 +24,7 @@ Escalate only as far as the work demands; the difference is who holds the plan.
 - **Skill** — a repeatable in-context procedure with no fan-out. Cheapest; prefer it
   before spinning up agents.
 - **Agent Team** (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`) — a lead supervising long-lived
-  peers over a shared task list (e.g. `refactor-swarm` by module). Use when work needs
+  peers over a shared task list (e.g. `/eng:refactor-swarm` by module). Use when work needs
   coordination across roles.
 - **Dynamic Workflow** (`Workflow`, via the `ultracode` keyword) — deterministic fan-out
   with verify gates, up to 16 concurrent / 1,000 per run. Use for breadth one context
@@ -51,7 +51,8 @@ behave?"*
   exists, build it first — an unattended loop with no verification path is not safe to run.
 - This repo's closing gate: `source ~/.zshrc` loads clean, `shellcheck` passes,
   `pre-commit run --all-files` is green, and `health-check` reports no broken symlinks.
-  Use the `verify-shell` / `verify-app` agents and the `test-and-fix` skill.
+  Use the `verify-shell` / `verify-app` agents (from `eng@claude-skills`) and the
+  `/eng:test-and-fix` skill.
 
 
 ## 5. Loop & routine primitives — pick by what triggers the next turn

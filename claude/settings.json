@@ -163,7 +163,10 @@
     "autoresearch@autoresearch": true,
     "core@claude-skills": true,
     "pm@claude-skills": true,
-    "eng@claude-skills": true
+    "eng@claude-skills": true,
+    "marketer@claude-skills": true,
+    "designer@claude-skills": true,
+    "research@claude-skills": true
   },
   "extraKnownMarketplaces": {
     "autoresearch": {

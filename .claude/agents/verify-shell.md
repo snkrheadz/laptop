@@ -1,1 +1,0 @@
-../../claude/agent-catalog/verify-shell.md

@@ -86,9 +86,7 @@ create_backup() {
         "$HOME/.claude/loop.md"
         "$HOME/.claude/commands"
         "$HOME/.claude/hooks"
-        "$HOME/.claude/agents/verify-shell.md"
-        "$HOME/.claude/agents/diagnose-dotfiles.md"
-        "$HOME/.claude/agents/migration-assistant.md"
+        "$HOME/.claude/agents"
         "$HOME/.claude/settings.json"
         "$HOME/.claude/skills"
     )
@@ -113,7 +111,8 @@ setup_claude_agents() {
 
     mkdir -p "$HOME/.claude/agents"
 
-    # Clean up stale symlinks from agents moved to catalog
+    # Clean up broken symlinks left by agents that moved to the claude-skills
+    # marketplace (their dotfiles source files no longer exist)
     for link in "$HOME/.claude/agents"/*.md; do
         if [ -L "$link" ] && [ ! -e "$link" ]; then
             rm "$link"
@@ -130,7 +129,7 @@ setup_claude_agents() {
         fi
     done
 
-    log_success "Claude agents configured (global: 2, catalog: $(find "$DOTFILES_DIR/claude/agent-catalog" -maxdepth 1 -name '*.md' 2>/dev/null | wc -l | tr -d ' '))"
+    log_success "Claude agents configured (global: $(find "$DOTFILES_DIR/claude/agents" -maxdepth 1 -name '*.md' 2>/dev/null | wc -l | tr -d ' '))"
 }
 
 # Create symlinks for all managed slash command files
@@ -391,7 +390,8 @@ main() {
     echo "  1. Restart your terminal or run: source ~/.zshrc"
     echo "  2. Add your API keys to ~/.secrets.env"
     echo "  3. Run 'rollback.sh' if you need to restore previous settings"
-    echo "  4. Run 'claude-agents preset dev' in each project to add agents"
+    echo "  4. Role agents come from the claude-skills marketplace — install a pack"
+    echo "     (e.g. /plugin install eng@claude-skills) to enable them everywhere"
     echo ""
 }
 
