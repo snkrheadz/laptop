@@ -371,6 +371,14 @@ main() {
     setup_claude_skills
     setup_claude_commands
     install_brew_packages
+    # Install marketplace plugins declared in claude/settings.json. Runs AFTER
+    # install_brew_packages so jq (from the Brewfile) and the claude CLI exist.
+    # Best-effort: guarded on the claude CLI, never aborts the install.
+    if command -v claude >/dev/null 2>&1; then
+        bash "$DOTFILES_DIR/scripts/sync-claude-plugins.sh" || log_warning "Plugin sync had issues (continuing)"
+    else
+        log_warning "claude CLI not found — skipping plugin sync (run scripts/sync-claude-plugins.sh after installing Claude Code)"
+    fi
     setup_mise
     setup_security
     setup_autosync

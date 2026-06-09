@@ -40,8 +40,9 @@ mise use go@1.24.3                        # Install/use specific version
 ├── install.sh          # Main installer (creates backup, symlinks, installs packages)
 ├── rollback.sh         # Restore from backup
 ├── scripts/
-│   ├── auto-sync.sh    # Hourly auto-sync via launchd
-│   └── sync-claude.sh  # Claude-only symlink sync (sources install.sh, skips brew/mise)
+│   ├── auto-sync.sh           # Hourly auto-sync via launchd
+│   ├── sync-claude.sh         # Claude symlink sync (sources install.sh) + plugin sync
+│   └── sync-claude-plugins.sh # Materialize marketplaces/plugins declared in settings.json (headless, idempotent)
 ├── Brewfile            # Homebrew packages, casks, VSCode extensions
 │
 ├── zsh/                # Shell config → ~/.zshrc, ~/.aliases, ~/.zsh/
