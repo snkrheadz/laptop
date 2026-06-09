@@ -161,7 +161,9 @@
     "frontend-design@claude-plugins-official": true,
     "document-skills@anthropic-agent-skills": true,
     "autoresearch@autoresearch": true,
-    "core@claude-skills": true
+    "core@claude-skills": true,
+    "pm@claude-skills": true,
+    "eng@claude-skills": true
   },
   "extraKnownMarketplaces": {
     "autoresearch": {

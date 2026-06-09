@@ -80,11 +80,9 @@ mise use go@1.24.3                        # Install/use specific version
 │   │                   #   other: strategic-research-analyst, nano-banana-pro-prompt-generator,
 │   │                   #     state-machine-diagram, migration-assistant, oncall-guide,
 │   │                   #     diagnose-dotfiles, side-job-researcher, governance-proposer, rule-auditor
-│   ├── skills/         # Skills (19): claude-code-guide, quick-commit, merge-pr,
-│   │                   #   review-changes, pr-review, review-inbox, test-and-fix, db-query,
-│   │                   #   trace-dataflow, project-setup, first-principles, techdebt,
-│   │                   #   governance-review, simplify-pipeline, refactor-swarm, rule-history,
-│   │                   #   html-output, task-definition-sheet, teach-session
+│   ├── skills/         # Skills (2, governance only): governance-review, rule-history
+│   │                   #   (17 shareable skills migrated to the snkrheadz/claude-skills
+│   │                   #    marketplace — see the Skills section below)
 │   └── commands/       # Custom slash commands (1): implement-with-notes
 │
 ├── .claude/            # Project-local config (NOT symlinked to ~/.claude/)
@@ -170,26 +168,25 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `diagnose-dotfiles`, `side-job-researcher`
 - `governance-proposer`, `rule-auditor`
 
-**Skills** (19):
-- `claude-code-guide` - Claude Code extension documentation
-- `db-query` - Database query helper
-- `first-principles` - First principles analysis
+**Skills** (2, governance only — others migrated to the `snkrheadz/claude-skills` marketplace):
 - `governance-review` - Governance rule freshness audit
-- `html-output` - Generate rich HTML artifacts (specs, reviews, designs, reports, editors)
-- `merge-pr` - PR merge with worktree cleanup
-- `pr-review` - Adversarial Architect-Reviewer for a PR/diff (fan-out → verify gate → synthesize)
-- `review-inbox` - Triage PRs where you are the requested reviewer (inbox → /pr-review → draft → confirm → COMMENT review). JA/EN selectable, default JA.
-- `project-setup` - Project setup wizard (with agent selection)
-- `quick-commit` - Fast commit workflow
-- `refactor-swarm` - Multi-module simplification
-- `review-changes` - Code review helper
 - `rule-history` - Governance rule history
-- `simplify-pipeline` - Single module simplification
-- `task-definition-sheet` - Business task definition sheet (業務定義シート) as A4 HTML
-- `teach-session` - Teaching/explanation session helper
-- `techdebt` - Tech debt analysis
-- `test-and-fix` - Test and fix workflow
-- `trace-dataflow` - Data flow tracing
+
+The remaining shareable skills now live in the **`snkrheadz/claude-skills`**
+plugin marketplace (single source of truth), grouped into role packs and consumed
+via `/plugin install <pack>@claude-skills` (declared in `settings.json`,
+materialized by `scripts/sync-claude-plugins.sh`). They are namespaced as
+`/<pack>:<skill>` once installed:
+- **core**: first-principles, html-output, teach-session, claude-code-guide
+- **pm**: task-definition-sheet (+ external phuryn/pm-skills)
+- **eng**: quick-commit, merge-pr, pr-review, review-changes, review-inbox,
+  test-and-fix, refactor-swarm, simplify-pipeline, techdebt, trace-dataflow,
+  db-query, project-setup (+ code-architect/verify/build/migration/cloud agents)
+- **marketer**: strategic-research-analyst agent
+- **designer**: nano-banana-pro-prompt-generator agent
+
+> Agents still live in `agent-catalog/` (opt-in via `claude-agents`); migrating
+> the agent layer to the marketplace is a separate follow-up.
 
 **Commands** (1) - Custom slash commands in `claude/commands/`, symlinked to `~/.claude/commands/`:
 - `implement-with-notes` - Implement a spec while keeping running implementation notes (decisions, tradeoffs, deltas)
