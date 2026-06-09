@@ -43,12 +43,20 @@ if [[ ! -f "$SETTINGS" ]]; then
     log_error "settings.json not found at: $SETTINGS"
     exit 1
 fi
+# Fail loud on corrupt JSON. Without this, a parse error in the loops below is
+# swallowed (process substitution hides jq's exit code) → false "synced!".
+if ! jq empty "$SETTINGS" 2>/dev/null; then
+    log_error "settings.json is not valid JSON: $SETTINGS"
+    exit 1
+fi
 
 failures=0
 
 # --- 1. marketplaces -------------------------------------------------------
 log_info "Reconciling marketplaces from extraKnownMarketplaces…"
-known_markets="$(claude plugin marketplace list 2>/dev/null || true)"
+# Keep stderr visible (no 2>/dev/null) so a broken/unauth CLI is diagnosable;
+# || true keeps a list failure non-fatal (items just re-attempt, idempotent).
+known_markets="$(claude plugin marketplace list || true)"
 
 while IFS=$'\t' read -r name repo; do
     [[ -z "$name" ]] && continue
@@ -77,7 +85,7 @@ done < <(jq -r '
 
 # --- 2. plugins ------------------------------------------------------------
 log_info "Reconciling plugins from enabledPlugins…"
-installed="$(claude plugin list 2>/dev/null || true)"
+installed="$(claude plugin list || true)"
 
 while IFS= read -r plugin; do
     [[ -z "$plugin" ]] && continue
