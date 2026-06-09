@@ -370,6 +370,13 @@ main() {
     setup_claude_agents
     setup_claude_skills
     setup_claude_commands
+    # Install marketplace plugins declared in claude/settings.json (best-effort;
+    # needs the claude CLI, which may not exist yet on a brand-new machine).
+    if command -v claude >/dev/null 2>&1; then
+        bash "$DOTFILES_DIR/scripts/sync-claude-plugins.sh" || log_warning "Plugin sync had issues (continuing)"
+    else
+        log_warning "claude CLI not found — skipping plugin sync (run scripts/sync-claude-plugins.sh after installing Claude Code)"
+    fi
     install_brew_packages
     setup_mise
     setup_security
