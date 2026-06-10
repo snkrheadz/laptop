@@ -34,6 +34,20 @@ Escalate only as far as the work demands; the difference is who holds the plan.
 wide fan-out + verify/synthesize → Workflow. For long autonomous runs, encode the
 fan-out in a Workflow instead of hand-spawning agents each turn.
 
+### Model routing (Fable 5 main session)
+Subagents **inherit the main-session model unless `model` is set explicitly** — on a
+Fable 5 session (2× Opus 4.8 cost, no fast mode) an untagged delegation buys top-tier
+reasoning for work that doesn't need it. So:
+- **Fable 5 (main)** holds design, decomposition, audit, review, final integration —
+  and only the genuinely hard implementation.
+- Delegate normal-difficulty implementation to `model: "opus"`; mechanical work
+  (boilerplate, renames, test scaffolds, clearly-specced edits) to `model: "sonnet"`.
+- Delegation prompts must be self-contained (paths, expected behavior, constraints,
+  how to verify); have agents return changed paths + summary + verification result,
+  not file dumps — keep the main context lean.
+- Don't delegate small tightly-coupled sequential edits: handoff overhead exceeds the
+  win. On an Opus 4.8 main session this section is moot — inherit freely.
+
 
 ## 3. Self-improvement & memory
 - **User correction → `tasks/lessons.md`** (record the pattern *and the why*).
