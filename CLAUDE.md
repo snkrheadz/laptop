@@ -65,7 +65,7 @@ mise use go@1.24.3                        # Install/use specific version
 ├── raycast/            # Raycast settings export (*.rayconfig)
 │
 ├── claude/             # Claude Code config → ~/.claude/
-│   ├── settings.json   # Claude Code settings (hooks, plugins, permissions)
+│   ├── settings.json   # Claude Code settings (hooks, plugins, permissions, model pin)
 │   ├── statusline.sh   # Status line display script
 │   ├── CLAUDE.md       # User global instructions (Workflow Orchestration)
 │   ├── loop.md         # Default no-arg `/loop` maintenance routine (project-agnostic)
@@ -85,6 +85,9 @@ mise use go@1.24.3                        # Install/use specific version
 │
 ├── .github/
 │   └── workflows/main.yml  # CI/CD (gitleaks + shellcheck)
+│
+├── docs/
+│   └── fable5-vs-opus48.html # Model comparison report (evidence base for model routing)
 │
 ├── .pre-commit-config.yaml   # Pre-commit hooks config
 ├── .gitleaks.toml            # Gitleaks secret scanning config
@@ -126,10 +129,12 @@ The `.zshrc` loads configuration in this order:
 The `claude/` directory contains Claude Code settings managed by this repository:
 
 **Managed files** (symlinked to `~/.claude/`):
-- `settings.json` - Hooks, plugins, permissions, statusLine config
+- `settings.json` - Hooks, plugins, permissions, statusLine config, model pin (`claude-fable-5[1m]`)
 - `statusline.sh` - Status line display script
 - `CLAUDE.md` - User global instructions (Workflow Orchestration)
   - auto-first execution (§1), Orchestration subagent → skill → team → workflow (§2)
+    - Model routing: Fable 5 main = design/audit/review; delegate implementation to
+      `opus`/`sonnet` subagents with explicit `model` (evidence: `docs/fable5-vs-opus48.html`)
   - Self-improvement & memory (§3), Verification = run the real thing (§4)
   - Loop & routine primitives (§5): routine (`schedule`) vs `/goal` (condition) vs `/loop` (time) vs `autoresearch` (metric)
   - Task management & principles
@@ -138,7 +143,7 @@ The `claude/` directory contains Claude Code settings managed by this repository
 **Hooks** (5):
 - `hooks/validate-shell.sh` - PostToolUse hook for shellcheck
 - `hooks/session-context.sh` - SessionStart hook for project context injection (+ PreCompact context restore)
-- `hooks/pre-tool-guard.sh` - PreToolUse hook for sensitive file access blocking
+- `hooks/pre-tool-guard.sh` - PreToolUse hook for sensitive file access blocking + `gh pr create` base-freshness guard
 - `hooks/post-failure-proposal.sh` - PostToolUseFailure hook for governance failure capture (Bash/Write/Edit)
 - `hooks/pre-compact-save.sh` - PreCompact hook for working state preservation
 
