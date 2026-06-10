@@ -65,7 +65,7 @@ mise use go@1.24.3                        # Install/use specific version
 ├── raycast/            # Raycast settings export (*.rayconfig)
 │
 ├── claude/             # Claude Code config → ~/.claude/
-│   ├── settings.json   # Claude Code settings (hooks, plugins, permissions, model pin)
+│   ├── settings.json   # Claude Code settings (hooks, plugins, permissions)
 │   ├── statusline.sh   # Status line display script
 │   ├── CLAUDE.md       # User global instructions (Workflow Orchestration)
 │   ├── loop.md         # Default no-arg `/loop` maintenance routine (project-agnostic)
@@ -129,7 +129,7 @@ The `.zshrc` loads configuration in this order:
 The `claude/` directory contains Claude Code settings managed by this repository:
 
 **Managed files** (symlinked to `~/.claude/`):
-- `settings.json` - Hooks, plugins, permissions, statusLine config, model pin (`claude-fable-5[1m]`)
+- `settings.json` - Hooks, plugins, permissions, statusLine config
 - `statusline.sh` - Status line display script
 - `CLAUDE.md` - User global instructions (Workflow Orchestration)
   - auto-first execution (§1), Orchestration subagent → skill → team → workflow (§2)

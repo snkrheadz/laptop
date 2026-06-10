@@ -78,7 +78,7 @@ laptop/
 ├── raycast/                # Raycast settings export
 ├── claude/                 # Claude Code configuration → ~/.claude/
 │   ├── CLAUDE.md           # User global instructions (Workflow Orchestration, §1–5)
-│   ├── settings.json       # Hooks, plugins, permissions, model pin (Fable 5)
+│   ├── settings.json       # Hooks, plugins, permissions
 │   ├── statusline.sh       # Custom status line script
 │   ├── loop.md             # Default no-arg /loop maintenance routine
 │   ├── hooks/              # Lifecycle hooks (5)
@@ -304,7 +304,7 @@ This repository manages Claude Code settings via symlinks to `~/.claude/`:
 ```text
 claude/
 ├── CLAUDE.md           # User global instructions (Workflow Orchestration, §1–5)
-├── settings.json       # Hooks, plugins, permissions, model pin (Fable 5)
+├── settings.json       # Hooks, plugins, permissions
 ├── statusline.sh       # Custom status line script
 ├── loop.md             # Default no-arg /loop maintenance routine
 ├── hooks/              # Lifecycle hooks (5)
@@ -331,7 +331,7 @@ claude/
 | Component | Description |
 |-----------|-------------|
 | `CLAUDE.md` | User global instructions (Workflow Orchestration, §1–5 + model routing) |
-| `settings.json` | Hooks, plugins, permissions, model pin (Fable 5) |
+| `settings.json` | Hooks, plugins, permissions |
 | `statusline.sh` | Status line: model, dir+branch, duration, cost (session/daily), lines, braille bars (ctx/5h/7d) |
 | `hooks/` | 5 lifecycle hooks (PostToolUse, SessionStart, PreToolUse, PostToolUseFailure, PreCompact) |
 | `agents/` | 3 global agents (verify-subagent-result + governance-proposer/rule-auditor) |

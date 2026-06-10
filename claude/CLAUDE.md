@@ -47,8 +47,7 @@ reasoning for work that doesn't need it. So:
   how to verify); have agents return changed paths + summary + verification result,
   not file dumps — keep the main context lean.
 - Don't delegate small tightly-coupled sequential edits: handoff overhead exceeds the
-  win. If the main session is ever switched back to Opus 4.8 (overriding the settings
-  pin), the cost asymmetry disappears — inherit freely there.
+  win. On an Opus 4.8 main session the cost asymmetry disappears — inherit freely there.
 
 
 ## 3. Self-improvement & memory
