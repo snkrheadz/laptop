@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Fable 5 vs Opus 4.8 — 比較レポート</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --dark: #141413;
+    --light: #faf9f5;
+    --mid-gray: #b0aea5;
+    --light-gray: #e8e6dc;
+    --orange: #d97757;
+    --blue: #6a9bcc;
+    --green: #788c5d;
+    --font-head: 'Poppins', Arial, sans-serif;
+    --font-body: 'Lora', Georgia, serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--light);
+    color: var(--dark);
+    line-height: 1.7;
+    font-size: 17px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 920px; margin: 0 auto; padding: 64px 28px 96px; }
+
+  /* ---- Header ---- */
+  .eyebrow {
+    font-family: var(--font-head);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 18px;
+  }
+  h1 {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 44px;
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+  .lede {
+    font-size: 20px;
+    color: #44423d;
+    max-width: 40em;
+    margin-bottom: 28px;
+  }
+  .meta {
+    font-family: var(--font-head);
+    font-size: 13px;
+    color: var(--mid-gray);
+    border-top: 1px solid var(--light-gray);
+    border-bottom: 1px solid var(--light-gray);
+    padding: 14px 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+  }
+  .meta b { color: var(--dark); font-weight: 500; }
+
+  /* ---- Fact-check banner ---- */
+  .factcheck {
+    margin: 36px 0;
+    background: #fff;
+    border: 1px solid var(--light-gray);
+    border-left: 4px solid var(--green);
+    border-radius: 10px;
+    padding: 22px 26px;
+  }
+  .factcheck .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-head);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--green);
+    margin-bottom: 10px;
+  }
+  .factcheck .badge::before {
+    content: "✓";
+    display: inline-grid;
+    place-items: center;
+    width: 22px; height: 22px;
+    background: var(--green);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 13px;
+  }
+  .factcheck p { font-size: 15.5px; color: #44423d; }
+
+  /* ---- Section ---- */
+  section { margin-top: 56px; }
+  h2 {
+    font-family: var(--font-head);
+    font-weight: 600;
+    font-size: 27px;
+    letter-spacing: -0.01em;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  h2 .num {
+    font-size: 15px;
+    color: var(--orange);
+    font-weight: 600;
+  }
+  .sub { color: var(--mid-gray); font-family: var(--font-head); font-size: 14px; margin-bottom: 22px; }
+
+  /* ---- Verdict callout ---- */
+  .verdict {
+    background: var(--dark);
+    color: var(--light);
+    border-radius: 14px;
+    padding: 32px 34px;
+    margin-top: 8px;
+  }
+  .verdict h2 { color: var(--light); margin-bottom: 14px; }
+  .verdict p { color: #d8d6cd; font-size: 17px; }
+  .verdict strong { color: var(--orange); font-weight: 600; }
+  .verdict .row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 22px; }
+  .pill {
+    font-family: var(--font-head);
+    font-size: 13.5px;
+    font-weight: 500;
+    padding: 8px 15px;
+    border-radius: 999px;
+    border: 1px solid #3a3935;
+    color: #eceae2;
+  }
+  .pill.fable { border-color: var(--orange); }
+  .pill.opus { border-color: var(--blue); }
+
+  /* ---- Table ---- */
+  .table-scroll { overflow-x: auto; border-radius: 12px; border: 1px solid var(--light-gray); }
+  table { width: 100%; border-collapse: collapse; background: #fff; min-width: 600px; }
+  thead th {
+    font-family: var(--font-head);
+    font-weight: 600;
+    font-size: 14.5px;
+    text-align: left;
+    padding: 16px 18px;
+    background: var(--light-gray);
+    color: var(--dark);
+  }
+  thead th.fable { color: var(--orange); }
+  thead th.opus { color: var(--blue); }
+  tbody td {
+    padding: 14px 18px;
+    border-top: 1px solid var(--light-gray);
+    font-size: 15.5px;
+    vertical-align: top;
+  }
+  tbody td:first-child { font-family: var(--font-head); font-weight: 500; font-size: 14.5px; }
+  tbody tr:hover { background: #fdfcf8; }
+  .hl { background: #fcefe9 !important; }
+  .hl td:first-child { color: var(--orange); }
+  .tag {
+    display: inline-block;
+    font-family: var(--font-head);
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 2px 9px;
+    border-radius: 6px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .tag.no { background: #f6e2db; color: #b3502f; }
+  .tag.yes { background: #e3ead7; color: #566b3c; }
+
+  /* ---- Cards ---- */
+  .cards { display: grid; gap: 18px; }
+  .card {
+    background: #fff;
+    border: 1px solid var(--light-gray);
+    border-radius: 12px;
+    padding: 24px 26px;
+  }
+  .card h3 {
+    font-family: var(--font-head);
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .card.accent-o { border-top: 3px solid var(--orange); }
+  .card.accent-b { border-top: 3px solid var(--blue); }
+  .card.accent-g { border-top: 3px solid var(--green); }
+  .card p + p { margin-top: 10px; }
+  .card .q {
+    font-size: 14px;
+    color: #5c5a54;
+    font-style: italic;
+    border-left: 3px solid var(--light-gray);
+    padding-left: 14px;
+    margin-top: 14px;
+  }
+
+  /* ---- Warning ---- */
+  .warn {
+    background: #fcefe9;
+    border: 1px solid #f0cbbb;
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-top: 8px;
+  }
+  .warn h3 {
+    font-family: var(--font-head);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--orange);
+    margin-bottom: 8px;
+    display: flex; align-items: center; gap: 9px;
+  }
+  .warn code, code {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 0.86em;
+    background: var(--light-gray);
+    padding: 2px 6px;
+    border-radius: 5px;
+    color: #3a3935;
+  }
+
+  ul.clean { list-style: none; margin-top: 12px; }
+  ul.clean li { position: relative; padding-left: 22px; margin-bottom: 9px; font-size: 15.5px; }
+  ul.clean li::before {
+    content: "→"; position: absolute; left: 0; color: var(--orange); font-weight: 600;
+  }
+
+  /* ---- Sources ---- */
+  .sources { margin-top: 60px; border-top: 1px solid var(--light-gray); padding-top: 26px; }
+  .sources h2 { font-size: 18px; }
+  .sources ol { margin: 14px 0 0 20px; }
+  .sources li { font-size: 14px; color: #5c5a54; margin-bottom: 7px; }
+  .sources a { color: var(--blue); text-decoration: none; word-break: break-all; }
+  .sources a:hover { text-decoration: underline; }
+
+  footer {
+    margin-top: 40px;
+    font-family: var(--font-head);
+    font-size: 12.5px;
+    color: var(--mid-gray);
+    text-align: center;
+  }
+
+  @media (max-width: 640px) {
+    h1 { font-size: 33px; }
+    .wrap { padding: 44px 20px 72px; }
+    .lede { font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Model Comparison Report</div>
+  <h1>Claude Fable 5 vs. Opus 4.8</h1>
+  <p class="lede">Claude Code の Model 設定を切り替える際の、料金・速度・ZDR・利用規約・データポリシーの差異を一次情報で検証した比較レポート。</p>
+  <div class="meta">
+    <span><b>対象:</b> <code>claude-fable-5</code> / <code>claude-opus-4-8</code></span>
+    <span><b>基準:</b> Claude API(第一者)・2026-06-09 GA</span>
+    <span><b>調査日:</b> 2026-06-10</span>
+  </div>
+
+  <div class="factcheck">
+    <div class="badge">ファクトチェック済み</div>
+    <p>本レポートの全項目を Anthropic 公式ドキュメント(Models overview / Fable 5 発表ページ / API and data retention / Commercial Terms)の一次情報で検証済み。料金・ZDR非対応・30日保持要件・学習利用ポリシーはいずれも公式記載と一致。</p>
+  </div>
+
+  <!-- VERDICT -->
+  <section>
+    <div class="verdict">
+      <h2>結論</h2>
+      <p>決定的な違いは <strong>「ZDR(ゼロデータ保持)非対応」</strong> と <strong>「料金が正確に2倍」</strong> の2点。最高性能が必要でZDR不要・コスト2倍を許容できる場合のみ Fable 5。ZDR運用中・高速応答重視・コスト効率重視なら Opus 4.8 が無難。</p>
+      <div class="row">
+        <span class="pill fable">Fable 5 — 最高性能 / $10·$50 / ZDR不可 / 30日保持</span>
+        <span class="pill opus">Opus 4.8 — 高効率 / $5·$25 / ZDR可 / Fast mode対応</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- TABLE -->
+  <section>
+    <h2><span class="num">01</span> 比較表</h2>
+    <p class="sub">Claude API(従量・第一者API)基準</p>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>項目</th>
+            <th class="fable">Claude Fable 5</th>
+            <th class="opus">Claude Opus 4.8</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="hl">
+            <td>INPUT 料金</td>
+            <td><b>$10</b> / MTok</td>
+            <td>$5 / MTok</td>
+          </tr>
+          <tr class="hl">
+            <td>OUTPUT 料金</td>
+            <td><b>$50</b> / MTok</td>
+            <td>$25 / MTok</td>
+          </tr>
+          <tr>
+            <td>コスト倍率</td>
+            <td>Opus 4.8 の <b>ちょうど2倍</b></td>
+            <td>基準</td>
+          </tr>
+          <tr>
+            <td>速度(latency)</td>
+            <td>公式の相対評価<b>記載なし</b><br><span style="color:#8a877d;font-size:13.5px;">最上位・最難タスク向け。Opus 4.8 以上の遅延を想定</span></td>
+            <td>Moderate</td>
+          </tr>
+          <tr class="hl">
+            <td>ZDR(ゼロデータ保持)</td>
+            <td>利用不可 <span class="tag no">不可</span></td>
+            <td>利用可 <span class="tag yes">可</span></td>
+          </tr>
+          <tr class="hl">
+            <td>データ保持期間</td>
+            <td><b>30日間保持(必須)</b><br><span style="color:#8a877d;font-size:13.5px;">Covered Model 要件</span></td>
+            <td>会話は既定で非保持 / ZDR選択可</td>
+          </tr>
+          <tr>
+            <td>学習利用(商用入力)</td>
+            <td>無断学習なし</td>
+            <td>無断学習なし(同左)</td>
+          </tr>
+          <tr>
+            <td>コンテキスト</td>
+            <td>1M tokens</td>
+            <td>1M tokens</td>
+          </tr>
+          <tr>
+            <td>最大出力</td>
+            <td>128k tokens</td>
+            <td>128k tokens</td>
+          </tr>
+          <tr>
+            <td>Thinking</td>
+            <td>Adaptive 常時ON(<code>disabled</code>不可 / 生CoT非返却)</td>
+            <td>Adaptive 対応</td>
+          </tr>
+          <tr>
+            <td>Fast mode</td>
+            <td>非対応 <span class="tag no">×</span></td>
+            <td>対応 <span class="tag yes">○</span></td>
+          </tr>
+          <tr>
+            <td>安全分類器による拒否</td>
+            <td>あり(<code>stop_reason:"refusal"</code> を HTTP 200 で返却 + <code>fallbacks</code>)</td>
+            <td>通常の拒否挙動</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- DETAILS -->
+  <section>
+    <h2><span class="num">02</span> 各観点の詳細</h2>
+    <p class="sub">5つの観点ごとの検証結果</p>
+    <div class="cards">
+      <div class="card accent-o">
+        <h3>① INPUT / OUTPUT 料金</h3>
+        <p>Fable 5 は <b>入力 $10 / 出力 $50</b> で、Opus 4.8(<b>$5 / $25</b>)の<strong>正確に2倍</strong>。両モデルとも Opus 4.7 世代の同一トークナイザを使うため、同一テキストのトークン換算に差はなく、実質コストもそのまま2倍になります。</p>
+      </div>
+
+      <div class="card accent-b">
+        <h3>② 速度(latency)</h3>
+        <p>公式の「Comparative latency」表に Fable 5 の格付けは<b>掲載されていません</b>(Opus 4.8 は "Moderate")。Fable 5 は最も要求の厳しい推論・長期エージェント作業向けの最上位モデルかつ Adaptive thinking 常時ON のため、<b>体感速度は Opus 4.8 と同等かそれ以下(遅め)</b>と見るのが現実的です。</p>
+        <p class="q">公式に数値の相対評価がないため、断定は避け推定として記載しています。</p>
+      </div>
+
+      <div class="card accent-g">
+        <h3>④ 利用規約・学習利用</h3>
+        <p>商用入力の学習利用は<b>両者とも「無断では行わない」</b>(Commercial Terms 上、モデル別の例外なし・一律)。Usage Policy も共通です。</p>
+        <p>Fable 5 は安全分類器を内蔵し、拒否時は <code>refusal</code>(HTTP 200)+ <code>fallbacks</code> パラメータで別モデルへ自動リトライ可能。出力前に拒否された場合は<b>課金なし</b>です。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ZDR WARNING -->
+  <section>
+    <h2><span class="num">03</span> ZDR・データポリシー(最重要)</h2>
+    <p class="sub">Fable 5 は "Covered Model" に指定されている</p>
+    <div class="warn">
+      <h3>⚠ Fable 5 への切り替えは ZDR 運用と両立しない</h3>
+      <p>Fable 5 / Mythos 5 は <b>"Covered Models"</b> に指定され、<b>30日間のデータ保持が必須</b>。<strong>ZDR(ゼロデータ保持)契約の対象外</strong>です。データ保持設定が要件を満たさない組織からのリクエストは <code>400 invalid_request_error</code> を返します。</p>
+      <ul class="clean">
+        <li><b>Opus 4.8</b> は Covered Model ではなく、Messages API は ZDR 適格。</li>
+        <li>既に ZDR 契約で運用中の組織が Claude Code の Model を Fable 5 に切り替えると、<b>入出力が30日保持される</b>(またはリクエスト自体が拒否される)。</li>
+        <li>ZDR はそもそも<b>商用組織のAPIキー / Claude Enterprise 経由のみ</b>適格。Pro / Max などコンシューマ製品は元々 ZDR 対象外。</li>
+        <li>コンプライアンス要件次第では <b>Fable 5 への切替自体が不可</b>になり得る最重要ポイント。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- CLAUDE CODE -->
+  <section>
+    <h2><span class="num">04</span> Claude Code 固有の注意点</h2>
+    <p class="sub">Model 設定として使う際の実務的な差</p>
+    <div class="cards">
+      <div class="card">
+        <ul class="clean" style="margin-top:0;">
+          <li><b>Fast mode は Opus 4.8 / 4.7 / 4.6 のみ対応。Fable 5 は非対応</b>。高速応答を重視するなら Opus 4.8 が有利。</li>
+          <li><code>effort</code> は両モデルとも Claude Code 上で既定 <code>high</code>。</li>
+          <li>Fable 5 は Adaptive thinking 常時ON、生の思考内容(CoT)は非返却(既定 <code>omitted</code>)。</li>
+          <li><b>サブスクリプション(Pro / Max)経由</b>の場合、課金は上記 API 単価ではなく<b>プランの利用上限</b>に従う。表中の $ 単価は <b>APIキー直叩き(従量)時</b>の比較。</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOURCES -->
+  <div class="sources">
+    <h2>出典(一次情報)</h2>
+    <ol>
+      <li>Models overview — <a href="https://platform.claude.com/docs/en/about-claude/models/overview">platform.claude.com/docs/en/about-claude/models/overview</a></li>
+      <li>Introducing Claude Fable 5 and Claude Mythos 5 — <a href="https://platform.claude.com/docs/en/about-claude/models/introducing-claude-fable-5-and-claude-mythos-5">platform.claude.com/.../introducing-claude-fable-5-and-claude-mythos-5</a></li>
+      <li>API and data retention(Covered Models / ZDR) — <a href="https://platform.claude.com/docs/en/manage-claude/api-and-data-retention">platform.claude.com/docs/en/manage-claude/api-and-data-retention</a></li>
+      <li>Anthropic Commercial Terms of Service — <a href="https://www.anthropic.com/legal/commercial-terms">anthropic.com/legal/commercial-terms</a></li>
+    </ol>
+  </div>
+
+  <footer>
+    Fact-checked against Anthropic primary sources · 2026-06-10 · Styled with the Anthropic design system (Poppins / Lora)
+  </footer>
+
+</div>
+</body>
+</html>

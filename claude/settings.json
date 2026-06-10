@@ -146,6 +146,9 @@
       }
     ]
   },
+  "worktree": {
+    "baseRef": "fresh"
+  },
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh",
@@ -183,11 +186,14 @@
     }
   },
   "language": "japanese",
+  "effortLevel": "high",
   "voice": {
     "enabled": true,
     "mode": "hold"
   },
+  "theme": "dark",
   "preferredNotifChannel": "ghostty",
+  "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
   "voiceEnabled": true

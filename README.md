@@ -94,6 +94,9 @@ laptop/
 ├── scripts/
 │   └── auto-sync.sh        # Hourly auto-sync script
 │
+├── docs/
+│   └── fable5-vs-opus48.html  # Model comparison report (evidence for model routing)
+│
 ├── .github/
 │   └── workflows/main.yml  # CI/CD (gitleaks + shellcheck)
 │
@@ -307,7 +310,7 @@ claude/
 ├── hooks/              # Lifecycle hooks (5)
 │   ├── validate-shell.sh           # PostToolUse: shellcheck validation
 │   ├── session-context.sh          # SessionStart: project context (+ PreCompact restore)
-│   ├── pre-tool-guard.sh           # PreToolUse: sensitive file access blocking
+│   ├── pre-tool-guard.sh           # PreToolUse: sensitive file block + PR base-freshness guard
 │   ├── post-failure-proposal.sh    # PostToolUseFailure: governance failure capture
 │   └── pre-compact-save.sh         # PreCompact: working state preservation
 ├── agents/             # Global agents (3, always loaded)
@@ -327,7 +330,7 @@ claude/
 
 | Component | Description |
 |-----------|-------------|
-| `CLAUDE.md` | User global instructions (Workflow Orchestration, §1–5) |
+| `CLAUDE.md` | User global instructions (Workflow Orchestration, §1–5 + model routing) |
 | `settings.json` | Hooks, plugins, permissions |
 | `statusline.sh` | Status line: model, dir+branch, duration, cost (session/daily), lines, braille bars (ctx/5h/7d) |
 | `hooks/` | 5 lifecycle hooks (PostToolUse, SessionStart, PreToolUse, PostToolUseFailure, PreCompact) |
@@ -362,7 +365,7 @@ Vim mode and `🤖<agent>` (subagent name) segments are appended when active.
 |------|----------------|-------------|
 | `validate-shell.sh` | PostToolUse | Runs shellcheck on `.sh` files after Write/Edit |
 | `session-context.sh` | SessionStart (+ PreCompact) | Injects project context at session start / restores it on compaction |
-| `pre-tool-guard.sh` | PreToolUse | Blocks access to sensitive files |
+| `pre-tool-guard.sh` | PreToolUse | Blocks sensitive file access; blocks `gh pr create` when behind the base branch |
 | `post-failure-proposal.sh` | PostToolUseFailure | Captures governance failures (Bash/Write/Edit) for rule proposals |
 | `pre-compact-save.sh` | PreCompact | Preserves working state before context compaction |
 

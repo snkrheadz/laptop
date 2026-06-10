@@ -8,8 +8,9 @@ model and keep this file minimal.
 
 ## 1. auto-first execution
 - Default to **auto mode**: act, don't ask. The harness routes risky commands through a
-  security check and `pre-tool-guard.sh` blocks sensitive-file access, so narrating
-  yes/no for each step adds no safety — it just hides the calls that matter.
+  security check and `pre-tool-guard.sh` blocks sensitive-file access and stale-branch
+  `gh pr create`, so narrating yes/no for each step adds no safety — it just hides the
+  calls that matter.
 - **Skip plan mode for ordinary work.** Current models don't need a separate planning
   step. Reach for `EnterPlanMode` only when a choice is genuinely hard to reverse
   (schema/data migrations, public-facing or destructive changes, multi-service
@@ -33,6 +34,20 @@ Escalate only as far as the work demands; the difference is who holds the plan.
 **Rule:** plan fits in 2–3 steps → subagent or skill; coordinated multi-role → Team;
 wide fan-out + verify/synthesize → Workflow. For long autonomous runs, encode the
 fan-out in a Workflow instead of hand-spawning agents each turn.
+
+### Model routing (Fable 5 main session)
+Subagents **inherit the main-session model unless `model` is set explicitly** — on a
+Fable 5 session (2× Opus 4.8 cost, no fast mode) an untagged delegation buys top-tier
+reasoning for work that doesn't need it. So:
+- **Fable 5 (main)** holds design, decomposition, audit, review, final integration —
+  and only the genuinely hard implementation.
+- Delegate normal-difficulty implementation to `model: "opus"`; mechanical work
+  (boilerplate, renames, test scaffolds, clearly-specced edits) to `model: "sonnet"`.
+- Delegation prompts must be self-contained (paths, expected behavior, constraints,
+  how to verify); have agents return changed paths + summary + verification result,
+  not file dumps — keep the main context lean.
+- Don't delegate small tightly-coupled sequential edits: handoff overhead exceeds the
+  win. On an Opus 4.8 main session the cost asymmetry disappears — inherit freely there.
 
 
 ## 3. Self-improvement & memory
