@@ -2,6 +2,8 @@
 # PreToolUse hook: Block Bash commands that access sensitive files
 # This provides defense-in-depth alongside deny rules in settings.json
 # Also enforces: merge base branch before creating a PR
+# Note: on exit 2 only stderr is fed back to the model, so every BLOCKED
+# message below must be redirected with >&2
 
 input=$(cat)
 
@@ -29,6 +31,8 @@ if echo "$command" | grep -qE 'gh pr create'; then
 
         # Detect base branch from --base flag (space or = form), or default to main/master
         base_branch=$(echo "$command" | sed -nE 's/.*--base[[:space:]=]+([^[:space:]]+).*/\1/p' | head -1)
+        # Strip surrounding quotes so --base="main" resolves as a valid ref
+        base_branch=${base_branch//[\"\']/}
         if [ -z "$base_branch" ]; then
             if git -C "$work_dir" show-ref --verify --quiet "refs/remotes/origin/main"; then
                 base_branch="main"
@@ -45,7 +49,6 @@ if echo "$command" | grep -qE 'gh pr create'; then
             behind=$(git -C "$work_dir" rev-list --count "HEAD..origin/$base_branch" 2>/dev/null || echo "0")
 
             if [ "$behind" -gt 0 ]; then
-                # exit 2 feeds stderr (not stdout) back to the model
                 {
                     echo "BLOCKED: Current branch '$current_branch' is $behind commit(s) behind origin/$base_branch."
                     echo ""

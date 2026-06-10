@@ -94,6 +94,9 @@ laptop/
 ├── scripts/
 │   └── auto-sync.sh        # Hourly auto-sync script
 │
+├── docs/
+│   └── fable5-vs-opus48.html  # Model comparison report (evidence for model routing)
+│
 ├── .github/
 │   └── workflows/main.yml  # CI/CD (gitleaks + shellcheck)
 │

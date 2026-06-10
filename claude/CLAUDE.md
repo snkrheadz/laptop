@@ -8,8 +8,9 @@ model and keep this file minimal.
 
 ## 1. auto-first execution
 - Default to **auto mode**: act, don't ask. The harness routes risky commands through a
-  security check and `pre-tool-guard.sh` blocks sensitive-file access, so narrating
-  yes/no for each step adds no safety — it just hides the calls that matter.
+  security check and `pre-tool-guard.sh` blocks sensitive-file access and stale-branch
+  `gh pr create`, so narrating yes/no for each step adds no safety — it just hides the
+  calls that matter.
 - **Skip plan mode for ordinary work.** Current models don't need a separate planning
   step. Reach for `EnterPlanMode` only when a choice is genuinely hard to reverse
   (schema/data migrations, public-facing or destructive changes, multi-service
@@ -46,7 +47,8 @@ reasoning for work that doesn't need it. So:
   how to verify); have agents return changed paths + summary + verification result,
   not file dumps — keep the main context lean.
 - Don't delegate small tightly-coupled sequential edits: handoff overhead exceeds the
-  win. On an Opus 4.8 main session this section is moot — inherit freely.
+  win. If the main session is ever switched back to Opus 4.8 (overriding the settings
+  pin), the cost asymmetry disappears — inherit freely there.
 
 
 ## 3. Self-improvement & memory
