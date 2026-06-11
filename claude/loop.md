@@ -13,7 +13,9 @@ force-push, merge, or anything destructive. Each pass:
 3. **Repo hygiene** – surface (don't silently auto-fix) uncommitted drift, broken
    symlinks, or a failing `pre-commit run --all-files`.
 4. **Report** – one short status line: what changed this pass, what's blocked, what's
-   next. If nothing is actionable, say so and let the loop idle longer.
+   next. Before reporting, audit each claim against a tool result from this pass —
+   only report work you can point to evidence for; if unverified, say so explicitly.
+   If nothing is actionable, say so and let the loop idle longer.
 
 **End the loop** when there is no pending work and all owned PRs are green. For bounded
 work with a single verifiable end state, prefer `/goal <condition>` over this loop; for

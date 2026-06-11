@@ -75,7 +75,7 @@ mise use go@1.24.3                        # Install/use specific version
 │   │                   #   rule-auditor (shareable agents migrated to the
 │   │                   #   snkrheadz/claude-skills marketplace — see the Agents section)
 │   ├── skills/         # Skills (2, governance only): governance-review, rule-history
-│   │                   #   (17 shareable skills migrated to the snkrheadz/claude-skills
+│   │                   #   (shareable skills migrated to the snkrheadz/claude-skills
 │   │                   #    marketplace — see the Skills section below)
 │   └── commands/       # Custom slash commands (1): implement-with-notes
 │
@@ -134,7 +134,8 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `CLAUDE.md` - User global instructions (Workflow Orchestration)
   - auto-first execution (§1), Orchestration subagent → skill → team → workflow (§2)
     - Model routing: Fable 5 main = design/audit/review; delegate implementation to
-      `opus`/`sonnet` subagents with explicit `model` (evidence: `docs/fable5-vs-opus48.html`)
+      `opus`/`sonnet` subagents with explicit `model` (evidence: `docs/fable5-vs-opus48.html`);
+      security/red-team work → Opus 4.8 (Fable 5 safety classifiers may refuse benign work)
   - Self-improvement & memory (§3), Verification = run the real thing (§4)
   - Loop & routine primitives (§5): routine (`schedule`) vs `/goal` (condition) vs `/loop` (time) vs `autoresearch` (metric)
   - Task management & principles
@@ -167,12 +168,14 @@ The `claude/` directory contains Claude Code settings managed by this repository
 **Shareable agents** now live in the **`snkrheadz/claude-skills`** marketplace
 (single source of truth) alongside the skills, enabled per role via
 `/plugin install <pack>@claude-skills`:
-- **eng** (11 agents): `code-architect`, `architecture-reviewer`, `code-simplifier`,
-  `build-validator`, `verify-app`, `verify-shell`, `migration-assistant`, `oncall-guide`,
-  `state-machine-diagram`, `aws-best-practices-advisor`, `gcp-best-practices-advisor`
-- **marketer**: `strategic-research-analyst`
-- **designer**: `nano-banana-pro-prompt-generator`
+- **eng** (8 agents): `code-architect`, `architecture-reviewer`, `verify-shell`,
+  `migration-assistant`, `oncall-guide`, `state-machine-diagram`,
+  `aws-best-practices-advisor`, `gcp-best-practices-advisor`
 - **research**: `arxiv-ai-researcher`, `gemini-api-researcher`, `huggingface-spaces-researcher`
+
+> The former **marketer**/**designer** packs and agents covered by official commands
+> (`code-simplifier`, `build-validator`, `verify-app` → `/simplify`, `/verify`) were
+> pruned from the marketplace — use the official plugins/commands instead.
 
 > Installing a pack makes its agents available in every project (global), replacing the
 > former per-project `claude-agents` opt-in (function and `agent-catalog/` removed).
@@ -186,14 +189,15 @@ plugin marketplace (single source of truth), grouped into role packs and consume
 via `/plugin install <pack>@claude-skills` (declared in `settings.json`,
 materialized by `scripts/sync-claude-plugins.sh`). They are namespaced as
 `/<pack>:<skill>` once installed:
-- **core**: first-principles, html-output, teach-session, claude-code-guide
+- **core**: first-principles, html-output, teach-session (+ pre-tool-guard hook)
 - **pm**: task-definition-sheet (+ external phuryn/pm-skills)
-- **eng**: quick-commit, merge-pr, pr-review, review-changes, review-inbox,
-  test-and-fix, refactor-swarm, simplify-pipeline, techdebt, trace-dataflow,
-  db-query, project-setup (+ code-architect/verify/build/migration/cloud agents)
-- **marketer**: strategic-research-analyst agent
-- **designer**: nano-banana-pro-prompt-generator agent
+- **eng**: create-pr, db-query, prune-redundant-skills, refactor-swarm, review-inbox,
+  techdebt, test-and-fix, trace-dataflow (+ code-architect/verify-shell/migration/cloud agents)
 - **research**: arxiv-ai-researcher, gemini-api-researcher, huggingface-spaces-researcher agents
+
+Skills covered by official Claude Code commands (quick-commit, merge-pr, pr-review,
+review-changes, simplify-pipeline, project-setup, claude-code-guide) were pruned from
+the marketplace — use `/code-review`, `/simplify`, `/verify`, `/init` etc. directly.
 
 **Commands** (1) - Custom slash commands in `claude/commands/`, symlinked to `~/.claude/commands/`:
 - `implement-with-notes` - Implement a spec while keeping running implementation notes (decisions, tradeoffs, deltas)
