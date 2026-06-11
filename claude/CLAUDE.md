@@ -48,6 +48,13 @@ reasoning for work that doesn't need it. So:
   not file dumps — keep the main context lean.
 - Don't delegate small tightly-coupled sequential edits: handoff overhead exceeds the
   win. On an Opus 4.8 main session the cost asymmetry disappears — inherit freely there.
+- **Security work routes to Opus 4.8.** Security audits, red-teaming, and
+  exploit-reproduction debugging can trip Fable 5's safety classifiers
+  (`stop_reason: refusal`) even when benign — run them on Opus 4.8 (switch the main
+  session, or a `model: "opus"` subagent).
+- **Dispatch async, don't block.** Fire independent subtasks with `run_in_background`
+  and keep working; reuse a long-lived agent via `SendMessage` instead of respawning —
+  context carries over and cache reads stay warm.
 
 
 ## 3. Self-improvement & memory
@@ -66,8 +73,8 @@ behave?"*
   exists, build it first — an unattended loop with no verification path is not safe to run.
 - This repo's closing gate: `source ~/.zshrc` loads clean, `shellcheck` passes,
   `pre-commit run --all-files` is green, and `health-check` reports no broken symlinks.
-  Use the `verify-shell` / `verify-app` agents (from `eng@claude-skills`) and the
-  `/eng:test-and-fix` skill.
+  Use the `verify-shell` agent (from `eng@claude-skills`), the official `/verify`
+  skill, and the `/eng:test-and-fix` skill.
 
 
 ## 5. Loop & routine primitives — pick by what triggers the next turn
