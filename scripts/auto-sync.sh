@@ -50,10 +50,15 @@ fi
 log "Staging changes..."
 git add -A
 
-# Run gitleaks on staged files (catch secrets before commit)
+# Run gitleaks on staged files (catch secrets before commit).
+# Use `protect --staged`: the legacy `detect --staged` form was removed in
+# gitleaks 8.x and now exits non-zero with "unknown flag", which this script
+# previously misreported as a secret detection. Keep stderr so a scan failure
+# is distinguishable from an actual leak.
 if command -v gitleaks &>/dev/null; then
-    if ! gitleaks detect --staged --source="$DOTFILES_DIR" 2>/dev/null; then
-        log "ERROR: gitleaks detected secrets in staged files. Aborting commit."
+    if ! gitleaks_out=$(gitleaks protect --staged --source="$DOTFILES_DIR" 2>&1); then
+        log "ERROR: gitleaks aborted commit (secret found or scan failed):"
+        log "$gitleaks_out"
         git reset HEAD 2>/dev/null || true
         exit 1
     fi
