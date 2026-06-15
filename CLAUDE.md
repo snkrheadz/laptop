@@ -189,11 +189,12 @@ plugin marketplace (single source of truth), grouped into role packs and consume
 via `/plugin install <pack>@claude-skills` (declared in `settings.json`,
 materialized by `scripts/sync-claude-plugins.sh`). They are namespaced as
 `/<pack>:<skill>` once installed:
-- **core**: first-principles, html-output, teach-session (+ pre-tool-guard hook)
+- **core**: first-principles, honest-reasoning, deep-thinking, life-decision, html-output, teach-session (+ pre-tool-guard hook)
 - **pm**: task-definition-sheet (+ external phuryn/pm-skills)
 - **eng**: create-pr, db-query, prune-redundant-skills, refactor-swarm, review-inbox,
   techdebt, test-and-fix, trace-dataflow (+ code-architect/verify-shell/migration/cloud agents)
 - **research**: arxiv-ai-researcher, gemini-api-researcher, huggingface-spaces-researcher agents
+- **strategy**: career-ai-scan, industry-ai-map, ai-opportunity-scan (AI-era personal strategy: career exposure, industry transformation, opportunity finding)
 
 Skills covered by official Claude Code commands (quick-commit, merge-pr, pr-review,
 review-changes, simplify-pipeline, project-setup, claude-code-guide) were pruned from
