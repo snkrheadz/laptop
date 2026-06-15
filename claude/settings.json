@@ -168,7 +168,8 @@
     "pm@claude-skills": true,
     "eng@claude-skills": true,
     "research@claude-skills": true,
-    "strategy@claude-skills": true
+    "strategy@claude-skills": true,
+    "medii-dev-tools@medii-agent-plugins": true
   },
   "extraKnownMarketplaces": {
     "autoresearch": {
@@ -189,6 +190,12 @@
         "repo": "phuryn/pm-skills"
       },
       "autoUpdate": true
+    },
+    "medii-agent-plugins": {
+      "source": {
+        "source": "directory",
+        "path": "/Users/snkrheadz/ghq/github.com/medii-jp/medii-agent-plugins"
+      }
     }
   },
   "language": "japanese",
