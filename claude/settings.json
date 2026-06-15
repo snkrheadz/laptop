@@ -182,6 +182,13 @@
         "source": "github",
         "repo": "snkrheadz/claude-skills"
       }
+    },
+    "pm-skills": {
+      "source": {
+        "source": "github",
+        "repo": "phuryn/pm-skills"
+      },
+      "autoUpdate": true
     }
   },
   "language": "japanese",
