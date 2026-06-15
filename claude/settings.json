@@ -78,7 +78,6 @@
     "defaultMode": "auto",
     "allowUnsandboxedCommands": false
   },
-  "model": "sonnet[1m]",
   "hooks": {
     "SessionStart": [
       {
