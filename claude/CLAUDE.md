@@ -35,6 +35,15 @@ Escalate only as far as the work demands; the difference is who holds the plan.
 wide fan-out + verify/synthesize → Workflow. For long autonomous runs, encode the
 fan-out in a Workflow instead of hand-spawning agents each turn.
 
+- **Web fan-out is serial, not parallel.** Hammering one host with many concurrent
+  `WebFetch` calls or parallel research subagents trips CDN rate limits and bot
+  detection, which slows the whole job. So: launch web-research subagents one at a
+  time; one `WebFetch` per turn; triage with `WebSearch`, then fetch only a curated
+  few (the 15-min cache makes re-fetch free); prefer typed channels
+  (`research@claude-skills` researchers, `hf-spaces`) over raw scraping. For
+  deliberate breadth, use a `Workflow` `pipeline()` (auto-capped concurrency), not
+  hand-spawned parallel agents.
+
 ### Model routing (Fable 5 main session)
 Subagents **inherit the main-session model unless `model` is set explicitly** — on a
 Fable 5 session (2× Opus 4.8 cost, no fast mode) an untagged delegation buys top-tier
