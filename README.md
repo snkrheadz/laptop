@@ -92,10 +92,14 @@ laptop/
 │   └── skills/             # Local skills (14)
 │
 ├── scripts/
-│   └── auto-sync.sh        # Hourly auto-sync script
+│   ├── auto-sync.sh               # Hourly auto-sync script
+│   ├── sync-claude.sh             # Claude symlink sync + plugin sync
+│   └── sync-claude-plugins.sh     # Materialize marketplaces/plugins declared in settings.json
 │
 ├── docs/
 │   └── fable5-vs-opus48.html  # Model comparison report (evidence for model routing)
+│
+├── .codegraph/             # CodeGraph index (code intelligence, auto-maintained)
 │
 ├── .github/
 │   └── workflows/main.yml  # CI/CD (gitleaks + shellcheck)
@@ -336,7 +340,7 @@ claude/
 | `hooks/` | 5 lifecycle hooks (PostToolUse, SessionStart, PreToolUse, PostToolUseFailure, PreCompact) |
 | `agents/` | 3 global agents (verify-subagent-result + governance-proposer/rule-auditor) |
 | `skills/` | 2 governance skills (others → snkrheadz/claude-skills marketplace) |
-| role agents | eng/marketer/designer/research packs in the snkrheadz/claude-skills marketplace |
+| role agents | eng/research packs in the snkrheadz/claude-skills marketplace |
 
 ### Status Line
 
@@ -384,11 +388,11 @@ Personal agents (machine-local real files in `~/.claude/agents/`, not dotfiles-m
 `side-job-researcher` — mirrors the machine-local `side-job-search` skill, so it is
 neither synced nor published.
 
-Role agents (eng/marketer/designer/research) ship via the **snkrheadz/claude-skills**
-marketplace; enable a pack with `/plugin install <pack>@claude-skills` to make its
-agents available in every project — e.g. `eng` provides `code-architect`,
-`architecture-reviewer`, `verify-shell`, `verify-app`, `build-validator`,
-`aws-/gcp-best-practices-advisor`, and more.
+Role agents (eng/research) ship via the **snkrheadz/claude-skills** marketplace;
+enable a pack with `/plugin install <pack>@claude-skills` to make its agents available
+in every project — e.g. `eng` provides `code-architect`, `architecture-reviewer`,
+`verify-shell`, `migration-assistant`, `oncall-guide`, `state-machine-diagram`,
+`aws-best-practices-advisor`, `gcp-best-practices-advisor`.
 
 ### Available Skills
 
@@ -399,8 +403,8 @@ Governance skills (live in this repo, symlinked to `~/.claude/skills/`):
 
 All other shareable skills migrated to the **snkrheadz/claude-skills** marketplace
 (core / pm / eng packs) and are invoked as `/<pack>:<skill>` after
-`/plugin install <pack>@claude-skills` — e.g. `/eng:quick-commit`,
-`/eng:test-and-fix`, `/eng:refactor-swarm`, `/core:first-principles`.
+`/plugin install <pack>@claude-skills` — e.g. `/eng:test-and-fix`,
+`/eng:refactor-swarm`, `/core:first-principles`.
 
 ### Local Skills (Project-specific)
 
