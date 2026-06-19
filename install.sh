@@ -335,6 +335,16 @@ setup_mise() {
     log_success "mise configured with runtimes"
 }
 
+install_pip_packages() {
+    log_info "Installing pip packages..."
+    if command -v pip3 >/dev/null 2>&1; then
+        pip3 install "headroom-ai[all]" --quiet
+        log_success "pip packages installed (headroom-ai)"
+    else
+        log_warning "pip3 not found — skipping pip packages (run: pip3 install 'headroom-ai[all]')"
+    fi
+}
+
 # Create secrets.env template
 create_secrets_template() {
     if [ ! -f "$HOME/.secrets.env" ]; then
@@ -379,6 +389,7 @@ main() {
         log_warning "claude CLI not found — skipping plugin sync (run scripts/sync-claude-plugins.sh after installing Claude Code)"
     fi
     setup_mise
+    install_pip_packages
     setup_security
     setup_autosync
     create_secrets_template
