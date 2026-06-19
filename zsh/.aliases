@@ -7,3 +7,6 @@ alias v="$VISUAL"
 
 # Pretty print the path
 alias path='echo $PATH | tr -s ":" "\n"'
+
+# Claude Code with Headroom context compression proxy
+alias cc="headroom wrap claude"
