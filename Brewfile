@@ -209,6 +209,8 @@ brew "zsh-completions"
 brew "aquasecurity/trivy/trivy", trusted: true
 # gossm is interactive CLI tool that you select server in AWS and then could connect or send files your AWS server using start-session, ssh, scp under AWS Systems Manger.
 brew "gjbae1212/gossm/gossm", trusted: true
+# Terraform
+brew "hashicorp/tap/terraform", trusted: true
 # Terraform Language Server
 brew "hashicorp/tap/terraform-ls", trusted: true
 # Google CLI for Gmail, Calendar, Drive, Docs, Sheets, and more
