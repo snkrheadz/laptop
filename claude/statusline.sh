@@ -205,7 +205,7 @@ if [ "$SEVEN_DAY_PCT" -ge 0 ] 2>/dev/null; then
     SD_PCT=${SEVEN_DAY_PCT%%.*}
     SD_COLOR=$(gradient "$SD_PCT")
     SD_BAR=$(braille_bar "$SD_PCT" 8)
-    SEGMENTS+=("${DIM}7d${RESET} ${SD_COLOR}${SD_BAR}${RESET} ${SD_PCT}%")
+    SEGMENTS+=("${DIM}7d*${RESET} ${SD_COLOR}${SD_BAR}${RESET} ${SD_PCT}%")
 fi
 
 # [8] Vim mode (if active)
