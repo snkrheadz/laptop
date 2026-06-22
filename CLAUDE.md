@@ -32,6 +32,13 @@ gitleaks detect --source=. --no-git       # Scan for secrets
 mise list                                 # List installed runtimes
 mise install                              # Install runtimes from config
 mise use go@1.24.3                        # Install/use specific version
+
+# CodeGraph (code intelligence index)
+codegraph index                           # 初回インデックス構築 or 完全再構築
+codegraph sync                            # 差分更新（スクリプト等からの手動実行用）
+codegraph status                          # インデックスの状態確認
+# 自動更新: MCP デーモン稼働中は FS ウォッチャーが 2 秒デバウンスで自動同期するため
+#           通常は手動実行不要。.codegraph/ を削除した場合は codegraph index を再実行。
 ```
 
 ## Architecture
@@ -88,6 +95,8 @@ mise use go@1.24.3                        # Install/use specific version
 │
 ├── docs/
 │   └── fable5-vs-opus48.html # Model comparison report (evidence base for model routing)
+│
+├── .codegraph/               # CodeGraph index (SQLite 知識グラフ、MCP デーモンが FS ウォッチで自動更新)
 │
 ├── .pre-commit-config.yaml   # Pre-commit hooks config
 ├── .gitleaks.toml            # Gitleaks secret scanning config

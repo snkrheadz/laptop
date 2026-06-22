@@ -429,6 +429,26 @@ The `.claude/skills/` directory contains 14 project-specific skills that are **o
 
 **Usage:** These skills are invoked using slash commands (e.g., `/brew-manage`, `/health-check`) when working in this repository with Claude Code.
 
+## CodeGraph (Code Intelligence)
+
+[CodeGraph](https://github.com/colbymchenry/codegraph) は tree-sitter で全シンボルを事前解析し SQLite に格納するコード知識グラフです。MCP 経由で Claude Code に提供することで、grep + ファイル読み込みループを 1 回のクエリに圧縮します。
+
+### 自動更新
+
+MCP デーモンが稼働中は **FS ウォッチャー（FSEvents）が 2 秒デバウンスで自動同期**するため、通常は手動操作不要です。
+
+### 手動操作が必要なタイミング
+
+| コマンド | タイミング |
+|---------|-----------|
+| `codegraph index` | 初回セットアップ後 / `.codegraph/` を削除した後 / 完全再構築したいとき |
+| `codegraph sync` | デーモン外（スクリプト等）から差分更新したいとき |
+| `codegraph status` | インデックスの状態確認・未同期ファイルの確認 |
+
+### `.codegraph/` の管理
+
+`.codegraph/` ディレクトリは `.gitignore` で除外済みです（マシンローカルなインデックスであり、コミット対象外）。
+
 ## License
 
 MIT

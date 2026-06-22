@@ -91,3 +91,6 @@ artifacts/
 
 # Working state (workflow orchestration)
 tasks/
+
+# CodeGraph index (machine-local, not committed)
+.codegraph/
