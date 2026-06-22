@@ -197,7 +197,7 @@ if [ "$FIVE_HOUR_PCT" -ge 0 ] 2>/dev/null; then
     FH_PCT=${FIVE_HOUR_PCT%%.*}
     FH_COLOR=$(gradient "$FH_PCT")
     FH_BAR=$(braille_bar "$FH_PCT" 8)
-    SEGMENTS+=("${DIM}5h${RESET} ${FH_COLOR}${FH_BAR}${RESET} ${FH_PCT}%")
+    SEGMENTS+=("${DIM}5h*${RESET} ${FH_COLOR}${FH_BAR}${RESET} ${FH_PCT}%")
 fi
 
 # [8] 7d rate limit bar (only if data exists)
@@ -205,10 +205,10 @@ if [ "$SEVEN_DAY_PCT" -ge 0 ] 2>/dev/null; then
     SD_PCT=${SEVEN_DAY_PCT%%.*}
     SD_COLOR=$(gradient "$SD_PCT")
     SD_BAR=$(braille_bar "$SD_PCT" 8)
-    SEGMENTS+=("${DIM}7d${RESET} ${SD_COLOR}${SD_BAR}${RESET} ${SD_PCT}%")
+    SEGMENTS+=("${DIM}7d*${RESET} ${SD_COLOR}${SD_BAR}${RESET} ${SD_PCT}%")
 fi
 
-# [8] Vim mode (if active)
+# [9] Vim mode (if active)
 if [ -n "$VIM_MODE" ]; then
     SEGMENTS+=("$VIM_MODE")
 fi

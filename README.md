@@ -336,7 +336,7 @@ claude/
 |-----------|-------------|
 | `CLAUDE.md` | User global instructions (Workflow Orchestration, §1–5 + model routing) |
 | `settings.json` | Hooks, plugins, permissions |
-| `statusline.sh` | Status line: model, dir+branch, duration, cost (session/daily), lines, braille bars (ctx/5h/7d) |
+| `statusline.sh` | Status line: model, dir+branch, duration, cost (session/daily), lines, braille bars (ctx/5h*/7d*) |
 | `hooks/` | 5 lifecycle hooks (PostToolUse, SessionStart, PreToolUse, PostToolUseFailure, PreCompact) |
 | `agents/` | 3 global agents (verify-subagent-result + governance-proposer/rule-auditor) |
 | `skills/` | 2 governance skills (others → snkrheadz/claude-skills marketplace) |
@@ -347,7 +347,7 @@ claude/
 Displays in Claude Code CLI (segments joined by ` | `, conditional ones shown only when data exists):
 
 ```
-Opus 4.8 | laptop 🌿main | ⏱ 5m | 💰$0.50/$5.20 | +120-45 | ctx ⣿⣿⣄ 45% | 5h ⣄⠀⠀ 12% | 7d ⣶⠀⠀ 18%
+Opus 4.8 | laptop 🌿main | ⏱ 5m | 💰$0.50/$5.20 | +120-45 | ctx ⣿⣿⣄ 45% | 5h* ⣄⠀⠀ 12% | 7d* ⣶⠀⠀ 18%
 ```
 
 | Segment | Meaning |
@@ -358,8 +358,8 @@ Opus 4.8 | laptop 🌿main | ⏱ 5m | 💰$0.50/$5.20 | +120-45 | ctx ⣿⣿⣄ 
 | `💰$0.50/$5.20` | Cost: this session / today's cumulative total |
 | `+120-45` | Lines added/removed (hidden when zero) |
 | `ctx ⣿⣿⣄ 45%` | Context window usage (braille bar, green→yellow→red gradient) |
-| `5h ⣄⠀⠀ 12%` | 5-hour rate limit usage (shown if available) |
-| `7d ⣶⠀⠀ 18%` | 7-day rate limit usage (shown if available) |
+| `5h* ⣄⠀⠀ 12%` | 5-hour rate limit usage — all models combined (`*` = not Sonnet-only; shown if available) |
+| `7d* ⣶⠀⠀ 18%` | 7-day rate limit usage — all models combined (`*` = not Sonnet-only; shown if available) |
 
 Vim mode and `🤖<agent>` (subagent name) segments are appended when active.
 
