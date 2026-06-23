@@ -8,8 +8,8 @@ model and keep this file minimal.
 
 ## 1. auto-first execution
 - Default to **auto mode**: act, don't ask. The harness routes risky commands through a
-  security check and `pre-tool-guard.sh` blocks sensitive-file access and stale-branch
-  `gh pr create`, so narrating yes/no for each step adds no safety — it just hides the
+  security check and `pre-tool-guard.sh` blocks sensitive-file access and guards
+  `gh pr create` (self-branch, stale-base, empty-diff), so narrating yes/no for each step adds no safety — it just hides the
   calls that matter.
 - **Skip plan mode for ordinary work.** Current models don't need a separate planning
   step. Reach for `EnterPlanMode` only when a choice is genuinely hard to reverse
@@ -75,6 +75,7 @@ reasoning for work that doesn't need it. So:
 - **User correction → `tasks/lessons.md`** (record the pattern *and the why*).
 - **Discovered preference → auto-memory** (`~/.claude/memory/`, let Claude Code manage it).
 - Review `tasks/lessons.md` at session start for the active project.
+- **Local-first lookup:** 会議・状況・コンテキスト情報を調べるときは、外部サービス（Google Calendar/Drive 等）を呼ぶ前に `~/.claude/memory/` とローカルの prep ファイルを先に確認する。
 
 
 ## 4. Verification = run the real thing
