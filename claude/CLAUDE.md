@@ -15,6 +15,11 @@ model and keep this file minimal.
   step. Reach for `EnterPlanMode` only when a choice is genuinely hard to reverse
   (schema/data migrations, public-facing or destructive changes, multi-service
   refactors) or the requirements are truly ambiguous.
+- **If you do use plan mode, keep `ExitPlanMode` light.** Pass a minimal `allowedPrompts`
+  (or none) — a large nested-JSON payload can corrupt the tool-call XML wrapper, so the
+  call leaks into the message as plain text (`<invoke name="ExitPlanMode">…`) and the plan
+  / approval never renders (observed on Opus 4.8). Approve Bash prompts interactively
+  instead of pre-listing them. Avoiding plan mode altogether (above) sidesteps this.
 - If an approach goes sideways, stop and re-think rather than pushing a failing path.
 
 
