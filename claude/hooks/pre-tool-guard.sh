@@ -33,6 +33,8 @@ if printf '%s' "$command" | tr ';&' '\n' | grep -qE '^[[:space:]]*gh[[:space:]]+
         base_branch=$(echo "$command" | sed -nE 's/.*--base[[:space:]=]+([^[:space:]]+).*/\1/p' | head -1)
         # Strip surrounding quotes so --base="main" resolves as a valid ref
         base_branch=${base_branch//[\"\']/}
+        # Discard unexpanded shell variable references (e.g. "$base") — fall through to auto-detect
+        case "$base_branch" in \$*) base_branch="" ;; esac
         if [ -z "$base_branch" ]; then
             if git -C "$work_dir" show-ref --verify --quiet "refs/remotes/origin/main"; then
                 base_branch="main"
