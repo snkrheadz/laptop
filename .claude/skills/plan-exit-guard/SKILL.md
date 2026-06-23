@@ -1,9 +1,9 @@
 ---
-name: safe-plan-exit
+name: plan-exit-guard
 description: Plan mode を終了して承認を求めるとき（ExitPlanMode を呼ぶ前）に使う。Opus 4.8 で ExitPlanMode の tool-call XML ラッパーが壊れ、承認が表示されない事故を防ぐ。トリガー: plan mode 終了, ExitPlanMode, プラン承認, exit plan mode, 承認依頼が表示されない
 ---
 
-# Safe Plan Exit
+# Plan Exit Guard
 
 Plan mode を抜けて承認を求めるときの手順。Opus 4.8 で `ExitPlanMode` の
 tool-call XML ラッパーが壊れ、`<invoke name="ExitPlanMode">...` 相当が
