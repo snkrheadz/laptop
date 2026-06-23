@@ -18,9 +18,9 @@ if [ -z "$command" ]; then
 fi
 
 # ---------------------------------------------------------------------------
-# gh pr create guard: ensure base branch is merged before opening a PR
+# gh pr create guard: block self-branch, stale-base, and empty-diff PRs
 # ---------------------------------------------------------------------------
-if echo "$command" | grep -qE 'gh pr create'; then
+if printf '%s' "$command" | tr ';&' '\n' | grep -qE '^[[:space:]]*gh[[:space:]]+pr[[:space:]]+create'; then
     # Determine working dir from hook input or fallback to cwd
     hook_cwd=$(echo "$input" | jq -r '.cwd // empty' 2>/dev/null)
     work_dir="${hook_cwd:-$(pwd)}"
@@ -41,13 +41,23 @@ if echo "$command" | grep -qE 'gh pr create'; then
             fi
         fi
 
-        if [ -n "$base_branch" ] && [ "$current_branch" != "$base_branch" ]; then
+        if [ -n "$base_branch" ]; then
+            # Guard 1: cannot PR a branch into itself (auto-sync may have committed to base directly)
+            if [ "$current_branch" = "$base_branch" ]; then
+                {
+                    echo "BLOCKED: Current branch is '$base_branch' — cannot open a PR targeting the same branch."
+                    echo ""
+                    echo "auto-sync may have committed your changes directly to $base_branch."
+                    echo "Check recent commits: git log --oneline -5"
+                } >&2
+                exit 2
+            fi
+
             # Fetch latest base branch
             git -C "$work_dir" fetch origin "$base_branch" --quiet 2>/dev/null
 
-            # Count commits on base branch not yet in current branch
+            # Guard 2: ensure base branch is merged before opening a PR (no stale diff)
             behind=$(git -C "$work_dir" rev-list --count "HEAD..origin/$base_branch" 2>/dev/null || echo "0")
-
             if [ "$behind" -gt 0 ]; then
                 {
                     echo "BLOCKED: Current branch '$current_branch' is $behind commit(s) behind origin/$base_branch."
@@ -57,6 +67,18 @@ if echo "$command" | grep -qE 'gh pr create'; then
                     echo ""
                     echo "Or, if you want to rebase instead:"
                     echo "  git rebase origin/$base_branch"
+                } >&2
+                exit 2
+            fi
+
+            # Guard 3: ensure there are commits to PR (non-empty diff)
+            ahead=$(git -C "$work_dir" rev-list --count "origin/$base_branch..HEAD" 2>/dev/null || echo "0")
+            if [ "$ahead" -eq 0 ]; then
+                {
+                    echo "BLOCKED: No commits found ahead of origin/$base_branch — the PR would be empty."
+                    echo ""
+                    echo "auto-sync may have already pushed your changes directly to $base_branch."
+                    echo "Check: git log --oneline -5 origin/$base_branch"
                 } >&2
                 exit 2
             fi
