@@ -20,7 +20,7 @@ fi
 # ---------------------------------------------------------------------------
 # gh pr create guard: block self-branch, stale-base, and empty-diff PRs
 # ---------------------------------------------------------------------------
-if printf '%s' "$command" | tr ';&' '\n' | grep -qE '^[[:space:]]*gh[[:space:]]+pr[[:space:]]+create'; then
+if printf '%s' "$command" | tr ';&|' '\n' | grep -qE '^[[:space:]]*gh[[:space:]]+pr[[:space:]]+create'; then
     # Determine working dir from hook input or fallback to cwd
     hook_cwd=$(echo "$input" | jq -r '.cwd // empty' 2>/dev/null)
     work_dir="${hook_cwd:-$(pwd)}"
@@ -55,11 +55,23 @@ if printf '%s' "$command" | tr ';&' '\n' | grep -qE '^[[:space:]]*gh[[:space:]]+
                 exit 2
             fi
 
-            # Fetch latest base branch
-            git -C "$work_dir" fetch origin "$base_branch" --quiet 2>/dev/null
+            # Fetch latest base branch (bounded so a network stall can't hang Claude Code)
+            fetch_timeout=""
+            if command -v timeout > /dev/null 2>&1; then
+                fetch_timeout="timeout 10"
+            elif command -v gtimeout > /dev/null 2>&1; then
+                fetch_timeout="gtimeout 10"
+            fi
+            $fetch_timeout git -C "$work_dir" fetch origin "$base_branch" --quiet 2>/dev/null
+
+            # Compute ahead/behind in a single graph walk (left = behind base, right = ahead of base)
+            counts=$(git -C "$work_dir" rev-list --left-right --count "origin/$base_branch...HEAD" 2>/dev/null)
+            behind=$(printf '%s' "$counts" | awk '{print $1+0}')
+            ahead=$(printf '%s' "$counts" | awk '{print $2+0}')
+            behind=${behind:-0}
+            ahead=${ahead:-0}
 
             # Guard 2: ensure base branch is merged before opening a PR (no stale diff)
-            behind=$(git -C "$work_dir" rev-list --count "HEAD..origin/$base_branch" 2>/dev/null || echo "0")
             if [ "$behind" -gt 0 ]; then
                 {
                     echo "BLOCKED: Current branch '$current_branch' is $behind commit(s) behind origin/$base_branch."
@@ -74,7 +86,6 @@ if printf '%s' "$command" | tr ';&' '\n' | grep -qE '^[[:space:]]*gh[[:space:]]+
             fi
 
             # Guard 3: ensure there are commits to PR (non-empty diff)
-            ahead=$(git -C "$work_dir" rev-list --count "origin/$base_branch..HEAD" 2>/dev/null || echo "0")
             if [ "$ahead" -eq 0 ]; then
                 {
                     echo "BLOCKED: No commits found ahead of origin/$base_branch — the PR would be empty."
