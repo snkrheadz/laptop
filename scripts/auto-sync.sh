@@ -13,6 +13,20 @@ log() {
 
 cd "$DOTFILES_DIR"
 
+# Skip if a pause lock is active (set by scripts/autosync-pause.sh during PR creation
+# or manual work). The lock auto-expires so a forgotten pause can't disable sync forever.
+PAUSE_LOCK="$HOME/.cache/dotfiles-autosync.pause"
+if [ -f "$PAUSE_LOCK" ]; then
+    expiry=$(cat "$PAUSE_LOCK" 2>/dev/null || echo 0)
+    now=$(date +%s)
+    if [[ "$expiry" =~ ^[0-9]+$ ]] && [ "$now" -lt "$expiry" ]; then
+        log "Paused until $(date -r "$expiry" '+%H:%M:%S') — skipping sync"
+        exit 0
+    fi
+    log "Pause lock expired — removing and continuing"
+    rm -f "$PAUSE_LOCK"
+fi
+
 # Check if we're in a git repository
 if [ ! -d ".git" ]; then
     log "ERROR: Not a git repository"

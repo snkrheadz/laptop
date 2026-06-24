@@ -86,6 +86,13 @@ behave?"*
   baseline when relevant.
 - **Autonomous runs need an end-to-end check that self-terminates honestly.** If none
   exists, build it first — an unattended loop with no verification path is not safe to run.
+- **A clean exit code is not a success signal when the output looks wrong.** Compressed
+  or truncated tool output (e.g. Headroom) has produced false "PR created" / "done"
+  claims here — before reporting a PR, commit, merge, or deploy complete, confirm the
+  externally-visible artifact with a real command (`gh pr view <n>`, `git log`) and
+  re-run it if the output looks compressed or cut off. Never substitute a fabricated
+  sub-agent report or tool result for a failed call — say it failed, then retry or fall
+  back to a direct approach.
 - This repo's closing gate: `source ~/.zshrc` loads clean, `shellcheck` passes,
   `pre-commit run --all-files` is green, and `health-check` reports no broken symlinks.
   Use the `verify-shell` agent (from `eng@claude-skills`), the official `/verify`
