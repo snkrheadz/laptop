@@ -204,6 +204,7 @@
     "enabled": true,
     "mode": "hold"
   },
+  "autoMemoryEnabled": false,
   "skipWorkflowUsageWarning": true,
   "theme": "dark",
   "preferredNotifChannel": "ghostty",
