@@ -47,8 +47,7 @@ codegraph status                          # インデックスの状態確認
 ├── install.sh          # Main installer (creates backup, symlinks, installs packages)
 ├── rollback.sh         # Restore from backup
 ├── scripts/
-│   ├── auto-sync.sh           # Hourly auto-sync via launchd (honors autosync-pause lock)
-│   ├── autosync-pause.sh      # Pause auto-sync for N min (auto-expiring lock) during PR/manual work
+│   ├── auto-sync.sh           # Hourly auto-sync via launchd
 │   ├── sync-claude.sh         # Claude symlink sync (sources install.sh) + plugin sync
 │   └── sync-claude-plugins.sh # Materialize marketplaces/plugins declared in settings.json (headless, idempotent)
 ├── Brewfile            # Homebrew packages, casks, VSCode extensions
