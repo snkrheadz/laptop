@@ -16,15 +16,24 @@ cd "$DOTFILES_DIR"
 # Skip if a pause lock is active (set by scripts/autosync-pause.sh during PR creation
 # or manual work). The lock auto-expires so a forgotten pause can't disable sync forever.
 PAUSE_LOCK="$HOME/.cache/dotfiles-autosync.pause"
-if [ -f "$PAUSE_LOCK" ]; then
-    expiry=$(cat "$PAUSE_LOCK" 2>/dev/null || echo 0)
+
+# Returns 0 if an unexpired pause lock is active; silently clears an expired lock.
+# On success, sets PAUSE_EXPIRY to the lock's epoch deadline for logging.
+pause_active() {
+    [ -f "$PAUSE_LOCK" ] || return 1
+    PAUSE_EXPIRY=$(cat "$PAUSE_LOCK" 2>/dev/null || echo 0)
+    local now
     now=$(date +%s)
-    if [[ "$expiry" =~ ^[0-9]+$ ]] && [ "$now" -lt "$expiry" ]; then
-        log "Paused until $(date -r "$expiry" '+%H:%M:%S') — skipping sync"
-        exit 0
+    if [[ "$PAUSE_EXPIRY" =~ ^[0-9]+$ ]] && [ "$now" -lt "$PAUSE_EXPIRY" ]; then
+        return 0
     fi
-    log "Pause lock expired — removing and continuing"
     rm -f "$PAUSE_LOCK"
+    return 1
+}
+
+if pause_active; then
+    log "Paused until $(date -r "$PAUSE_EXPIRY" '+%H:%M:%S') — skipping sync"
+    exit 0
 fi
 
 # Check if we're in a git repository
@@ -76,6 +85,14 @@ if command -v gitleaks &>/dev/null; then
         git reset HEAD 2>/dev/null || true
         exit 1
     fi
+fi
+
+# Re-check the pause lock right before the destructive commit/push: a pause set
+# after the initial check (while brew dump and scans ran) must still take effect.
+if pause_active; then
+    log "Paused mid-run — unstaging and skipping commit"
+    git reset HEAD 2>/dev/null || true
+    exit 0
 fi
 
 # Create commit
