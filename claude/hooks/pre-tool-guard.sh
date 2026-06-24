@@ -25,6 +25,27 @@ if printf '%s' "$command" | tr ';&|' '\n' | grep -qE '^[[:space:]]*gh[[:space:]]
     hook_cwd=$(echo "$input" | jq -r '.cwd // empty' 2>/dev/null)
     work_dir="${hook_cwd:-$(pwd)}"
 
+    # If the command cd's into a directory before running gh (e.g. "cd /path && gh pr create ..."),
+    # evaluate the guard in that target dir rather than the session cwd. Otherwise a command that
+    # operates on a different repo than the session cwd (e.g. a second checkout) yields false
+    # positives — the guard would inspect the unrelated session repo's branches.
+    cd_target=$(printf '%s' "$command" | sed -nE 's/^[[:space:]]*cd[[:space:]]+([^[:space:]&;|]+).*/\1/p')
+    cd_target=${cd_target//[\"\']/}
+    if [ -n "$cd_target" ]; then
+        # Expand a leading ~ to $HOME (tilde does not expand inside quotes)
+        tilde='~'
+        if [ "${cd_target:0:1}" = "$tilde" ]; then
+            cd_target="$HOME${cd_target:1}"
+        fi
+        case "$cd_target" in
+            /*) cd_resolved="$cd_target" ;;
+            *)  cd_resolved="$work_dir/$cd_target" ;;
+        esac
+        if git -C "$cd_resolved" rev-parse --git-dir > /dev/null 2>&1; then
+            work_dir="$cd_resolved"
+        fi
+    fi
+
     # Only apply inside a git repo
     if git -C "$work_dir" rev-parse --git-dir > /dev/null 2>&1; then
         current_branch=$(git -C "$work_dir" branch --show-current 2>/dev/null)
