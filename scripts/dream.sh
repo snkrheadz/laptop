@@ -34,9 +34,12 @@ log() { echo "[dream] $1" >&2; }
 die() { echo "[dream] ERROR: $1" >&2; exit 1; }
 
 # repo path を Claude Code の transcript ディレクトリ名にエンコードする。
+# Claude Code は英数字以外を "-" に置換する(大文字は保持)。"/" と "." だけでなく
+# "_" やスペース等も対象にしないと実ディレクトリ名と食い違うため、英数字以外を
+# まとめて "-" にする。
 # 例: /Users/x/ghq/github.com/u/laptop -> -Users-x-ghq-github-com-u-laptop
 encode_repo() {
-    echo "$1" | sed 's/[/.]/-/g'
+    printf '%s' "$1" | sed 's/[^A-Za-z0-9]/-/g'
 }
 
 resolve_repo() {
@@ -50,9 +53,11 @@ resolve_repo() {
 extract_transcripts() {
     local tdir="$1"
     local files
-    # mtime 新しい順に N 本
-    files=$(find "$tdir" -maxdepth 1 -name '*.jsonl' -print0 2>/dev/null \
-        | xargs -0 ls -t 2>/dev/null | head -n "$DREAM_SESSIONS" || true)
+    # mtime 新しい順に N 本。ls -t に glob を直接渡す(xargs 経由だとファイルが多い
+    # ときバッチ分割され、各バッチ内でしか -t ソートされず全体の最新N本にならない)。
+    # ファイル名は UUID.jsonl 固定でパース安全なので SC2012 は無視してよい。
+    # shellcheck disable=SC2012
+    files=$(ls -t "$tdir"/*.jsonl 2>/dev/null | head -n "$DREAM_SESSIONS" || true)
     [ -z "$files" ] && return 1
 
     while IFS= read -r f; do
@@ -61,7 +66,11 @@ extract_transcripts() {
         sid=$(head -1 "$f" | jq -r '.sessionId // "unknown"' 2>/dev/null || echo "unknown")
         echo "===== SESSION $sid ====="
         # user(string content) と assistant(text blocks) のみ。tool_result の
-        # array content は除外(ノイズ)。出力を MAXCHARS で切る。
+        # array content は除外(ノイズ)。出力を MAXCHARS で切る。head -c は
+        # バイト単位で切るため、末尾で割れた UTF-8 を iconv -c で除去し文字化けを防ぐ。
+        # 注: 出力が大きいと head -c が先に閉じて jq が SIGPIPE(141)で死に、
+        # pipefail+set -e が拾って関数全体が中断する。truncate は正常動作なので
+        # `|| true` でパイプライン失敗を飲み込む(部分出力はそのまま使う)。
         jq -r '
             if .type=="user" and (.message.content|type=="string")
               then "USER: " + .message.content
@@ -69,7 +78,7 @@ extract_transcripts() {
               then ([.message.content[] | select(.type=="text") | .text] | join("\n"))
                    | select(length>0) | "ASSISTANT: " + .
             else empty end
-        ' "$f" 2>/dev/null | head -c "$DREAM_MAXCHARS"
+        ' "$f" 2>/dev/null | head -c "$DREAM_MAXCHARS" | iconv -f UTF-8 -t UTF-8 -c || true
         echo
     done <<< "$files"
 }
@@ -124,6 +133,7 @@ cmd_generate() {
     [ -d "$tdir" ] || die "このリポジトリの transcript が無い: $tdir"
     command -v claude >/dev/null 2>&1 || die "claude CLI が見つからない"
     command -v jq >/dev/null 2>&1 || die "jq が見つからない"
+    command -v iconv >/dev/null 2>&1 || die "iconv が見つからない"
 
     log "repo:        $repo"
     log "transcripts: $tdir"
@@ -140,10 +150,18 @@ cmd_generate() {
 
     prompt="$(build_prompt "$repo" "$lessons_content" "$transcripts")"
 
+    # candidate 出力先(tasks/)が無いと後段の mv が落ちるので先に作る。
+    mkdir -p "$repo/tasks"
+
     log "Dreaming 中... (claude -p, 書き込みツールなし)"
-    # read-only 保証: 書き込み系ツールを一切渡さない。入力は全てプロンプト内。
-    # 万一モデルがツールを試みても、許可されていないので本番ファイルは変わらない。
-    {
+    # read-only 保証: 空 allowlist で全ツールを不許可にした上で、書き込み系を
+    # 明示 disallow する二重防御(入力は全てプロンプト内なのでツールは不要。
+    # allowlist だけでは Task 経由のサブエージェント等で書き込み経路が再び開く)。
+    # 一時ファイルに書き、claude 成功時のみ candidate へ反映する。こうすると
+    # claude が途中失敗しても、前回の candidate を壊さずに済む。
+    local tmp
+    tmp="$(mktemp "${TMPDIR:-/tmp}/dream.XXXXXX")"
+    if {
         echo "<!-- 自動生成 (dream.sh) / dry-run / 本体 lessons.md は不変 -->"
         echo "<!-- 生成: $(date -u +%Y-%m-%dT%H:%M:%SZ) / model: $DREAM_MODEL -->"
         echo
@@ -152,10 +170,14 @@ cmd_generate() {
                      --allowedTools "" \
                      --disallowedTools "Write,Edit,NotebookEdit,Bash" \
                      --output-format text
-    } > "$candidate_file"
-
-    log "candidate を書き出した: $candidate_file"
-    log "次に: dream.sh check '$repo' で内容を検査(本番には未反映)"
+    } > "$tmp"; then
+        mv "$tmp" "$candidate_file"
+        log "candidate を書き出した: $candidate_file"
+        log "次に: dream.sh check '$repo' で内容を検査(本番には未反映)"
+    else
+        rm -f "$tmp"
+        die "claude が失敗。前回の candidate は保持(変更なし)"
+    fi
 }
 
 cmd_check() {
@@ -188,11 +210,16 @@ cmd_check() {
         warn=1
     fi
 
-    # 削除/上書きを示唆する危険語(stale クリアの自動適用は禁止)
+    # 削除/上書きを示唆する危険語(stale クリアの自動適用は禁止)。
+    # grep は1回だけ走らせ結果を再利用する(同一ファイルへの二重スキャンを避ける)。
     echo
     echo "--- 削除・上書きを示唆する記述(人間が必ず確認) ---"
-    if grep -niE '削除|消す|remove|delete|上書き|overwrite' "$candidate_file" >/dev/null 2>&1; then
-        grep -niE '削除|消す|remove|delete|上書き|overwrite' "$candidate_file" | sed 's/^/  /'
+    local danger
+    danger=$(grep -niE '削除|消す|remove|delete|上書き|overwrite' "$candidate_file" 2>/dev/null || true)
+    if [ -n "$danger" ]; then
+        # 各行頭に2スペースを足す用途で、${//} では書けないため sed を使う
+        # shellcheck disable=SC2001
+        echo "$danger" | sed 's/^/  /'
         echo "  ⚠ 削除系の提案あり。dry-run では適用しない。アーカイブ提案として人間が判断。"
         warn=1
     else
