@@ -4,12 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-macOS laptop setup repository with dotfiles management, auto-sync, and security features.
+macOS laptop setup repository with dotfiles management, manual sync, and security features.
 
 ## Commands
 
 ```bash
-# Full installation (backup, symlinks, brew packages, security tools, auto-sync)
+# Full installation (backup, symlinks, brew packages, security tools)
 ./install.sh
 
 # Sync ONLY Claude Code symlinks (~/.claude/*), skipping brew/mise/security/backup
@@ -21,7 +21,7 @@ macOS laptop setup repository with dotfiles management, auto-sync, and security 
 # Manual operations
 brew bundle dump --force --file=Brewfile  # Dump current Homebrew packages
 brew bundle --file=Brewfile               # Install packages from Brewfile
-./scripts/auto-sync.sh                    # Run auto-sync manually
+./scripts/auto-sync.sh                    # Sync dotfiles manually (commit & push)
 
 # Security checks
 pre-commit install                        # Setup pre-commit hooks
@@ -47,7 +47,7 @@ codegraph status                          # インデックスの状態確認
 ├── install.sh          # Main installer (creates backup, symlinks, installs packages)
 ├── rollback.sh         # Restore from backup
 ├── scripts/
-│   ├── auto-sync.sh           # Hourly auto-sync via launchd
+│   ├── auto-sync.sh           # Manual dotfiles sync (commit & push)
 │   ├── sync-claude.sh         # Claude symlink sync (sources install.sh) + plugin sync
 │   └── sync-claude-plugins.sh # Materialize marketplaces/plugins declared in settings.json (headless, idempotent)
 ├── Brewfile            # Homebrew packages, casks, VSCode extensions
@@ -105,7 +105,7 @@ codegraph status                          # インデックスの状態確認
 
 ## Key Features
 
-- **Auto-sync**: launchd agent runs `auto-sync.sh` every hour to commit and push changes
+- **Manual sync**: run `./scripts/auto-sync.sh` to commit and push changes (no background agent; launchd auto-sync removed)
 - **Backup/Rollback**: `install.sh` creates timestamped backups; `rollback.sh` restores them
 - **Security**: gitleaks + pre-commit hooks scan for secrets before commit
 - **Secrets**: Store API keys in `~/.secrets.env` (gitignored, created by install.sh)
@@ -222,7 +222,7 @@ These skills are **only available in this repository** (not symlinked to `~/.cla
 - `git-config` - Git configuration files
 - `health-check` - Dotfiles health check
 - `hf-spaces` - HuggingFace Spaces search
-- `launchd-manage` - Auto-sync launchd management
+- `launchd-manage` - (非推奨/廃止) launchd auto-sync は廃止。手動同期は `scripts/auto-sync.sh` を直接実行
 - `mise-runtime` - Runtime management (mise)
 - `new-machine-setup` - New machine setup guide
 
