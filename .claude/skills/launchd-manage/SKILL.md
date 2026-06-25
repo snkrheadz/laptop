@@ -1,5 +1,5 @@
 ---
-description: "auto-sync launchd管理。dotfiles自動同期の状態確認・起動・停止・ログ確認。トリガー: launchd, auto-sync, 自動同期, 同期, sync agent"
+description: "(非推奨/廃止) launchd auto-sync は廃止され手動同期へ移行。dotfiles 同期は scripts/auto-sync.sh を直接実行する。トリガー: launchd, auto-sync, 自動同期, 同期, sync agent"
 model: haiku
 context: fork
 allowed-tools:
@@ -10,11 +10,16 @@ allowed-tools:
 
 # launchd-manage スキル
 
-dotfiles自動同期のlaunchdエージェント管理を行う。
+> **⚠️ 非推奨 / 廃止**: launchd による毎時 auto-sync は廃止されました。
+> `install.sh` はもう launchd エージェント（`com.dotfiles.autosync`）を設定しません。
+> dotfiles の同期は **手動** で `scripts/auto-sync.sh` を実行してください。
+> 以下の launchd 管理手順は、過去に残った plist がある環境向けの参考情報です。
+
+dotfiles同期のlaunchdエージェント管理（廃止済み）に関する参考情報。
 
 ## 概要
 
-auto-syncは毎時dotfilesの変更をGitHubに自動同期するlaunchdエージェント。
+（廃止）auto-syncは以前、毎時dotfilesの変更をGitHubに自動同期するlaunchdエージェントだった。
 
 - **plistファイル**: `~/Library/LaunchAgents/com.user.dotfiles-sync.plist`
 - **実行スクリプト**: `/Users/snkrheadz/ghq/github.com/snkrheadz/laptop/scripts/auto-sync.sh`

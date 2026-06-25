@@ -92,7 +92,7 @@ laptop/
 │   └── skills/             # Local skills (14)
 │
 ├── scripts/
-│   ├── auto-sync.sh               # Hourly auto-sync script
+│   ├── auto-sync.sh               # Manual dotfiles sync script (commit & push)
 │   ├── sync-claude.sh             # Claude symlink sync + plugin sync
 │   └── sync-claude-plugins.sh     # Materialize marketplaces/plugins declared in settings.json
 │
@@ -142,27 +142,27 @@ gitleaks detect --source=. --no-git
 pre-commit run --all-files
 ```
 
-## Automation
+## Synchronization
 
-### Auto-Sync (launchd)
+### Manual Sync
 
-An hourly `launchd` agent runs `scripts/auto-sync.sh`:
-
-1. Regenerates `Brewfile` from current installations
-2. Runs `gitleaks` scan (aborts if secrets detected)
-3. Executes pre-commit hooks
-4. Commits and pushes changes automatically
-
-**Log files:**
-
-- `~/.dotfiles_autosync.log` - Standard output
-- `~/.dotfiles_autosync.error.log` - Errors
-
-**Manual sync:**
+Syncing is **manual** — run `scripts/auto-sync.sh` yourself whenever you want to
+push local config changes. No background agent commits anything automatically.
 
 ```bash
 ./scripts/auto-sync.sh
 ```
+
+The script:
+
+1. Regenerates `Brewfile` from current installations
+2. Runs `gitleaks` scan (aborts if secrets detected)
+3. Executes pre-commit hooks
+4. Commits and pushes changes
+
+> **Note:** This previously ran hourly via a `launchd` agent (`com.dotfiles.autosync`).
+> The agent has been removed; `install.sh` no longer installs it. The script name is
+> kept as `auto-sync.sh` for continuity but it is invoked manually now.
 
 ## Installation
 
@@ -186,8 +186,7 @@ cd ~/ghq/github.com/snkrheadz/laptop
 5. Installs all Homebrew packages from Brewfile
 6. Sets up mise and installs runtimes (Go, Node.js, Python, Ruby)
 7. Sets up gitleaks + pre-commit hooks
-8. Configures launchd auto-sync agent
-9. Creates `~/.secrets.env` template
+8. Creates `~/.secrets.env` template
 
 ### Rollback
 

@@ -11,8 +11,6 @@ NC='\033[0m' # No Color
 # Configuration
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BACKUP_DIR="$HOME/.dotfiles_backup/$(date +%Y%m%d_%H%M%S)"
-LAUNCHD_PLIST="$HOME/Library/LaunchAgents/com.dotfiles.autosync.plist"
-
 # Logging functions
 log_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
 log_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
@@ -274,48 +272,6 @@ setup_security() {
     log_success "Security tools configured"
 }
 
-# Setup launchd auto-sync
-setup_autosync() {
-    log_info "Setting up auto-sync..."
-
-    mkdir -p "$HOME/Library/LaunchAgents"
-
-    # Create launchd plist
-    cat > "$LAUNCHD_PLIST" << EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>Label</key>
-    <string>com.dotfiles.autosync</string>
-    <key>ProgramArguments</key>
-    <array>
-        <string>$DOTFILES_DIR/scripts/auto-sync.sh</string>
-    </array>
-    <key>StartInterval</key>
-    <integer>3600</integer>
-    <key>RunAtLoad</key>
-    <true/>
-    <key>StandardOutPath</key>
-    <string>$HOME/.dotfiles_autosync.log</string>
-    <key>StandardErrorPath</key>
-    <string>$HOME/.dotfiles_autosync.error.log</string>
-    <key>EnvironmentVariables</key>
-    <dict>
-        <key>PATH</key>
-        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
-    </dict>
-</dict>
-</plist>
-EOF
-
-    # Load the launchd agent
-    launchctl unload "$LAUNCHD_PLIST" 2>/dev/null || true
-    launchctl load "$LAUNCHD_PLIST"
-
-    log_success "Auto-sync configured (runs every hour)"
-}
-
 # Setup mise and install runtimes
 setup_mise() {
     log_info "Setting up mise..."
@@ -391,7 +347,6 @@ main() {
     setup_mise
     install_pip_packages
     setup_security
-    setup_autosync
     create_secrets_template
 
     echo ""
