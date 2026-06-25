@@ -10,3 +10,8 @@ alias path='echo $PATH | tr -s ":" "\n"'
 
 # Claude Code with Headroom context compression proxy
 alias cc="headroom wrap claude"
+
+# Dreaming (out-of-band memory curation, dry-run). repo 引数は省略時 cwd。
+# 例: cc-dream-gen ~/ghq/github.com/snkrheadz/laptop && cc-dream-check
+alias cc-dream-gen="$HOME/ghq/github.com/snkrheadz/laptop/scripts/dream.sh generate"
+alias cc-dream-check="$HOME/ghq/github.com/snkrheadz/laptop/scripts/dream.sh check"
