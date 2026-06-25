@@ -118,5 +118,3 @@ Compose these (the *when*) with §2 (the *how* to fan out).
 - Non-trivial work: jot a short checkable plan in `tasks/todo.md`, track it as you go,
   and close with a one-paragraph review. Skip the ceremony for small obvious changes.
 - Keep every change minimal and scoped — touch only what's necessary.
-
-@RTK.md

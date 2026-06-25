@@ -8,8 +8,8 @@ alias v="$VISUAL"
 # Pretty print the path
 alias path='echo $PATH | tr -s ":" "\n"'
 
-# Claude Code with Headroom context compression proxy
-alias cc="headroom wrap claude"
+# Claude Code
+alias cc="claude"
 
 # Dreaming (out-of-band memory curation, dry-run). repo 引数は省略時 cwd。
 # 例: cc-dream-gen ~/ghq/github.com/snkrheadz/laptop && cc-dream-check
