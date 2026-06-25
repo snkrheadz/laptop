@@ -149,6 +149,7 @@
   "worktree": {
     "baseRef": "fresh"
   },
+  "enableWorkflows": false,
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh",
@@ -200,6 +201,7 @@
   },
   "language": "japanese",
   "effortLevel": "high",
+  "fastMode": true,
   "voice": {
     "enabled": true,
     "mode": "hold"
@@ -207,7 +209,9 @@
   "autoMemoryEnabled": false,
   "skipWorkflowUsageWarning": true,
   "theme": "dark",
+  "verbose": false,
   "preferredNotifChannel": "ghostty",
+  "autoCompactEnabled": true,
   "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
@@ -216,7 +220,10 @@
     "codegraph": {
       "type": "stdio",
       "command": "codegraph",
-      "args": ["serve", "--mcp"]
+      "args": [
+        "serve",
+        "--mcp"
+      ]
     }
   }
 }
