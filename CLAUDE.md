@@ -140,15 +140,8 @@ The `claude/` directory contains Claude Code settings managed by this repository
 **Managed files** (symlinked to `~/.claude/`):
 - `settings.json` - Hooks, plugins, permissions, statusLine config
 - `statusline.sh` - Status line display script
-- `CLAUDE.md` - User global instructions (Workflow Orchestration)
-  - auto-first execution (§1), Orchestration subagent → skill → team → workflow (§2)
-    - Model routing: Fable 5 main = design/audit/review; delegate implementation to
-      `opus`/`sonnet` subagents with explicit `model` (evidence: `docs/fable5-vs-opus48.html`);
-      security/red-team work → Opus 4.8 (Fable 5 safety classifiers may refuse benign work)
-  - Self-improvement & memory (§3), Verification = run the real thing (§4)
-  - Loop & routine primitives (§5): routine (`schedule`) vs `/goal` (condition) vs `/loop` (time) vs `autoresearch` (metric)
-  - Task management & principles
-- `loop.md` - Default routine for a no-arg `/loop`; prefer a standing routine (`schedule`) for unattended recurring work and `/goal` for bounded work (see CLAUDE.md §5)
+- `CLAUDE.md` - User global instructions (Workflow Orchestration §1–§5)
+- `loop.md` - Default no-arg `/loop` maintenance routine
 
 **Hooks** (5):
 - `hooks/validate-shell.sh` - PostToolUse hook for shellcheck
@@ -156,11 +149,6 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `hooks/pre-tool-guard.sh` - PreToolUse hook for sensitive file access blocking + `gh pr create` base-freshness guard
 - `hooks/post-failure-proposal.sh` - PostToolUseFailure hook for governance failure capture (Bash/Write/Edit)
 - `hooks/pre-compact-save.sh` - PreCompact hook for working state preservation
-
-**Memory Architecture**:
-- Auto-Memory (`~/.claude/memory/`): tool patterns, environment info, API knowledge (auto-managed)
-- `tasks/lessons.md`: user corrections, mistake patterns, project-specific rules (explicit)
-- Rule: "corrected by user → lessons.md, discovered preference → auto-memory"
 
 **Global Agents** (3, always loaded — symlinked to `~/.claude/agents/`):
 - `verify-subagent-result` - SubAgent verification
@@ -182,32 +170,12 @@ The `claude/` directory contains Claude Code settings managed by this repository
   `aws-best-practices-advisor`, `gcp-best-practices-advisor`
 - **research**: `arxiv-ai-researcher`, `gemini-api-researcher`, `huggingface-spaces-researcher`
 
-> The former **marketer**/**designer** packs and agents covered by official commands
-> (`code-simplifier`, `build-validator`, `verify-app` → `/simplify`, `/verify`) were
-> pruned from the marketplace — use the official plugins/commands instead.
-
-> Installing a pack makes its agents available in every project (global), replacing the
-> former per-project `claude-agents` opt-in (function and `agent-catalog/` removed).
-
 **Skills** (2, governance only — others migrated to the `snkrheadz/claude-skills` marketplace):
 - `governance-review` - Governance rule freshness audit
 - `rule-history` - Governance rule history
 
-The remaining shareable skills now live in the **`snkrheadz/claude-skills`**
-plugin marketplace (single source of truth), grouped into role packs and consumed
-via `/plugin install <pack>@claude-skills` (declared in `settings.json`,
-materialized by `scripts/sync-claude-plugins.sh`). They are namespaced as
-`/<pack>:<skill>` once installed:
-- **core**: first-principles, honest-reasoning, deep-thinking, life-decision, html-output, teach-session (+ pre-tool-guard hook)
-- **pm**: task-definition-sheet (+ external phuryn/pm-skills)
-- **eng**: create-pr, db-query, prune-redundant-skills, refactor-swarm, review-inbox,
-  techdebt, test-and-fix, trace-dataflow (+ code-architect/verify-shell/migration/cloud agents)
-- **research**: arxiv-ai-researcher, gemini-api-researcher, huggingface-spaces-researcher agents
-- **strategy**: career-ai-scan, industry-ai-map, ai-opportunity-scan (AI-era personal strategy: career exposure, industry transformation, opportunity finding)
-
-Skills covered by official Claude Code commands (quick-commit, merge-pr, pr-review,
-review-changes, simplify-pipeline, project-setup, claude-code-guide) were pruned from
-the marketplace — use `/code-review`, `/simplify`, `/verify`, `/init` etc. directly.
+Packs in `snkrheadz/claude-skills` (declared in `settings.json`, installed via `scripts/sync-claude-plugins.sh`, namespaced as `/<pack>:<skill>`):
+`core` | `pm` | `eng` | `research` | `strategy`
 
 **Commands** (1) - Custom slash commands in `claude/commands/`, symlinked to `~/.claude/commands/`:
 - `implement-with-notes` - Implement a spec while keeping running implementation notes (decisions, tradeoffs, deltas)
@@ -230,10 +198,3 @@ These skills are **only available in this repository** (not symlinked to `~/.cla
 - `symlink-manage` - Symlink management
 - `tmux-config` - tmux configuration
 - `zsh-config` - zsh configuration
-
-## Best Practices
-
-- Test after code changes to verify behavior
-- Review related files before committing multiple changes
-- Use concise PR titles that describe the changes
-- Consider PostToolUse hooks for code format automation in projects
