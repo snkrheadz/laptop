@@ -1,7 +1,5 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Overview
 
 macOS laptop setup repository with dotfiles management, manual sync, and security features.
@@ -102,8 +100,6 @@ codegraph status                          # インデックスの状態確認
 ## Key Features
 
 - **Manual sync**: run `./scripts/auto-sync.sh` to commit and push changes (no background agent; launchd auto-sync removed)
-- **Backup/Rollback**: `install.sh` creates timestamped backups; `rollback.sh` restores them
-- **Security**: gitleaks + pre-commit hooks scan for secrets before commit
 - **Secrets**: Store API keys in `~/.secrets.env` (gitignored, created by install.sh)
 - **Runtimes**: mise manages Go 1.24.3, Node.js 25.2.1/22.16.0, Python 3.13, Ruby 3.4.8
 
@@ -127,7 +123,6 @@ The `.zshrc` loads configuration in this order:
 ### Avoiding Conflicts
 
 - Do not create functions with names that conflict with oh-my-zsh plugin aliases (e.g., `g` is used by git plugin)
-- Check `alias` output after installation to identify potential conflicts
 
 ### Claude Code Configuration
 
@@ -182,7 +177,6 @@ These skills are **only available in this repository** (not symlinked to `~/.cla
 - `launchd-manage` - (非推奨/廃止) launchd auto-sync は廃止。手動同期は `scripts/auto-sync.sh` を直接実行
 - `mise-runtime` - Runtime management (mise)
 - `new-machine-setup` - New machine setup guide
-
 - `security-check` - Security scanning
 - `symlink-manage` - Symlink management
 - `tmux-config` - tmux configuration
