@@ -117,4 +117,7 @@ Compose these (the *when*) with §2 (the *how* to fan out).
 ## Task management & principles
 - Non-trivial work: jot a short checkable plan in `tasks/todo.md`, track it as you go,
   and close with a one-paragraph review. Skip the ceremony for small obvious changes.
-- Keep every change minimal and scoped — touch only what's necessary.
+- Keep every change minimal and scoped — every changed line should trace to the
+  request. Don't refactor, reformat, or "improve" adjacent code that isn't broken.
+  Remove only the imports/vars/functions YOUR edit orphaned; pre-existing dead code →
+  mention it, don't delete it (unless asked).
