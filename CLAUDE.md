@@ -76,8 +76,8 @@ codegraph status                          # インデックスの状態確認
 │   ├── statusline.sh   # Status line display script
 │   ├── CLAUDE.md       # User global instructions (Workflow Orchestration)
 │   ├── loop.md         # Default no-arg `/loop` maintenance routine (project-agnostic)
-│   ├── hooks/          # Lifecycle hooks (5): validate-shell.sh,
-│   │                   #   session-context.sh, pre-tool-guard.sh, post-failure-proposal.sh, verify-git-on-stop.sh
+│   ├── hooks/          # Lifecycle hooks (3): validate-shell.sh,
+│   │                   #   pre-tool-guard.sh, verify-git-on-stop.sh
 │   ├── agents/         # Global agents (3): verify-subagent-result, governance-proposer,
 │   │                   #   rule-auditor (shareable agents migrated to the
 │   │                   #   snkrheadz/claude-skills marketplace — see the Agents section)
@@ -143,11 +143,9 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `CLAUDE.md` - User global instructions (Workflow Orchestration §1–§5)
 - `loop.md` - Default no-arg `/loop` maintenance routine
 
-**Hooks** (5):
+**Hooks** (3):
 - `hooks/validate-shell.sh` - PostToolUse hook for shellcheck
-- `hooks/session-context.sh` - SessionStart hook for project context injection (branch/commit/worktree count only)
 - `hooks/pre-tool-guard.sh` - PreToolUse hook for sensitive file access blocking + `gh pr create` base-freshness guard
-- `hooks/post-failure-proposal.sh` - PostToolUseFailure hook for governance failure capture (Bash/Write/Edit)
 - `hooks/verify-git-on-stop.sh` - Stop hook: when the last reply claims a commit/push/PR/merge, injects actual `git`/`gh pr` state so false-success reports get caught against reality (near-silent otherwise; `stop_hook_active`-guarded)
 
 **Global Agents** (3, always loaded — symlinked to `~/.claude/agents/`):

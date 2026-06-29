@@ -79,17 +79,6 @@
     "allowUnsandboxedCommands": false
   },
   "hooks": {
-    "SessionStart": [
-      {
-        "matcher": ".*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/session-context.sh"
-          }
-        ]
-      }
-    ],
     "PreToolUse": [
       {
         "matcher": "Bash",
@@ -108,17 +97,6 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/validate-shell.sh"
-          }
-        ]
-      }
-    ],
-    "PostToolUseFailure": [
-      {
-        "matcher": "Bash|Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/post-failure-proposal.sh"
           }
         ]
       }
