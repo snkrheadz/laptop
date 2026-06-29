@@ -202,12 +202,6 @@
         "repo": "phuryn/pm-skills"
       },
       "autoUpdate": true
-    },
-    "medii-agent-plugins": {
-      "source": {
-        "source": "directory",
-        "path": "/Users/snkrheadz/ghq/github.com/medii-jp/medii-agent-plugins"
-      }
     }
   },
   "language": "japanese",
