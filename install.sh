@@ -167,11 +167,12 @@ setup_claude_core() {
     # claude hooks
     mkdir -p "$HOME/.claude/hooks"
     rm -f "$HOME/.claude/hooks/post-verify-rule-proposal.sh"  # cleanup stale hook (replaced by post-failure-proposal.sh)
+    rm -f "$HOME/.claude/hooks/pre-compact-save.sh"           # cleanup removed hook (caused cross-session context contamination)
+    rm -f "$HOME/.claude/hooks/session-context.sh"            # cleanup removed hook (redundant with harness-provided git status)
+    rm -f "$HOME/.claude/hooks/post-failure-proposal.sh"      # cleanup removed hook (proposals never consumed by governance-review)
+    rm -f "$HOME/.claude/hooks/pre-tool-guard.sh"             # cleanup removed hook (per-Bash subprocess overhead; sensitive-file blocks remain in settings.json deny)
     safe_ln "$DOTFILES_DIR/claude/hooks/validate-shell.sh" "$HOME/.claude/hooks/validate-shell.sh"
-    safe_ln "$DOTFILES_DIR/claude/hooks/session-context.sh" "$HOME/.claude/hooks/session-context.sh"
-    safe_ln "$DOTFILES_DIR/claude/hooks/pre-tool-guard.sh" "$HOME/.claude/hooks/pre-tool-guard.sh"
-    safe_ln "$DOTFILES_DIR/claude/hooks/post-failure-proposal.sh" "$HOME/.claude/hooks/post-failure-proposal.sh"
-    safe_ln "$DOTFILES_DIR/claude/hooks/pre-compact-save.sh" "$HOME/.claude/hooks/pre-compact-save.sh"
+    safe_ln "$DOTFILES_DIR/claude/hooks/verify-git-on-stop.sh" "$HOME/.claude/hooks/verify-git-on-stop.sh"
 
     # claude CLAUDE.md (user global)
     safe_ln "$DOTFILES_DIR/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
@@ -229,6 +230,15 @@ setup_claude_skills() {
     log_info "Setting up Claude skills..."
 
     mkdir -p "$HOME/.claude/skills"
+
+    # Clean up broken skill symlinks left by skills removed from dotfiles
+    # (their dotfiles source dirs no longer exist)
+    for link in "$HOME/.claude/skills"/*; do
+        if [ -L "$link" ] && [ ! -e "$link" ]; then
+            rm "$link"
+            log_info "Cleaned up stale skill symlink: $(basename "$link")"
+        fi
+    done
 
     # Dynamically find all skill directories (directories containing SKILL.md)
     for skill_dir in "$DOTFILES_DIR/claude/skills"/*/; do

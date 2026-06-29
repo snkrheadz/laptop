@@ -81,10 +81,8 @@ laptop/
 │   ├── settings.json       # Hooks, plugins, permissions
 │   ├── statusline.sh       # Custom status line script
 │   ├── loop.md             # Default no-arg /loop maintenance routine
-│   ├── hooks/              # Lifecycle hooks (5)
-│   ├── agents/             # Global agents (3): verify-subagent-result, governance-proposer,
-│   │                       #   rule-auditor (shareable role agents → claude-skills marketplace)
-│   ├── skills/             # Skills (2): governance-review, rule-history (others → claude-skills marketplace)
+│   ├── hooks/              # Lifecycle hooks (2)
+│   ├── agents/             # Global agents (1): verify-subagent-result
 │   └── commands/           # Custom slash commands (1): implement-with-notes
 │
 ├── .claude/                # Project-local config (NOT symlinked to ~/.claude/)
@@ -310,22 +308,14 @@ claude/
 ├── settings.json       # Hooks, plugins, permissions
 ├── statusline.sh       # Custom status line script
 ├── loop.md             # Default no-arg /loop maintenance routine
-├── hooks/              # Lifecycle hooks (5)
+├── hooks/              # Lifecycle hooks (2)
 │   ├── validate-shell.sh           # PostToolUse: shellcheck validation
-│   ├── session-context.sh          # SessionStart: project context (+ PreCompact restore)
-│   ├── pre-tool-guard.sh           # PreToolUse: sensitive file block + PR base-freshness guard
-│   ├── post-failure-proposal.sh    # PostToolUseFailure: governance failure capture
-│   └── pre-compact-save.sh         # PreCompact: working state preservation
-├── agents/             # Global agents (3, always loaded)
-│   ├── verify-subagent-result.md
-│   ├── governance-proposer.md   # pairs with governance-review/rule-history skills
-│   └── rule-auditor.md
-│   # side-job-researcher is personal → kept machine-local in ~/.claude/agents/ (not here)
-└── skills/             # Skills (2): governance tooling only
-    ├── governance-review/  # Governance rule freshness audit
-    └── rule-history/       # Governance rule history
-    # Shareable skills AND agents migrated to the snkrheadz/claude-skills marketplace
-    # (core/pm/eng/marketer/designer/research packs); invoked as /<pack>:<skill> or
+│   └── verify-git-on-stop.sh       # Stop: surfaces ground-truth git/PR state vs self-report
+└── agents/             # Global agents (1, always loaded)
+    └── verify-subagent-result.md
+    # side-job-researcher is personal → kept machine-local in ~/.claude/agents/ (not here)
+    # Shareable skills AND agents live in the snkrheadz/claude-skills marketplace
+    # (core/pm/eng/research packs); invoked as /<pack>:<skill> or
     # enabled per role via `/plugin install <pack>@claude-skills`.
 ```
 
@@ -336,9 +326,8 @@ claude/
 | `CLAUDE.md` | User global instructions (Workflow Orchestration, §1–5 + model routing) |
 | `settings.json` | Hooks, plugins, permissions |
 | `statusline.sh` | Status line: model, dir+branch, duration, cost (session/daily), lines, braille bars (ctx/5h*/7d*) |
-| `hooks/` | 5 lifecycle hooks (PostToolUse, SessionStart, PreToolUse, PostToolUseFailure, PreCompact) |
-| `agents/` | 3 global agents (verify-subagent-result + governance-proposer/rule-auditor) |
-| `skills/` | 2 governance skills (others → snkrheadz/claude-skills marketplace) |
+| `hooks/` | 2 lifecycle hooks (PostToolUse, Stop) |
+| `agents/` | 1 global agent (verify-subagent-result) |
 | role agents | eng/research packs in the snkrheadz/claude-skills marketplace |
 
 ### Status Line
@@ -367,10 +356,7 @@ Vim mode and `🤖<agent>` (subagent name) segments are appended when active.
 | Hook | Lifecycle Event | Description |
 |------|----------------|-------------|
 | `validate-shell.sh` | PostToolUse | Runs shellcheck on `.sh` files after Write/Edit |
-| `session-context.sh` | SessionStart (+ PreCompact) | Injects project context at session start / restores it on compaction |
-| `pre-tool-guard.sh` | PreToolUse | Blocks sensitive file access; blocks `gh pr create` when behind the base branch |
-| `post-failure-proposal.sh` | PostToolUseFailure | Captures governance failures (Bash/Write/Edit) for rule proposals |
-| `pre-compact-save.sh` | PreCompact | Preserves working state before context compaction |
+| `verify-git-on-stop.sh` | Stop | Surfaces ground-truth git/PR state when the last reply claims a commit/push/PR/merge |
 
 ### Agents
 
@@ -379,8 +365,6 @@ Global agents (live in this repo, symlinked to `~/.claude/agents/`, always loade
 | Agent | Purpose |
 |-------|---------|
 | `verify-subagent-result` | SubAgent result verification |
-| `governance-proposer` | Governance rule proposals |
-| `rule-auditor` | Rule freshness auditing |
 
 Project agent (real file in `.claude/agents/`, this repo only): `diagnose-dotfiles`.
 Personal agents (machine-local real files in `~/.claude/agents/`, not dotfiles-managed):
@@ -395,12 +379,7 @@ in every project — e.g. `eng` provides `code-architect`, `architecture-reviewe
 
 ### Available Skills
 
-Governance skills (live in this repo, symlinked to `~/.claude/skills/`):
-
-- `/governance-review` - Governance rule freshness audit
-- `/rule-history` - Governance rule history
-
-All other shareable skills migrated to the **snkrheadz/claude-skills** marketplace
+All shareable skills migrated to the **snkrheadz/claude-skills** marketplace
 (core / pm / eng packs) and are invoked as `/<pack>:<skill>` after
 `/plugin install <pack>@claude-skills` — e.g. `/eng:test-and-fix`,
 `/eng:refactor-swarm`, `/core:first-principles`.

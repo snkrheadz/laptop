@@ -1,7 +1,5 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Overview
 
 macOS laptop setup repository with dotfiles management, manual sync, and security features.
@@ -76,14 +74,10 @@ codegraph status                          # インデックスの状態確認
 │   ├── statusline.sh   # Status line display script
 │   ├── CLAUDE.md       # User global instructions (Workflow Orchestration)
 │   ├── loop.md         # Default no-arg `/loop` maintenance routine (project-agnostic)
-│   ├── hooks/          # Lifecycle hooks (6): validate-shell.sh,
-│   │                   #   session-context.sh, pre-tool-guard.sh, post-failure-proposal.sh, pre-compact-save.sh, verify-git-on-stop.sh
-│   ├── agents/         # Global agents (3): verify-subagent-result, governance-proposer,
-│   │                   #   rule-auditor (shareable agents migrated to the
-│   │                   #   snkrheadz/claude-skills marketplace — see the Agents section)
-│   ├── skills/         # Skills (2, governance only): governance-review, rule-history
-│   │                   #   (shareable skills migrated to the snkrheadz/claude-skills
-│   │                   #    marketplace — see the Skills section below)
+│   ├── hooks/          # Lifecycle hooks (2): validate-shell.sh,
+│   │                   #   verify-git-on-stop.sh
+│   ├── agents/         # Global agents (1): verify-subagent-result
+│   │                   #   (shareable agents in the snkrheadz/claude-skills marketplace)
 │   └── commands/       # Custom slash commands (1): implement-with-notes
 │
 ├── .claude/            # Project-local config (NOT symlinked to ~/.claude/)
@@ -106,8 +100,6 @@ codegraph status                          # インデックスの状態確認
 ## Key Features
 
 - **Manual sync**: run `./scripts/auto-sync.sh` to commit and push changes (no background agent; launchd auto-sync removed)
-- **Backup/Rollback**: `install.sh` creates timestamped backups; `rollback.sh` restores them
-- **Security**: gitleaks + pre-commit hooks scan for secrets before commit
 - **Secrets**: Store API keys in `~/.secrets.env` (gitignored, created by install.sh)
 - **Runtimes**: mise manages Go 1.24.3, Node.js 25.2.1/22.16.0, Python 3.13, Ruby 3.4.8
 
@@ -131,7 +123,6 @@ The `.zshrc` loads configuration in this order:
 ### Avoiding Conflicts
 
 - Do not create functions with names that conflict with oh-my-zsh plugin aliases (e.g., `g` is used by git plugin)
-- Check `alias` output after installation to identify potential conflicts
 
 ### Claude Code Configuration
 
@@ -143,18 +134,14 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `CLAUDE.md` - User global instructions (Workflow Orchestration §1–§5)
 - `loop.md` - Default no-arg `/loop` maintenance routine
 
-**Hooks** (6):
+**Hooks** (2):
 - `hooks/validate-shell.sh` - PostToolUse hook for shellcheck
-- `hooks/session-context.sh` - SessionStart hook for project context injection (+ PreCompact context restore)
-- `hooks/pre-tool-guard.sh` - PreToolUse hook for sensitive file access blocking + `gh pr create` base-freshness guard
-- `hooks/post-failure-proposal.sh` - PostToolUseFailure hook for governance failure capture (Bash/Write/Edit)
-- `hooks/pre-compact-save.sh` - PreCompact hook for working state preservation
 - `hooks/verify-git-on-stop.sh` - Stop hook: when the last reply claims a commit/push/PR/merge, injects actual `git`/`gh pr` state so false-success reports get caught against reality (near-silent otherwise; `stop_hook_active`-guarded)
 
-**Global Agents** (3, always loaded — symlinked to `~/.claude/agents/`):
+> Note: sensitive-file access blocking is enforced by `settings.json` `deny` rules (harness-native, zero per-call overhead); the former `pre-tool-guard.sh` PreToolUse hook was removed. `gh pr create` base-sync is handled by the `/eng:create-pr` skill.
+
+**Global Agents** (1, always loaded — symlinked to `~/.claude/agents/`):
 - `verify-subagent-result` - SubAgent verification
-- `governance-proposer`, `rule-auditor` - Governance mechanism (pair with the
-  `governance-review` / `rule-history` skills, which also stay in dotfiles)
 
 **Project Agents** (1, dotfiles repo only — real file in `.claude/agents/`):
 - `diagnose-dotfiles` - Dotfiles troubleshooting (specific to this repo)
@@ -170,10 +157,6 @@ The `claude/` directory contains Claude Code settings managed by this repository
   `migration-assistant`, `oncall-guide`, `state-machine-diagram`,
   `aws-best-practices-advisor`, `gcp-best-practices-advisor`
 - **research**: `arxiv-ai-researcher`, `gemini-api-researcher`, `huggingface-spaces-researcher`
-
-**Skills** (2, governance only — others migrated to the `snkrheadz/claude-skills` marketplace):
-- `governance-review` - Governance rule freshness audit
-- `rule-history` - Governance rule history
 
 Packs in `snkrheadz/claude-skills` (declared in `settings.json`, installed via `scripts/sync-claude-plugins.sh`, namespaced as `/<pack>:<skill>`):
 `core` | `pm` | `eng` | `research` | `strategy`
@@ -194,7 +177,6 @@ These skills are **only available in this repository** (not symlinked to `~/.cla
 - `launchd-manage` - (非推奨/廃止) launchd auto-sync は廃止。手動同期は `scripts/auto-sync.sh` を直接実行
 - `mise-runtime` - Runtime management (mise)
 - `new-machine-setup` - New machine setup guide
-
 - `security-check` - Security scanning
 - `symlink-manage` - Symlink management
 - `tmux-config` - tmux configuration
