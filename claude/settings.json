@@ -180,8 +180,7 @@
     "pm@claude-skills": true,
     "eng@claude-skills": true,
     "research@claude-skills": true,
-    "strategy@claude-skills": true,
-    "medii-dev-tools@medii-agent-plugins": true
+    "strategy@claude-skills": true
   },
   "extraKnownMarketplaces": {
     "autoresearch": {
