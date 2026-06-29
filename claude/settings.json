@@ -132,7 +132,6 @@
     "typescript-lsp@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
     "document-skills@anthropic-agent-skills": true,
-    "autoresearch@autoresearch": true,
     "core@claude-skills": true,
     "pm@claude-skills": true,
     "eng@claude-skills": true,
@@ -140,13 +139,6 @@
     "strategy@claude-skills": true
   },
   "extraKnownMarketplaces": {
-    "autoresearch": {
-      "source": {
-        "source": "github",
-        "repo": "uditgoenka/autoresearch"
-      },
-      "autoUpdate": true
-    },
     "claude-skills": {
       "source": {
         "source": "github",
