@@ -76,8 +76,8 @@ codegraph status                          # インデックスの状態確認
 │   ├── statusline.sh   # Status line display script
 │   ├── CLAUDE.md       # User global instructions (Workflow Orchestration)
 │   ├── loop.md         # Default no-arg `/loop` maintenance routine (project-agnostic)
-│   ├── hooks/          # Lifecycle hooks (3): validate-shell.sh,
-│   │                   #   pre-tool-guard.sh, verify-git-on-stop.sh
+│   ├── hooks/          # Lifecycle hooks (2): validate-shell.sh,
+│   │                   #   verify-git-on-stop.sh
 │   ├── agents/         # Global agents (1): verify-subagent-result
 │   │                   #   (shareable agents in the snkrheadz/claude-skills marketplace)
 │   └── commands/       # Custom slash commands (1): implement-with-notes
@@ -139,10 +139,11 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `CLAUDE.md` - User global instructions (Workflow Orchestration §1–§5)
 - `loop.md` - Default no-arg `/loop` maintenance routine
 
-**Hooks** (3):
+**Hooks** (2):
 - `hooks/validate-shell.sh` - PostToolUse hook for shellcheck
-- `hooks/pre-tool-guard.sh` - PreToolUse hook for sensitive file access blocking + `gh pr create` base-freshness guard
 - `hooks/verify-git-on-stop.sh` - Stop hook: when the last reply claims a commit/push/PR/merge, injects actual `git`/`gh pr` state so false-success reports get caught against reality (near-silent otherwise; `stop_hook_active`-guarded)
+
+> Note: sensitive-file access blocking is enforced by `settings.json` `deny` rules (harness-native, zero per-call overhead); the former `pre-tool-guard.sh` PreToolUse hook was removed. `gh pr create` base-sync is handled by the `/eng:create-pr` skill.
 
 **Global Agents** (1, always loaded — symlinked to `~/.claude/agents/`):
 - `verify-subagent-result` - SubAgent verification

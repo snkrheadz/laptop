@@ -81,7 +81,7 @@ laptop/
 │   ├── settings.json       # Hooks, plugins, permissions
 │   ├── statusline.sh       # Custom status line script
 │   ├── loop.md             # Default no-arg /loop maintenance routine
-│   ├── hooks/              # Lifecycle hooks (3)
+│   ├── hooks/              # Lifecycle hooks (2)
 │   ├── agents/             # Global agents (1): verify-subagent-result
 │   └── commands/           # Custom slash commands (1): implement-with-notes
 │
@@ -308,9 +308,8 @@ claude/
 ├── settings.json       # Hooks, plugins, permissions
 ├── statusline.sh       # Custom status line script
 ├── loop.md             # Default no-arg /loop maintenance routine
-├── hooks/              # Lifecycle hooks (3)
+├── hooks/              # Lifecycle hooks (2)
 │   ├── validate-shell.sh           # PostToolUse: shellcheck validation
-│   ├── pre-tool-guard.sh           # PreToolUse: sensitive file block + PR base-freshness guard
 │   └── verify-git-on-stop.sh       # Stop: surfaces ground-truth git/PR state vs self-report
 └── agents/             # Global agents (1, always loaded)
     └── verify-subagent-result.md
@@ -327,7 +326,7 @@ claude/
 | `CLAUDE.md` | User global instructions (Workflow Orchestration, §1–5 + model routing) |
 | `settings.json` | Hooks, plugins, permissions |
 | `statusline.sh` | Status line: model, dir+branch, duration, cost (session/daily), lines, braille bars (ctx/5h*/7d*) |
-| `hooks/` | 3 lifecycle hooks (PostToolUse, PreToolUse, Stop) |
+| `hooks/` | 2 lifecycle hooks (PostToolUse, Stop) |
 | `agents/` | 1 global agent (verify-subagent-result) |
 | role agents | eng/research packs in the snkrheadz/claude-skills marketplace |
 
@@ -357,7 +356,6 @@ Vim mode and `🤖<agent>` (subagent name) segments are appended when active.
 | Hook | Lifecycle Event | Description |
 |------|----------------|-------------|
 | `validate-shell.sh` | PostToolUse | Runs shellcheck on `.sh` files after Write/Edit |
-| `pre-tool-guard.sh` | PreToolUse | Blocks sensitive file access; blocks `gh pr create` when behind the base branch |
 | `verify-git-on-stop.sh` | Stop | Surfaces ground-truth git/PR state when the last reply claims a commit/push/PR/merge |
 
 ### Agents

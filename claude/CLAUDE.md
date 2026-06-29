@@ -8,9 +8,9 @@ model and keep this file minimal.
 
 ## 1. auto-first execution
 - Default to **auto mode**: act, don't ask. The harness routes risky commands through a
-  security check and `pre-tool-guard.sh` blocks sensitive-file access and guards
-  `gh pr create` (self-branch, stale-base, empty-diff), so narrating yes/no for each step adds no safety — it just hides the
-  calls that matter.
+  security check and `settings.json` `deny` rules block sensitive-file access, so
+  narrating yes/no for each step adds no safety — it just hides the calls that matter.
+  (`gh pr create` base-sync is handled by the `/eng:create-pr` skill.)
 - **Skip plan mode for ordinary work.** Current models don't need a separate planning
   step. Reach for `EnterPlanMode` only when a choice is genuinely hard to reverse
   (schema/data migrations, public-facing or destructive changes, multi-service
