@@ -167,11 +167,11 @@ setup_claude_core() {
     # claude hooks
     mkdir -p "$HOME/.claude/hooks"
     rm -f "$HOME/.claude/hooks/post-verify-rule-proposal.sh"  # cleanup stale hook (replaced by post-failure-proposal.sh)
+    rm -f "$HOME/.claude/hooks/pre-compact-save.sh"           # cleanup removed hook (caused cross-session context contamination)
     safe_ln "$DOTFILES_DIR/claude/hooks/validate-shell.sh" "$HOME/.claude/hooks/validate-shell.sh"
     safe_ln "$DOTFILES_DIR/claude/hooks/session-context.sh" "$HOME/.claude/hooks/session-context.sh"
     safe_ln "$DOTFILES_DIR/claude/hooks/pre-tool-guard.sh" "$HOME/.claude/hooks/pre-tool-guard.sh"
     safe_ln "$DOTFILES_DIR/claude/hooks/post-failure-proposal.sh" "$HOME/.claude/hooks/post-failure-proposal.sh"
-    safe_ln "$DOTFILES_DIR/claude/hooks/pre-compact-save.sh" "$HOME/.claude/hooks/pre-compact-save.sh"
 
     # claude CLAUDE.md (user global)
     safe_ln "$DOTFILES_DIR/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"

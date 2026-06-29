@@ -21,11 +21,3 @@ worktree_count=$(git -C "$current_dir" worktree list 2>/dev/null | wc -l)
 worktree_count=${worktree_count// /}
 
 echo "Project context: branch=${branch}, last_commit=\"${last_commit}\", active_worktrees=${worktree_count}"
-
-# Restore pre-compact context if available (one-shot restore)
-context_file="$HOME/.claude/pre-compact-context.md"
-if [[ -f "$context_file" ]]; then
-    echo ""
-    echo "--- Restored from pre-compact snapshot ---"
-    cat "$context_file" && rm -f "$context_file"
-fi

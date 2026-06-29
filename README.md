@@ -312,10 +312,10 @@ claude/
 ├── loop.md             # Default no-arg /loop maintenance routine
 ├── hooks/              # Lifecycle hooks (5)
 │   ├── validate-shell.sh           # PostToolUse: shellcheck validation
-│   ├── session-context.sh          # SessionStart: project context (+ PreCompact restore)
+│   ├── session-context.sh          # SessionStart: project context (branch/commit/worktree)
 │   ├── pre-tool-guard.sh           # PreToolUse: sensitive file block + PR base-freshness guard
 │   ├── post-failure-proposal.sh    # PostToolUseFailure: governance failure capture
-│   └── pre-compact-save.sh         # PreCompact: working state preservation
+│   └── verify-git-on-stop.sh       # Stop: surfaces ground-truth git/PR state vs self-report
 ├── agents/             # Global agents (3, always loaded)
 │   ├── verify-subagent-result.md
 │   ├── governance-proposer.md   # pairs with governance-review/rule-history skills
@@ -336,7 +336,7 @@ claude/
 | `CLAUDE.md` | User global instructions (Workflow Orchestration, §1–5 + model routing) |
 | `settings.json` | Hooks, plugins, permissions |
 | `statusline.sh` | Status line: model, dir+branch, duration, cost (session/daily), lines, braille bars (ctx/5h*/7d*) |
-| `hooks/` | 5 lifecycle hooks (PostToolUse, SessionStart, PreToolUse, PostToolUseFailure, PreCompact) |
+| `hooks/` | 5 lifecycle hooks (PostToolUse, SessionStart, PreToolUse, PostToolUseFailure, Stop) |
 | `agents/` | 3 global agents (verify-subagent-result + governance-proposer/rule-auditor) |
 | `skills/` | 2 governance skills (others → snkrheadz/claude-skills marketplace) |
 | role agents | eng/research packs in the snkrheadz/claude-skills marketplace |
@@ -367,10 +367,10 @@ Vim mode and `🤖<agent>` (subagent name) segments are appended when active.
 | Hook | Lifecycle Event | Description |
 |------|----------------|-------------|
 | `validate-shell.sh` | PostToolUse | Runs shellcheck on `.sh` files after Write/Edit |
-| `session-context.sh` | SessionStart (+ PreCompact) | Injects project context at session start / restores it on compaction |
+| `session-context.sh` | SessionStart | Injects project context (branch/commit/worktree count) at session start |
 | `pre-tool-guard.sh` | PreToolUse | Blocks sensitive file access; blocks `gh pr create` when behind the base branch |
 | `post-failure-proposal.sh` | PostToolUseFailure | Captures governance failures (Bash/Write/Edit) for rule proposals |
-| `pre-compact-save.sh` | PreCompact | Preserves working state before context compaction |
+| `verify-git-on-stop.sh` | Stop | Surfaces ground-truth git/PR state when the last reply claims a commit/push/PR/merge |
 
 ### Agents
 

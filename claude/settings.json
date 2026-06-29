@@ -123,17 +123,6 @@
         ]
       }
     ],
-    "PreCompact": [
-      {
-        "matcher": ".*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/pre-compact-save.sh"
-          }
-        ]
-      }
-    ],
     "Stop": [
       {
         "matcher": ".*",
