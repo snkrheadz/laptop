@@ -188,13 +188,15 @@
       "source": {
         "source": "github",
         "repo": "uditgoenka/autoresearch"
-      }
+      },
+      "autoUpdate": true
     },
     "claude-skills": {
       "source": {
         "source": "github",
         "repo": "snkrheadz/claude-skills"
-      }
+      },
+      "autoUpdate": true
     },
     "pm-skills": {
       "source": {
