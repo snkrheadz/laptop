@@ -206,6 +206,7 @@
     "enabled": true,
     "mode": "hold"
   },
+  "cleanupPeriodDays": 7,
   "autoMemoryEnabled": false,
   "skipWorkflowUsageWarning": true,
   "theme": "dark",
