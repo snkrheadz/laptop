@@ -163,8 +163,6 @@ cat /Users/snkrheadz/ghq/github.com/snkrheadz/laptop/claude/statusline.sh
 | エージェント | 説明 |
 |-------------|------|
 | `verify-subagent-result` | SubAgent 結果の検証 |
-| `governance-proposer` | ガバナンスルール提案 |
-| `rule-auditor` | ルール鮮度の監査 |
 
 ### Project-local（このリポジトリのみ・`.claude/agents/` の実体ファイル）
 

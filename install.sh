@@ -230,6 +230,15 @@ setup_claude_skills() {
 
     mkdir -p "$HOME/.claude/skills"
 
+    # Clean up broken skill symlinks left by skills removed from dotfiles
+    # (their dotfiles source dirs no longer exist)
+    for link in "$HOME/.claude/skills"/*; do
+        if [ -L "$link" ] && [ ! -e "$link" ]; then
+            rm "$link"
+            log_info "Cleaned up stale skill symlink: $(basename "$link")"
+        fi
+    done
+
     # Dynamically find all skill directories (directories containing SKILL.md)
     for skill_dir in "$DOTFILES_DIR/claude/skills"/*/; do
         if [ -f "${skill_dir}SKILL.md" ]; then

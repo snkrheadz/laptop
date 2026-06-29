@@ -78,12 +78,8 @@ codegraph status                          # インデックスの状態確認
 │   ├── loop.md         # Default no-arg `/loop` maintenance routine (project-agnostic)
 │   ├── hooks/          # Lifecycle hooks (3): validate-shell.sh,
 │   │                   #   pre-tool-guard.sh, verify-git-on-stop.sh
-│   ├── agents/         # Global agents (3): verify-subagent-result, governance-proposer,
-│   │                   #   rule-auditor (shareable agents migrated to the
-│   │                   #   snkrheadz/claude-skills marketplace — see the Agents section)
-│   ├── skills/         # Skills (2, governance only): governance-review, rule-history
-│   │                   #   (shareable skills migrated to the snkrheadz/claude-skills
-│   │                   #    marketplace — see the Skills section below)
+│   ├── agents/         # Global agents (1): verify-subagent-result
+│   │                   #   (shareable agents in the snkrheadz/claude-skills marketplace)
 │   └── commands/       # Custom slash commands (1): implement-with-notes
 │
 ├── .claude/            # Project-local config (NOT symlinked to ~/.claude/)
@@ -148,10 +144,8 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `hooks/pre-tool-guard.sh` - PreToolUse hook for sensitive file access blocking + `gh pr create` base-freshness guard
 - `hooks/verify-git-on-stop.sh` - Stop hook: when the last reply claims a commit/push/PR/merge, injects actual `git`/`gh pr` state so false-success reports get caught against reality (near-silent otherwise; `stop_hook_active`-guarded)
 
-**Global Agents** (3, always loaded — symlinked to `~/.claude/agents/`):
+**Global Agents** (1, always loaded — symlinked to `~/.claude/agents/`):
 - `verify-subagent-result` - SubAgent verification
-- `governance-proposer`, `rule-auditor` - Governance mechanism (pair with the
-  `governance-review` / `rule-history` skills, which also stay in dotfiles)
 
 **Project Agents** (1, dotfiles repo only — real file in `.claude/agents/`):
 - `diagnose-dotfiles` - Dotfiles troubleshooting (specific to this repo)
@@ -167,10 +161,6 @@ The `claude/` directory contains Claude Code settings managed by this repository
   `migration-assistant`, `oncall-guide`, `state-machine-diagram`,
   `aws-best-practices-advisor`, `gcp-best-practices-advisor`
 - **research**: `arxiv-ai-researcher`, `gemini-api-researcher`, `huggingface-spaces-researcher`
-
-**Skills** (2, governance only — others migrated to the `snkrheadz/claude-skills` marketplace):
-- `governance-review` - Governance rule freshness audit
-- `rule-history` - Governance rule history
 
 Packs in `snkrheadz/claude-skills` (declared in `settings.json`, installed via `scripts/sync-claude-plugins.sh`, namespaced as `/<pack>:<skill>`):
 `core` | `pm` | `eng` | `research` | `strategy`

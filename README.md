@@ -81,10 +81,8 @@ laptop/
 │   ├── settings.json       # Hooks, plugins, permissions
 │   ├── statusline.sh       # Custom status line script
 │   ├── loop.md             # Default no-arg /loop maintenance routine
-│   ├── hooks/              # Lifecycle hooks (5)
-│   ├── agents/             # Global agents (3): verify-subagent-result, governance-proposer,
-│   │                       #   rule-auditor (shareable role agents → claude-skills marketplace)
-│   ├── skills/             # Skills (2): governance-review, rule-history (others → claude-skills marketplace)
+│   ├── hooks/              # Lifecycle hooks (3)
+│   ├── agents/             # Global agents (1): verify-subagent-result
 │   └── commands/           # Custom slash commands (1): implement-with-notes
 │
 ├── .claude/                # Project-local config (NOT symlinked to ~/.claude/)
@@ -314,16 +312,11 @@ claude/
 │   ├── validate-shell.sh           # PostToolUse: shellcheck validation
 │   ├── pre-tool-guard.sh           # PreToolUse: sensitive file block + PR base-freshness guard
 │   └── verify-git-on-stop.sh       # Stop: surfaces ground-truth git/PR state vs self-report
-├── agents/             # Global agents (3, always loaded)
-│   ├── verify-subagent-result.md
-│   ├── governance-proposer.md   # pairs with governance-review/rule-history skills
-│   └── rule-auditor.md
-│   # side-job-researcher is personal → kept machine-local in ~/.claude/agents/ (not here)
-└── skills/             # Skills (2): governance tooling only
-    ├── governance-review/  # Governance rule freshness audit
-    └── rule-history/       # Governance rule history
-    # Shareable skills AND agents migrated to the snkrheadz/claude-skills marketplace
-    # (core/pm/eng/marketer/designer/research packs); invoked as /<pack>:<skill> or
+└── agents/             # Global agents (1, always loaded)
+    └── verify-subagent-result.md
+    # side-job-researcher is personal → kept machine-local in ~/.claude/agents/ (not here)
+    # Shareable skills AND agents live in the snkrheadz/claude-skills marketplace
+    # (core/pm/eng/research packs); invoked as /<pack>:<skill> or
     # enabled per role via `/plugin install <pack>@claude-skills`.
 ```
 
@@ -335,8 +328,7 @@ claude/
 | `settings.json` | Hooks, plugins, permissions |
 | `statusline.sh` | Status line: model, dir+branch, duration, cost (session/daily), lines, braille bars (ctx/5h*/7d*) |
 | `hooks/` | 3 lifecycle hooks (PostToolUse, PreToolUse, Stop) |
-| `agents/` | 3 global agents (verify-subagent-result + governance-proposer/rule-auditor) |
-| `skills/` | 2 governance skills (others → snkrheadz/claude-skills marketplace) |
+| `agents/` | 1 global agent (verify-subagent-result) |
 | role agents | eng/research packs in the snkrheadz/claude-skills marketplace |
 
 ### Status Line
@@ -375,8 +367,6 @@ Global agents (live in this repo, symlinked to `~/.claude/agents/`, always loade
 | Agent | Purpose |
 |-------|---------|
 | `verify-subagent-result` | SubAgent result verification |
-| `governance-proposer` | Governance rule proposals |
-| `rule-auditor` | Rule freshness auditing |
 
 Project agent (real file in `.claude/agents/`, this repo only): `diagnose-dotfiles`.
 Personal agents (machine-local real files in `~/.claude/agents/`, not dotfiles-managed):
@@ -391,12 +381,7 @@ in every project — e.g. `eng` provides `code-architect`, `architecture-reviewe
 
 ### Available Skills
 
-Governance skills (live in this repo, symlinked to `~/.claude/skills/`):
-
-- `/governance-review` - Governance rule freshness audit
-- `/rule-history` - Governance rule history
-
-All other shareable skills migrated to the **snkrheadz/claude-skills** marketplace
+All shareable skills migrated to the **snkrheadz/claude-skills** marketplace
 (core / pm / eng packs) and are invoked as `/<pack>:<skill>` after
 `/plugin install <pack>@claude-skills` — e.g. `/eng:test-and-fix`,
 `/eng:refactor-swarm`, `/core:first-principles`.
