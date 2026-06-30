@@ -77,7 +77,7 @@ codegraph status                          # インデックスの状態確認
 │   ├── hooks/          # Lifecycle hooks (2): validate-shell.sh,
 │   │                   #   verify-git-on-stop.sh
 │   ├── agents/         # Global agents (1): verify-subagent-result
-│   │                   #   (shareable agents in the snkrheadz/claude-skills marketplace)
+│   │                   #   (shareable agents in the snkrheadz/the-boris-way marketplace)
 │   └── commands/       # Custom slash commands (1): implement-with-notes
 │
 ├── .claude/            # Project-local config (NOT symlinked to ~/.claude/)
@@ -150,16 +150,16 @@ The `claude/` directory contains Claude Code settings managed by this repository
 > `~/.claude/agents/`, not dotfiles-managed), mirroring its machine-local
 > `side-job-search` skill — so it is not synced or published to the marketplace.
 
-**Shareable agents** now live in the **`snkrheadz/claude-skills`** marketplace
+**Shareable agents** now live in the **`snkrheadz/the-boris-way`** marketplace
 (single source of truth) alongside the skills, enabled per role via
-`/plugin install <pack>@claude-skills`:
+`/plugin install <pack>@the-boris-way`:
 - **eng** (8 agents): `code-architect`, `architecture-reviewer`, `verify-shell`,
   `migration-assistant`, `oncall-guide`, `state-machine-diagram`,
   `aws-best-practices-advisor`, `gcp-best-practices-advisor`
 - **research**: `arxiv-ai-researcher`, `gemini-api-researcher`, `huggingface-spaces-researcher`
 
-Packs in `snkrheadz/claude-skills` (declared in `settings.json`, installed via `scripts/sync-claude-plugins.sh`, namespaced as `/<pack>:<skill>`):
-`core` | `pm` | `eng` | `research` | `strategy`
+Packs in `snkrheadz/the-boris-way` (declared in `settings.json`, installed via `scripts/sync-claude-plugins.sh`, namespaced as `/<pack>:<skill>`):
+`core` | `pm` | `eng` | `research` | `strategy` | `writing` | `spec`
 
 **Commands** (1) - Custom slash commands in `claude/commands/`, symlinked to `~/.claude/commands/`:
 - `implement-with-notes` - Implement a spec while keeping running implementation notes (decisions, tradeoffs, deltas)

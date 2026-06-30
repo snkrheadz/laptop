@@ -170,11 +170,11 @@ cat /Users/snkrheadz/ghq/github.com/snkrheadz/laptop/claude/statusline.sh
 |-------------|------|
 | `diagnose-dotfiles` | dotfiles の問題診断 |
 
-### Role agents（claude-skills マーケットプレイス経由）
+### Role agents（the-boris-way マーケットプレイス経由）
 
 `verify-shell` / `verify-app` / `code-architect` / `migration-assistant` などの
-役割別 agent は `snkrheadz/claude-skills` のパック（eng/marketer/designer/research）に
-移行済み。`/plugin install <pack>@claude-skills` で有効化すると全プロジェクトで使える。
+役割別 agent は `snkrheadz/the-boris-way` のパック（eng/marketer/designer/research）に
+移行済み。`/plugin install <pack>@the-boris-way` で有効化すると全プロジェクトで使える。
 
 > machine-local（dotfiles 非管理）の実体 agent が `~/.claude/agents/` に置かれることもある
 > （例: `side-job-researcher`）。これらは symlink ではないため install/sync で消えない。

@@ -45,7 +45,7 @@ fan-out in a Workflow instead of hand-spawning agents each turn.
   detection, which slows the whole job. So: launch web-research subagents one at a
   time; one `WebFetch` per turn; triage with `WebSearch`, then fetch only a curated
   few (the 15-min cache makes re-fetch free); prefer typed channels
-  (`research@claude-skills` researchers, `hf-spaces`) over raw scraping. For
+  (`research@the-boris-way` researchers, `hf-spaces`) over raw scraping. For
   deliberate breadth, use a `Workflow` `pipeline()` (auto-capped concurrency), not
   hand-spawned parallel agents.
 
@@ -88,7 +88,7 @@ behave?"*
   exists, build it first — an unattended loop with no verification path is not safe to run.
 - This repo's closing gate: `source ~/.zshrc` loads clean, `shellcheck` passes,
   `pre-commit run --all-files` is green, and `health-check` reports no broken symlinks.
-  Use the `verify-shell` agent (from `eng@claude-skills`), the official `/verify`
+  Use the `verify-shell` agent (from `eng@the-boris-way`), the official `/verify`
   skill, and the `/eng:test-and-fix` skill.
 
 

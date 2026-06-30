@@ -132,17 +132,18 @@
     "typescript-lsp@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
     "document-skills@anthropic-agent-skills": true,
-    "core@claude-skills": true,
-    "pm@claude-skills": true,
-    "eng@claude-skills": true,
-    "research@claude-skills": true,
-    "strategy@claude-skills": true
+    "core@the-boris-way": true,
+    "pm@the-boris-way": true,
+    "eng@the-boris-way": true,
+    "research@the-boris-way": true,
+    "strategy@the-boris-way": true,
+    "spec@the-boris-way": true
   },
   "extraKnownMarketplaces": {
-    "claude-skills": {
+    "the-boris-way": {
       "source": {
         "source": "github",
-        "repo": "snkrheadz/claude-skills"
+        "repo": "snkrheadz/the-boris-way"
       },
       "autoUpdate": true
     },

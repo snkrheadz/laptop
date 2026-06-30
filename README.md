@@ -332,9 +332,9 @@ claude/
 └── agents/             # Global agents (1, always loaded)
     └── verify-subagent-result.md
     # side-job-researcher is personal → kept machine-local in ~/.claude/agents/ (not here)
-    # Shareable skills AND agents live in the snkrheadz/claude-skills marketplace
-    # (core/pm/eng/research packs); invoked as /<pack>:<skill> or
-    # enabled per role via `/plugin install <pack>@claude-skills`.
+    # Shareable skills AND agents live in the snkrheadz/the-boris-way marketplace
+    # (core/pm/eng/research/strategy/writing/spec packs); invoked as /<pack>:<skill> or
+    # enabled per role via `/plugin install <pack>@the-boris-way`.
 ```
 
 ### Managed Components
@@ -346,7 +346,7 @@ claude/
 | `statusline.sh` | Status line: model, dir+branch, duration, cost (session/daily), lines, braille bars (ctx/5h*/7d*) |
 | `hooks/` | 2 lifecycle hooks (PostToolUse, Stop) |
 | `agents/` | 1 global agent (verify-subagent-result) |
-| role agents | eng/research packs in the snkrheadz/claude-skills marketplace |
+| role agents | eng/research packs in the snkrheadz/the-boris-way marketplace |
 
 ### Status Line
 
@@ -389,17 +389,17 @@ Personal agents (machine-local real files in `~/.claude/agents/`, not dotfiles-m
 `side-job-researcher` — mirrors the machine-local `side-job-search` skill, so it is
 neither synced nor published.
 
-Role agents (eng/research) ship via the **snkrheadz/claude-skills** marketplace;
-enable a pack with `/plugin install <pack>@claude-skills` to make its agents available
+Role agents (eng/research) ship via the **snkrheadz/the-boris-way** marketplace;
+enable a pack with `/plugin install <pack>@the-boris-way` to make its agents available
 in every project — e.g. `eng` provides `code-architect`, `architecture-reviewer`,
 `verify-shell`, `migration-assistant`, `oncall-guide`, `state-machine-diagram`,
 `aws-best-practices-advisor`, `gcp-best-practices-advisor`.
 
 ### Available Skills
 
-All shareable skills migrated to the **snkrheadz/claude-skills** marketplace
-(core / pm / eng packs) and are invoked as `/<pack>:<skill>` after
-`/plugin install <pack>@claude-skills` — e.g. `/eng:test-and-fix`,
+All shareable skills migrated to the **snkrheadz/the-boris-way** marketplace
+(core / pm / eng / research / strategy / writing / spec packs) and are invoked as `/<pack>:<skill>` after
+`/plugin install <pack>@the-boris-way` — e.g. `/eng:test-and-fix`,
 `/eng:refactor-swarm`, `/core:first-principles`.
 
 ### Local Skills (Project-specific)

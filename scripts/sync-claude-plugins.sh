@@ -6,7 +6,7 @@ set -uo pipefail
 #
 # The symlink sync (install.sh / sync-claude.sh) distributes *files*
 # (skills, agents, hooks, settings.json). It does NOT install the plugins that
-# come from marketplaces (official, autoresearch, document-skills, claude-skills…) —
+# come from marketplaces (official, autoresearch, document-skills, the-boris-way…) —
 # those live in a per-machine cache and must be installed via the `claude` CLI.
 #
 # settings.json is the single source of truth: `claude plugin` commands write
@@ -65,7 +65,7 @@ while IFS=$'\t' read -r name repo; do
         continue
     fi
     # Substring match against the (indented) `marketplace list` output; the bare
-    # name appears as e.g. "  ❯ claude-skills", so -Fx whole-line match would miss.
+    # name appears as e.g. "  ❯ the-boris-way", so -Fx whole-line match would miss.
     if printf '%s\n' "$known_markets" | grep -qF "$name"; then
         log_info "  $name: already configured — skipping"
         continue
