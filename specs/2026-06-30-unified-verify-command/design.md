@@ -39,7 +39,7 @@ status: approved
 
 ## 既存コードへの影響（blast radius）
 - **`scripts/verify.sh`（新規）**: オーケストレータ。`scripts/*.sh` に属し、自身も shellcheck チェック対象（lint-shell.sh 経由）に入る。
-- **`.github/workflows/main.yml`（変更）**: 現在の「gitleaks 単体ステップ + Shellcheck ステップ」を、`scripts/verify.sh` 呼び出しに集約。gitleaks は pre-commit の gitleaks フック経由で引き続き実行されるため**カバレッジは退行しない**（むしろ pre-commit の他フックも CI で走るようになり増える）。CI に `pre-commit` の用意（インストール）が必要 ← pre-commit は既存の dev 依存（`.pre-commit-config.yaml`・CLAUDE.md 記載）であり新規依存ではない。トリガー・`permissions` は不変。
+- **`.github/workflows/main.yml`（変更）**: 現在の「gitleaks 単体ステップ + Shellcheck ステップ」を、`scripts/verify.sh` 呼び出しに集約。gitleaks は pre-commit の gitleaks フック経由で引き続き実行されるため**カバレッジは退行しない**（むしろ pre-commit の他フックも CI で走るようになり増える）。<!-- ⚠️ 訂正(review で判明): pre-commit の gitleaks は `protect --staged` モードで CI(staged 差分ゼロ)では実質スキャンしない。退行する。実装では `gitleaks detect --no-git` を verify の明示チェックとして追加して是正。詳細は review.md 参照。 -->CI に `pre-commit` の用意（インストール）が必要 ← pre-commit は既存の dev 依存（`.pre-commit-config.yaml`・CLAUDE.md 記載）であり新規依存ではない。トリガー・`permissions` は不変。
 - **影響を受けないが関連**: `scripts/lint-shell.sh`（verify から呼ばれる、無変更）、`health-check` スキル（対話的入口として不変）、`install.sh`（symlink の正典、無変更）、各単体検査コマンド（後方互換、無変更）。
 - 破壊的変更: 利用者向けには無し（従来コマンドは全て生存）。CI の内部構成のみ変化。
 

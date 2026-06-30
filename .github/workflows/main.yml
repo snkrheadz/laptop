@@ -19,7 +19,7 @@ jobs:
 
       - name: Install tools
         run: |
-          brew install shellcheck pre-commit
+          brew install shellcheck pre-commit gitleaks
 
       - name: Verify
         run: bash scripts/verify.sh

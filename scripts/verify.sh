@@ -21,9 +21,13 @@ set -uo pipefail
 cd "$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)" || exit 1
 DOTFILES_DIR="$(pwd)"
 
-# Environment: GitHub Actions (and most CI) set CI=true.
+# Environment: CI sets CI=true; GitHub Actions also sets GITHUB_ACTIONS=true.
+# Require GITHUB_ACTIONS too where possible to reduce false positives from a
+# stray CI=true in a local shell.
 ENV="local"
-[[ -n "${CI:-}" ]] && ENV="ci"
+if [[ -n "${GITHUB_ACTIONS:-}" || -n "${CI:-}" ]]; then
+    ENV="ci"
+fi
 
 # Result accumulation (name / status PASS|FAIL|SKIP / detail).
 R_NAME=()
@@ -67,35 +71,57 @@ check_precommit() {
     fi
 }
 
-# 3. No broken symlinks pointing into this repo. The set of links is DERIVED
+# 3. Full working-tree secret scan. pre-commit's gitleaks hook runs in
+#    `protect --staged` mode (staged diff only) — in a fresh CI checkout nothing
+#    is staged, so it scans nothing. This explicit `detect` restores the
+#    full-tree scan the CI did before, so secret coverage does not regress.
+check_gitleaks() {
+    hr "gitleaks"
+    if ! command -v gitleaks &> /dev/null; then
+        echo "  gitleaks not installed"
+        record "gitleaks" "SKIP" "gitleaks 未インストール"
+        return
+    fi
+    local out rc
+    out="$(gitleaks detect --source=. --no-git 2>&1)"
+    rc=$?
+    if [[ $rc -eq 0 ]]; then
+        record "gitleaks" "PASS" ""
+    else
+        echo "$out" | tail -20
+        record "gitleaks" "FAIL" "秘密情報検出"
+    fi
+}
+
+# 4. No broken symlinks pointing into this repo. The set of links is DERIVED
 #    (not a re-declared expected list) so it cannot drift from install.sh.
 check_symlinks() {
     hr "symlink"
-    local roots=(
-        "$HOME"
-        "$HOME/.claude" "$HOME/.claude/hooks" "$HOME/.claude/commands"
-        "$HOME/.claude/agents" "$HOME/.claude/skills"
-        "$HOME/.zsh" "$HOME/.config/ghostty" "$HOME/.config/mise"
-    )
-    local found=0 broken=0 link target root
-    shopt -s nullglob dotglob
-    for root in "${roots[@]}"; do
-        [[ -d "$root" ]] || continue
-        for link in "$root"/*; do
-            [[ -L "$link" ]] || continue
-            target="$(readlink "$link")"
-            case "$target" in
-                "$DOTFILES_DIR"/*)
-                    found=$((found + 1))
-                    if [[ ! -e "$link" ]]; then   # -e follows the link: false = broken
-                        echo "  [BROKEN] $link -> $target"
-                        broken=$((broken + 1))
-                    fi
-                    ;;
-            esac
-        done
-    done
-    shopt -u nullglob dotglob
+    # DERIVE the link set instead of hardcoding paths (no drift vs install.sh):
+    # scan HOME's top level plus the app-config trees this repo installs into.
+    # Bounded so we never walk ~/Library etc. New links under these trees are
+    # picked up automatically.
+    local found=0 broken=0 link target
+    local links
+    links="$( {
+        find "$HOME" -maxdepth 1 -type l
+        [[ -d "$HOME/.config" ]] && find "$HOME/.config" -type l
+        [[ -d "$HOME/.claude" ]] && find "$HOME/.claude" -type l
+    } 2> /dev/null )"
+
+    while IFS= read -r link; do
+        [[ -n "$link" ]] || continue
+        target="$(readlink "$link")"
+        case "$target" in
+            "$DOTFILES_DIR"/*)
+                found=$((found + 1))
+                if [[ ! -e "$link" ]]; then   # -e follows the link: false = broken
+                    echo "  [BROKEN] $link -> $target"
+                    broken=$((broken + 1))
+                fi
+                ;;
+        esac
+    done <<< "$links"
 
     if [[ $found -eq 0 ]]; then
         echo "  no dotfiles symlinks found (not installed?)"
@@ -120,10 +146,12 @@ check_shell_init() {
     if [[ "$ENV" == "ci" ]]; then
         local errs=0 f
         shopt -s nullglob
+        local nout
         for f in zsh/.zshrc zsh/.aliases zsh/configs/*.zsh zsh/configs/post/*.zsh; do
             [[ -f "$f" ]] || continue
-            if ! zsh -n "$f" 2> /dev/null; then
+            if ! nout="$(zsh -n "$f" 2>&1)"; then
                 echo "  [SYNTAX] $f"
+                [[ -n "$nout" ]] && echo "$nout"
                 errs=$((errs + 1))
             fi
         done
@@ -142,11 +170,14 @@ check_shell_init() {
         record "shell-init" "SKIP" "未インストール (~/.zshrc)"
         return
     fi
-    if zsh -c "source $HOME/.zshrc" > /dev/null 2>&1; then
+    # Pass the path as an argument (not interpolated into the -c string) so a
+    # space in $HOME can't break word-splitting. Capture once — no double run.
+    local sout
+    if sout="$(zsh -c 'source "$1"' -- "$HOME/.zshrc" 2>&1)"; then
         record "shell-init" "PASS" "読み込み OK (~/.zshrc)"
     else
         echo "  ~/.zshrc failed to source:"
-        zsh -c "source $HOME/.zshrc" 2>&1 | sed 's/^/    /' | head -20
+        [[ -n "$sout" ]] && echo "$sout"
         record "shell-init" "FAIL" "読み込み失敗 (~/.zshrc)"
     fi
 }
@@ -154,6 +185,7 @@ check_shell_init() {
 echo "verify: env=$ENV  root=$DOTFILES_DIR"
 check_shellcheck
 check_precommit
+check_gitleaks
 check_symlinks
 check_shell_init
 
