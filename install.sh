@@ -109,7 +109,7 @@ setup_claude_agents() {
 
     mkdir -p "$HOME/.claude/agents"
 
-    # Clean up broken symlinks left by agents that moved to the claude-skills
+    # Clean up broken symlinks left by agents that moved to the the-boris-way
     # marketplace (their dotfiles source files no longer exist)
     for link in "$HOME/.claude/agents"/*.md; do
         if [ -L "$link" ] && [ ! -e "$link" ]; then
@@ -366,8 +366,8 @@ main() {
     echo "  1. Restart your terminal or run: source ~/.zshrc"
     echo "  2. Add your API keys to ~/.secrets.env"
     echo "  3. Run 'rollback.sh' if you need to restore previous settings"
-    echo "  4. Role agents come from the claude-skills marketplace — install a pack"
-    echo "     (e.g. /plugin install eng@claude-skills) to enable them everywhere"
+    echo "  4. Role agents come from the the-boris-way marketplace — install a pack"
+    echo "     (e.g. /plugin install eng@the-boris-way) to enable them everywhere"
     echo ""
 }
 

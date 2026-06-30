@@ -40,5 +40,5 @@ fi
 echo ""
 echo "Next steps:"
 echo "  1. Start a new Claude Code session to pick up the changes"
-echo "  2. Role agents ship via the claude-skills marketplace packs (eng/marketer/designer/research)"
+echo "  2. Role agents ship via the the-boris-way marketplace packs (eng/marketer/designer/research)"
 echo ""
