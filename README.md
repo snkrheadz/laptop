@@ -275,6 +275,24 @@ alias deploy="./scripts/deploy-work.sh"
 3. Update `rollback.sh` symlinks array
 4. Commit and push
 
+## Spec-Driven Development
+
+A set of `/spec-*` Claude Code slash commands take a change from a one-line idea to a
+mergeable PR, stopping at a human-approved gate at each phase:
+
+```text
+/spec-scan → /spec-requirement → /spec-design → /spec-tasks
+           → /implement-with-notes → /spec-review → /eng:create-pr
+```
+
+Each command runs a single phase, writes one artifact under `specs/<id>/`, and stops for
+your review. Approval is just editing a `status:` line in the generated file. The design
+favors observable acceptance criteria, per-task verification, and an isolated-context
+adversarial review before any PR.
+
+See **[specs/README.md](specs/README.md)** for the full human-readable guide (each
+command, the gates, worked examples, and the artifact layout).
+
 ## Development Notes
 
 ### zsh Loading Order
