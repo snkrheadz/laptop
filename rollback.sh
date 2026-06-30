@@ -73,18 +73,17 @@ restore_backup() {
 
     # Backed-up files are dotfiles (.zshrc, .gitconfig, ...). Default globbing
     # skips names starting with "." — without dotglob this loop restores nothing.
-    shopt -s dotglob nullglob
-    for file in "$backup_dir"/*; do
-        if [ -e "$file" ]; then
-            local filename
-            filename=$(basename "$file")
-            local dest="$HOME/$filename"
-
-            cp -R "$file" "$dest"
-            log_info "Restored: $dest"
-        fi
-    done
-    shopt -u dotglob nullglob
+    # Run in a subshell so dotglob/nullglob stay scoped here and don't leak to
+    # the caller's shell options.
+    (
+        shopt -s dotglob nullglob
+        for file in "$backup_dir"/*; do
+            if [ -e "$file" ]; then
+                cp -R "$file" "$HOME/$(basename "$file")"
+                log_info "Restored: $HOME/$(basename "$file")"
+            fi
+        done
+    )
 
     log_success "Backup restored"
 }

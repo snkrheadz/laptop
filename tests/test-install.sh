@@ -40,21 +40,17 @@ assert_symlink_to() { # link, expected target
     fi
 }
 
-# Track and clean up isolated homes even if a case aborts.
-TMPDIRS=()
+# One parent temp root, created in THIS shell so the EXIT trap (which also runs
+# in this shell) can actually see and remove it. mkhome makes subdirs under it;
+# removing the root removes them all — even if a case aborts. (Tracking each dir
+# in an array failed: mkhome is called via $(...), so array appends happened in a
+# command-substitution subshell and never reached the trap.)
+TEST_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/dotfiles-test.XXXXXX")"
 cleanup() {
-    local d
-    for d in "${TMPDIRS[@]:-}"; do
-        [[ -n "$d" && -d "$d" ]] && rm -rf "$d"
-    done
+    [[ -n "${TEST_ROOT:-}" && -d "$TEST_ROOT" ]] && rm -rf "$TEST_ROOT"
 }
 trap cleanup EXIT
-mkhome() {
-    local d
-    d="$(mktemp -d "${TMPDIR:-/tmp}/dotfiles-test.XXXXXX")"
-    TMPDIRS+=("$d")
-    echo "$d"
-}
+mkhome() { mktemp -d "$TEST_ROOT/home.XXXXXX"; }
 
 # Read-only fingerprint of the REAL home's managed entries, to prove the test
 # left the real environment untouched.
@@ -69,9 +65,11 @@ real_home_fingerprint() {
 # ── Case 1: symlink creation points at the repo ──────────────────────
 case_symlink_creation() {
     echo "case: symlink creation"
-    local h
+    local h rc
     h="$(mkhome)"
     ( set -e; export HOME="$h"; source "$DOTFILES_DIR/install.sh"; create_symlinks ) > /dev/null 2>&1
+    rc=$?
+    if [[ $rc -ne 0 ]]; then fail "create_symlinks failed (rc=$rc)"; return; fi
     assert_symlink_to "$h/.zshrc" "$DOTFILES_DIR/zsh/.zshrc"
     assert_symlink_to "$h/.gitconfig" "$DOTFILES_DIR/git/.gitconfig"
     assert_symlink_to "$h/.tmux.conf" "$DOTFILES_DIR/tmux/.tmux.conf"
@@ -80,10 +78,12 @@ case_symlink_creation() {
 # ── Case 2: existing real file is backed up before being replaced ─────
 case_backup() {
     echo "case: backup of existing file"
-    local h bdir
+    local h bdir rc
     h="$(mkhome)"
     printf 'ORIGINAL_ZSHRC\n' > "$h/.zshrc"   # a real file, not a symlink
     ( set -e; export HOME="$h"; source "$DOTFILES_DIR/install.sh"; create_backup ) > /dev/null 2>&1
+    rc=$?
+    if [[ $rc -ne 0 ]]; then fail "create_backup failed (rc=$rc)"; return; fi
     bdir="$(cat "$h/.dotfiles_last_backup" 2> /dev/null || true)"
     if [[ -n "$bdir" && -f "$bdir/.zshrc" && "$(cat "$bdir/.zshrc")" == "ORIGINAL_ZSHRC" ]]; then
         pass "existing .zshrc backed up with original content"
@@ -95,12 +95,20 @@ case_backup() {
 # ── Case 3: rollback restores the original file ──────────────────────
 case_rollback() {
     echo "case: rollback restores original"
-    local h bdir
+    local h bdir rc
     h="$(mkhome)"
     printf 'ORIGINAL_ZSHRC\n' > "$h/.zshrc"
     ( set -e; export HOME="$h"; source "$DOTFILES_DIR/install.sh"; create_backup; create_symlinks ) > /dev/null 2>&1
+    rc=$?
+    if [[ $rc -ne 0 ]]; then fail "rollback setup (backup+symlinks) failed (rc=$rc)"; return; fi
+    # Guard against a false pass: the install phase MUST have turned .zshrc into a
+    # symlink, otherwise "restored" is trivially true without rollback doing work.
+    if [[ ! -L "$h/.zshrc" ]]; then fail "rollback setup did not symlink .zshrc"; return; fi
     bdir="$(cat "$h/.dotfiles_last_backup" 2> /dev/null || true)"
+    if [[ -z "$bdir" || ! -d "$bdir" ]]; then fail "rollback setup produced no backup dir"; return; fi
     ( set -e; export HOME="$h"; source "$DOTFILES_DIR/rollback.sh"; remove_symlinks; restore_backup "$bdir" ) > /dev/null 2>&1
+    rc=$?
+    if [[ $rc -ne 0 ]]; then fail "rollback execution failed (rc=$rc)"; return; fi
     if [[ ! -L "$h/.zshrc" && -f "$h/.zshrc" && "$(cat "$h/.zshrc")" == "ORIGINAL_ZSHRC" ]]; then
         pass "rollback restored original .zshrc (not a symlink)"
     else
