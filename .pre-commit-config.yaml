@@ -14,3 +14,15 @@ repos:
     rev: v8.18.1
     hooks:
       - id: gitleaks
+
+  # Shellcheck every shell script (repo-wide), via the same script CI runs so
+  # commit-time and CI judgments stay identical. lint-shell.sh derives its own
+  # targets (.sh + shell shebangs), so pass_filenames is off and it always runs.
+  - repo: local
+    hooks:
+      - id: shellcheck-all
+        name: shellcheck (all shell scripts)
+        entry: bash scripts/lint-shell.sh
+        language: system
+        pass_filenames: false
+        always_run: true
