@@ -159,7 +159,7 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - **research**: `arxiv-ai-researcher`, `gemini-api-researcher`, `huggingface-spaces-researcher`
 
 Packs in `snkrheadz/the-boris-way` (declared in `settings.json`, installed via `scripts/sync-claude-plugins.sh`, namespaced as `/<pack>:<skill>`):
-`core` | `pm` | `eng` | `research` | `strategy`
+`core` | `pm` | `eng` | `research` | `strategy` | `writing` | `spec`
 
 **Commands** (1) - Custom slash commands in `claude/commands/`, symlinked to `~/.claude/commands/`:
 - `implement-with-notes` - Implement a spec while keeping running implementation notes (decisions, tradeoffs, deltas)
