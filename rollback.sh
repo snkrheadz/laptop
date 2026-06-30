@@ -71,6 +71,9 @@ restore_backup() {
 
     log_info "Restoring from backup: $backup_dir"
 
+    # Backed-up files are dotfiles (.zshrc, .gitconfig, ...). Default globbing
+    # skips names starting with "." — without dotglob this loop restores nothing.
+    shopt -s dotglob nullglob
     for file in "$backup_dir"/*; do
         if [ -e "$file" ]; then
             local filename
@@ -81,6 +84,7 @@ restore_backup() {
             log_info "Restored: $dest"
         fi
     done
+    shopt -u dotglob nullglob
 
     log_success "Backup restored"
 }
@@ -146,4 +150,8 @@ main() {
     echo ""
 }
 
-main "$@"
+# Only run main when executed directly, not when sourced (e.g. by tests that
+# exercise remove_symlinks / restore_backup against an isolated HOME).
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi
