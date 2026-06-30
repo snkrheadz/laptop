@@ -19,10 +19,7 @@ jobs:
 
       - name: Install tools
         run: |
-          brew install gitleaks shellcheck
+          brew install shellcheck pre-commit gitleaks
 
-      - name: Run gitleaks
-        run: gitleaks detect --source=. --no-git
-
-      - name: Shellcheck
-        run: bash scripts/lint-shell.sh
+      - name: Verify
+        run: bash scripts/verify.sh
