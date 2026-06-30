@@ -14,6 +14,11 @@
 
 set -euo pipefail
 
+# Anchor to the repository root so `git ls-files` (and the relative paths it
+# emits) resolve identically no matter where the script is invoked from. Without
+# this, running from a subdirectory silently scans only that subtree.
+cd "$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)"
+
 # Scripts to permanently exclude from the scan. Keep empty unless there is a
 # justified reason; any entry here is visible and reviewable in the diff.
 # Paths are repo-relative (as emitted by `git ls-files`).
@@ -41,13 +46,19 @@ is_shell_script() {
     local first
     IFS= read -r first < "$f" 2>/dev/null || return 1
     first=${first%$'\r'}                  # tolerate CRLF
+    first=${first#$'\xef\xbb\xbf'}        # tolerate UTF-8 BOM
     [[ "$first" == '#!'* ]] || return 1
 
-    # Resolve the interpreter, handling `#!/usr/bin/env <shell>`.
+    # Resolve the interpreter, handling `#!/usr/bin/env [-S] <shell>` — skip any
+    # leading flags (e.g. env's -S/--split-string) before the interpreter name.
     local shebang=${first#'#!'}
     read -r -a parts <<< "$shebang"
     local interp=${parts[0]:-}
-    [[ "${interp##*/}" == "env" ]] && interp=${parts[1]:-}
+    if [[ "${interp##*/}" == "env" ]]; then
+        local i=1
+        while [[ "${parts[$i]:-}" == -* ]]; do ((i++)); done
+        interp=${parts[$i]:-}
+    fi
 
     case "${interp##*/}" in
         sh | bash | dash | ksh) return 0 ;;
@@ -63,7 +74,7 @@ fi
 # Build the target list from version-controlled files.
 targets=()
 while IFS= read -r f; do
-    [[ -f "$f" ]] || continue           # skip deleted-but-tracked / symlinks
+    [[ -f "$f" ]] || continue           # skip deleted-but-tracked (symlinks to regular files pass -f)
     is_excluded "$f" && continue
     is_shell_script "$f" && targets+=("$f")
 done < <(git ls-files)
