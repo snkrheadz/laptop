@@ -182,11 +182,29 @@ check_shell_init() {
     fi
 }
 
+# 6. Behavior tests for install.sh / rollback.sh (run against an isolated HOME;
+#    never touches the real environment). Catches regressions in the destructive
+#    symlink/backup/restore paths that static checks cannot see.
+check_install_tests() {
+    hr "install-tests"
+    if [[ ! -f tests/test-install.sh ]]; then
+        echo "  tests/test-install.sh not found"
+        record "install-tests" "SKIP" "テスト未配置"
+        return
+    fi
+    if bash tests/test-install.sh; then
+        record "install-tests" "PASS" ""
+    else
+        record "install-tests" "FAIL" "振る舞いテスト失敗"
+    fi
+}
+
 echo "verify: env=$ENV  root=$DOTFILES_DIR"
 check_shellcheck
 check_precommit
 check_gitleaks
 check_symlinks
+check_install_tests
 check_shell_init
 
 echo
