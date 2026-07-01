@@ -1,10 +1,15 @@
 #!/bin/bash
 # Stop hook: surface ground-truth git/GitHub state when the model claimed a
 # git action this turn, so false-success reports (phantom commits/pushes/PRs)
-# get caught against reality instead of self-report.
+# get caught against reality instead of self-report. Also fires, independent
+# of any claim, when cwd is a linked worktree left with uncommitted changes —
+# the other recurring failure mode (work silently stranded off main).
 #
 # Design (kept near-silent on purpose):
-#   - Only speaks up when the LAST assistant message claims a commit/push/PR/merge.
+#   - Fires when EITHER the LAST assistant message claims a commit/push/PR/merge,
+#     OR cwd is a linked git worktree (`.git` is a file, not a dir) with a dirty
+#     working tree — worktrees are short-lived/single-purpose dispatches, so this
+#     stays silent for the vast majority of (non-worktree) sessions.
 #   - Injects actual `git` (and best-effort `gh pr`) state via additionalContext,
 #     which continues the turn once so the model reconciles its claim vs truth.
 #   - `stop_hook_active` guard prevents an infinite stop->continue loop.
@@ -38,8 +43,21 @@ if [[ -n "$transcript" && -f "$transcript" ]]; then
 fi
 [[ -n "$last_text" ]] || exit 0
 
-# Did the model claim a git/GitHub mutation? If not, stay silent.
-if ! echo "$last_text" | grep -iqE 'commit|push|pull request| pr #|opened (a|the) pr|created (a|the) pr|merg|コミット|プッシュ|マージ|プルリク|pr を'; then
+# Trigger 1: did the model claim a git/GitHub mutation?
+claimed_git_action=false
+if echo "$last_text" | grep -iqE 'commit|push|pull request| pr #|opened (a|the) pr|created (a|the) pr|merg|コミット|プッシュ|マージ|プルリク|pr を'; then
+    claimed_git_action=true
+fi
+
+# Trigger 2: cwd is a linked worktree (not the main checkout) with
+# uncommitted changes. In a linked worktree `.git` is a file (a `gitdir:`
+# pointer), not a directory — this is standard git behavior, no parsing needed.
+in_dirty_worktree=false
+if [[ -f "$cwd/.git" ]] && [[ -n "$(git -C "$cwd" status --porcelain 2>/dev/null)" ]]; then
+    in_dirty_worktree=true
+fi
+
+if [[ "$claimed_git_action" != true && "$in_dirty_worktree" != true ]]; then
     exit 0
 fi
 
@@ -76,7 +94,12 @@ if [[ -n "$pr_line" ]]; then
 else
     report+="- gh pr: no open PR found for current branch"$'\n'
 fi
-report+=$'\n'"Reconcile your last message against this. If you claimed a commit/push/PR that this does not reflect, say so plainly and correct it — do not restate the claim as done."
+if [[ "$in_dirty_worktree" == true ]]; then
+    report+=$'\n'"This is a linked worktree, not the main checkout, and it has uncommitted changes. If this work is meant to land on the main branch, commit and merge/copy it back before finishing — don't leave it stranded here."
+fi
+if [[ "$claimed_git_action" == true ]]; then
+    report+=$'\n'"Reconcile your last message against this. If you claimed a commit/push/PR that this does not reflect, say so plainly and correct it — do not restate the claim as done."
+fi
 
 jq -nc --arg ctx "$report" \
     '{hookSpecificOutput:{hookEventName:"Stop", additionalContext:$ctx}}'
