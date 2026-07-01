@@ -93,6 +93,8 @@ brew "librsvg"
 brew "graphviz"
 # GNU grep, egrep and fgrep
 brew "grep"
+# Agent multiplexer that lives in your terminal
+brew "herdr"
 # HTTP load generator, ApacheBench (ab) replacement
 brew "hey"
 # Add GitHub support to git on the command-line
