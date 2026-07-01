@@ -7,12 +7,19 @@
 #
 # Design (kept near-silent on purpose):
 #   - Fires when EITHER the LAST assistant message claims a commit/push/PR/merge,
-#     OR cwd is a linked git worktree (`.git` is a file, not a dir) with a dirty
-#     working tree — worktrees are short-lived/single-purpose dispatches, so this
-#     stays silent for the vast majority of (non-worktree) sessions.
+#     OR cwd is a linked git worktree (git-dir differs from git-common-dir —
+#     true only for linked worktrees, unlike checking whether `.git` is a file,
+#     which a submodule also satisfies) with a dirty working tree. This keeps
+#     firing on every such Stop for as long as the worktree stays dirty,
+#     including long multi-turn worktree sessions (e.g. an Agent Team lead
+#     that intentionally holds off committing until final integration) —
+#     over-surfacing ground truth there is the accepted tradeoff against
+#     silently missing genuinely abandoned work; this script does not try to
+#     guess whether a session is "done".
 #   - Injects actual `git` (and best-effort `gh pr`) state via additionalContext,
 #     which continues the turn once so the model reconciles its claim vs truth.
-#   - `stop_hook_active` guard prevents an infinite stop->continue loop.
+#   - `stop_hook_active` guard prevents an infinite stop->continue loop within
+#     one Stop event — it does not suppress firing again on a later, separate Stop.
 # Always exits 0; never blocks.
 
 input=$(cat)
@@ -31,7 +38,8 @@ eval "$(echo "$input" | jq -r '
 [[ -n "$cwd" ]] || exit 0
 git -C "$cwd" rev-parse --is-inside-work-tree >/dev/null 2>&1 || exit 0
 
-# Pull the last assistant text block from the transcript.
+# Pull the last assistant text block from the transcript. May be empty — a
+# turn can end with only tool_use blocks — Trigger 2 below doesn't need it.
 last_text=""
 if [[ -n "$transcript" && -f "$transcript" ]]; then
     last_text=$(tail -n 80 "$transcript" 2>/dev/null | jq -rs '
@@ -41,20 +49,26 @@ if [[ -n "$transcript" && -f "$transcript" ]]; then
           else "" end
     ' 2>/dev/null)
 fi
-[[ -n "$last_text" ]] || exit 0
 
 # Trigger 1: did the model claim a git/GitHub mutation?
 claimed_git_action=false
-if echo "$last_text" | grep -iqE 'commit|push|pull request| pr #|opened (a|the) pr|created (a|the) pr|merg|コミット|プッシュ|マージ|プルリク|pr を'; then
+if [[ -n "$last_text" ]] && echo "$last_text" | grep -iqE 'commit|push|pull request| pr #|opened (a|the) pr|created (a|the) pr|merg|コミット|プッシュ|マージ|プルリク|pr を'; then
     claimed_git_action=true
 fi
 
-# Trigger 2: cwd is a linked worktree (not the main checkout) with
-# uncommitted changes. In a linked worktree `.git` is a file (a `gitdir:`
-# pointer), not a directory — this is standard git behavior, no parsing needed.
+# Trigger 2: cwd is a linked worktree with uncommitted changes. git-dir
+# differs from git-common-dir only for linked worktrees — unlike checking
+# whether `.git` is a file, this correctly excludes submodules (which also
+# have `.git` as a file, but with git-dir == git-common-dir).
 in_dirty_worktree=false
-if [[ -f "$cwd/.git" ]] && [[ -n "$(git -C "$cwd" status --porcelain 2>/dev/null)" ]]; then
-    in_dirty_worktree=true
+dirty=""
+dirty_checked=false
+git_dir=$(git -C "$cwd" rev-parse --git-dir 2>/dev/null)
+git_common_dir=$(git -C "$cwd" rev-parse --git-common-dir 2>/dev/null)
+if [[ -n "$git_dir" && "$git_dir" != "$git_common_dir" ]]; then
+    dirty=$(git -C "$cwd" status --porcelain 2>/dev/null)
+    dirty_checked=true
+    [[ -n "$dirty" ]] && in_dirty_worktree=true
 fi
 
 if [[ "$claimed_git_action" != true && "$in_dirty_worktree" != true ]]; then
@@ -64,7 +78,7 @@ fi
 # Gather ground truth.
 branch=$(git -C "$cwd" rev-parse --abbrev-ref HEAD 2>/dev/null)
 head_line=$(git -C "$cwd" log -1 --format='%h %s (%cr)' 2>/dev/null)
-dirty=$(git -C "$cwd" status --porcelain 2>/dev/null)
+[[ "$dirty_checked" == true ]] || dirty=$(git -C "$cwd" status --porcelain 2>/dev/null)
 ab=$(git -C "$cwd" rev-list --left-right --count '@{u}...HEAD' 2>/dev/null)
 behind=$(echo "$ab" | awk '{print $1}')
 ahead=$(echo "$ab" | awk '{print $2}')
