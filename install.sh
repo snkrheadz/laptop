@@ -170,7 +170,7 @@ setup_claude_core() {
     rm -f "$HOME/.claude/hooks/pre-compact-save.sh"           # cleanup removed hook (caused cross-session context contamination)
     rm -f "$HOME/.claude/hooks/session-context.sh"            # cleanup removed hook (redundant with harness-provided git status)
     rm -f "$HOME/.claude/hooks/post-failure-proposal.sh"      # cleanup removed hook (proposals never consumed by governance-review)
-    rm -f "$HOME/.claude/hooks/pre-tool-guard.sh"             # cleanup removed hook (per-Bash subprocess overhead; sensitive-file blocks remain in settings.json deny)
+    rm -f "$HOME/.claude/hooks/pre-tool-guard.sh"             # cleanup removed local copy (settings.json deny rules + the core@the-boris-way plugin hook cover it)
     safe_ln "$DOTFILES_DIR/claude/hooks/validate-shell.sh" "$HOME/.claude/hooks/validate-shell.sh"
     safe_ln "$DOTFILES_DIR/claude/hooks/verify-git-on-stop.sh" "$HOME/.claude/hooks/verify-git-on-stop.sh"
 

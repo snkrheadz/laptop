@@ -8,8 +8,10 @@ model and keep this file minimal.
 
 ## 1. auto-first execution
 - Default to **auto mode**: act, don't ask. The harness routes risky commands through a
-  security check and `settings.json` `deny` rules block sensitive-file access, so
-  narrating yes/no for each step adds no safety — it just hides the calls that matter.
+  security check, and accident guardrails (`settings.json` deny rules + the `core` pack's
+  `pre-tool-guard` hook — guardrails against mistakes, not a security boundary) catch
+  sensitive-file access, so narrating yes/no for each step adds no safety — it just
+  hides the calls that matter.
   (`gh pr create` base-sync is handled by the `/eng:create-pr` skill.)
 - **Skip plan mode for ordinary work.** Current models don't need a separate planning
   step. Reach for `EnterPlanMode` only when a choice is genuinely hard to reverse
@@ -19,7 +21,9 @@ model and keep this file minimal.
   (or none) — a large nested-JSON payload can corrupt the tool-call XML wrapper, so the
   call leaks into the message as plain text (`<invoke name="ExitPlanMode">…`) and the plan
   / approval never renders (observed on Opus 4.8). Approve Bash prompts interactively
-  instead of pre-listing them. Avoiding plan mode altogether (above) sidesteps this.
+  instead of pre-listing them. If the call does leak as text, re-call `ExitPlanMode`
+  with `allowedPrompts` empty. Avoiding plan mode altogether (above) sidesteps this.
+  (Opus 4.8 workaround, recorded 2026-06 — prune this bullet once the harness fix ships.)
 - If an approach goes sideways, stop and re-think rather than pushing a failing path.
 
 

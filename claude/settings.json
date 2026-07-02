@@ -45,8 +45,7 @@
       "Bash(shellcheck *)",
       "Bash(pre-commit *)",
       "Bash(gitleaks *)",
-      "Bash(tree *)",
-      "mcp__pencil"
+      "Bash(tree *)"
     ],
     "deny": [
       "Read(~/.secrets.env)",
@@ -178,7 +177,6 @@
   "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
-  "voiceEnabled": true,
   "mcpServers": {
     "codegraph": {
       "type": "stdio",
