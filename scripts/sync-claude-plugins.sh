@@ -10,9 +10,10 @@ set -uo pipefail
 # those live in a per-machine cache and must be installed via the `claude` CLI.
 #
 # settings.json is the single source of truth: `claude plugin` commands write
-# their state back into it (via the ~/.claude/settings.json symlink), and the
-# hourly auto-sync commits/pushes it. This script just reads that declared state
-# and reconciles the local machine to match — no separate plugin list to maintain.
+# their state back into it (via the ~/.claude/settings.json symlink), and you
+# commit/push it with scripts/auto-sync.sh (manual sync). This script just reads
+# that declared state and reconciles the local machine to match — no separate
+# plugin list to maintain.
 #
 # Reconciles:
 #   .extraKnownMarketplaces  → `claude plugin marketplace add <repo|url>`

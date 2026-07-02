@@ -81,13 +81,11 @@ laptop/
 │   ├── settings.json       # Hooks, plugins, permissions
 │   ├── statusline.sh       # Custom status line script
 │   ├── loop.md             # Default no-arg /loop maintenance routine
-│   ├── hooks/              # Lifecycle hooks (2)
-│   ├── agents/             # Global agents (1): verify-subagent-result
-│   └── commands/           # Custom slash commands (1): implement-with-notes
+│   └── hooks/              # Lifecycle hooks (2)
 │
 ├── .claude/                # Project-local config (NOT symlinked to ~/.claude/)
 │   ├── agents/             # Project agents (1): diagnose-dotfiles (dotfiles-specific)
-│   └── skills/             # Local skills (14)
+│   └── skills/             # Local skills (13)
 │
 ├── scripts/
 │   ├── auto-sync.sh               # Manual dotfiles sync script (commit & push)
@@ -277,12 +275,13 @@ alias deploy="./scripts/deploy-work.sh"
 
 ## Spec-Driven Development
 
-A set of `/spec-*` Claude Code slash commands take a change from a one-line idea to a
-mergeable PR, stopping at a human-approved gate at each phase:
+The spec pipeline ships as the **`spec@the-boris-way`** marketplace pack and takes a
+change from a one-line idea to a mergeable PR, stopping at a human-approved gate at
+each phase:
 
 ```text
-/spec-scan → /spec-requirement → /spec-design → /spec-tasks
-           → /implement-with-notes → /spec-review → /eng:create-pr
+/spec:scan → /spec:requirement → /spec:design → /spec:tasks
+           → /spec:implement → /spec:review → /eng:create-pr
 ```
 
 Each command runs a single phase, writes one artifact under `specs/<id>/`, and stops for
@@ -290,8 +289,9 @@ your review. Approval is just editing a `status:` line in the generated file. Th
 favors observable acceptance criteria, per-task verification, and an isolated-context
 adversarial review before any PR.
 
-See **[specs/README.md](specs/README.md)** for the full human-readable guide (each
-command, the gates, worked examples, and the artifact layout).
+See the pack's guide (`spec/README.md` in **snkrheadz/the-boris-way**) for each command,
+the gates, worked examples, and the artifact layout. This repo's `specs/` directory
+holds the generated artifacts.
 
 ## Development Notes
 
@@ -326,15 +326,14 @@ claude/
 ├── settings.json       # Hooks, plugins, permissions
 ├── statusline.sh       # Custom status line script
 ├── loop.md             # Default no-arg /loop maintenance routine
-├── hooks/              # Lifecycle hooks (2)
-│   ├── validate-shell.sh           # PostToolUse: shellcheck validation
-│   └── verify-git-on-stop.sh       # Stop: surfaces ground-truth git/PR state vs self-report
-└── agents/             # Global agents (1, always loaded)
-    └── verify-subagent-result.md
+└── hooks/              # Lifecycle hooks (2)
+    ├── validate-shell.sh           # PostToolUse: shellcheck validation
+    └── verify-git-on-stop.sh       # Stop: surfaces ground-truth git/PR state vs self-report
     # side-job-researcher is personal → kept machine-local in ~/.claude/agents/ (not here)
-    # Shareable skills AND agents live in the snkrheadz/the-boris-way marketplace
-    # (core/pm/eng/research/strategy/writing/spec packs); invoked as /<pack>:<skill> or
-    # enabled per role via `/plugin install <pack>@the-boris-way`.
+    # Shareable skills AND agents (incl. verify-subagent-result, research pack) live in
+    # the snkrheadz/the-boris-way marketplace (core/pm/eng/research/strategy/writing/spec
+    # packs); invoked as /<pack>:<skill> or enabled per role via
+    # `/plugin install <pack>@the-boris-way`.
 ```
 
 ### Managed Components
@@ -345,8 +344,7 @@ claude/
 | `settings.json` | Hooks, plugins, permissions |
 | `statusline.sh` | Status line: model, dir+branch, duration, cost (session/daily), lines, braille bars (ctx/5h*/7d*) |
 | `hooks/` | 2 lifecycle hooks (PostToolUse, Stop) |
-| `agents/` | 1 global agent (verify-subagent-result) |
-| role agents | eng/research packs in the snkrheadz/the-boris-way marketplace |
+| shareable agents | eng/research packs in the snkrheadz/the-boris-way marketplace |
 
 ### Status Line
 
@@ -378,11 +376,9 @@ Vim mode and `🤖<agent>` (subagent name) segments are appended when active.
 
 ### Agents
 
-Global agents (live in this repo, symlinked to `~/.claude/agents/`, always loaded):
-
-| Agent | Purpose |
-|-------|---------|
-| `verify-subagent-result` | SubAgent result verification |
+This repo ships no global agents of its own — shareable agents (including
+`verify-subagent-result`, now in the `research` pack) live in the
+**snkrheadz/the-boris-way** marketplace.
 
 Project agent (real file in `.claude/agents/`, this repo only): `diagnose-dotfiles`.
 Personal agents (machine-local real files in `~/.claude/agents/`, not dotfiles-managed):
@@ -404,7 +400,7 @@ All shareable skills migrated to the **snkrheadz/the-boris-way** marketplace
 
 ### Local Skills (Project-specific)
 
-The `.claude/skills/` directory contains 14 project-specific skills that are **only available in this repository** (not symlinked to `~/.claude/`). These skills are tailored for managing this dotfiles repository.
+The `.claude/skills/` directory contains 13 project-specific skills that are **only available in this repository** (not symlinked to `~/.claude/`). These skills are tailored for managing this dotfiles repository.
 
 | Skill | Description |
 |-------|-------------|
@@ -415,7 +411,6 @@ The `.claude/skills/` directory contains 14 project-specific skills that are **o
 | `git-config` | Git config files (.gitconfig, .gitmessage, .gitignore) |
 | `health-check` | Dotfiles health check (symlinks, configs, dependencies) |
 | `hf-spaces` | HuggingFace Spaces search (research demos, model prototypes) |
-| `launchd-manage` | Auto-sync launchd agent management (start/stop/logs) |
 | `mise-runtime` | Runtime management with mise (Go, Node.js, Python, Ruby) |
 | `new-machine-setup` | New machine setup guide (macOS → dotfiles) |
 | `security-check` | Security scanning (gitleaks, pre-commit, secrets) |

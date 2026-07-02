@@ -74,15 +74,12 @@ codegraph status                          # インデックスの状態確認
 │   ├── statusline.sh   # Status line display script
 │   ├── CLAUDE.md       # User global instructions (Workflow Orchestration)
 │   ├── loop.md         # Default no-arg `/loop` maintenance routine (project-agnostic)
-│   ├── hooks/          # Lifecycle hooks (2): validate-shell.sh,
-│   │                   #   verify-git-on-stop.sh
-│   ├── agents/         # Global agents (1): verify-subagent-result
-│   │                   #   (shareable agents in the snkrheadz/the-boris-way marketplace)
-│   └── commands/       # Custom slash commands (1): implement-with-notes
+│   └── hooks/          # Lifecycle hooks (2): validate-shell.sh,
+│                       #   verify-git-on-stop.sh
 │
 ├── .claude/            # Project-local config (NOT symlinked to ~/.claude/)
 │   ├── agents/         # Project agents (1): diagnose-dotfiles (real file, dotfiles-specific)
-│   └── skills/         # Local skills (14): brew-manage, health-check, zsh-config, etc.
+│   └── skills/         # Local skills (13): brew-manage, health-check, zsh-config, etc.
 │
 ├── .github/
 │   └── workflows/main.yml  # CI/CD (gitleaks + shellcheck)
@@ -138,10 +135,11 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `hooks/validate-shell.sh` - PostToolUse hook for shellcheck
 - `hooks/verify-git-on-stop.sh` - Stop hook: when the last reply claims a commit/push/PR/merge, injects actual `git`/`gh pr` state so false-success reports get caught against reality (near-silent otherwise; `stop_hook_active`-guarded)
 
-> Note: sensitive-file access blocking is enforced by `settings.json` `deny` rules (harness-native, zero per-call overhead); the former `pre-tool-guard.sh` PreToolUse hook was removed. `gh pr create` base-sync is handled by the `/eng:create-pr` skill.
+> Note: sensitive-file access is guarded by two accident-prevention layers: `settings.json` `deny` rules (harness-native) and the `pre-tool-guard.sh` PreToolUse hook shipped by `core@the-boris-way` (the local copy in `claude/hooks/` was removed; the plugin one still runs on every Bash call). Neither is a security boundary — they catch mistakes, not adversaries. `gh pr create` base-sync is handled by the `/eng:create-pr` skill.
 
-**Global Agents** (1, always loaded — symlinked to `~/.claude/agents/`):
-- `verify-subagent-result` - SubAgent verification
+**Global Agents** (0 in this repo): `claude/agents/` is empty — all shareable agents
+(including `verify-subagent-result`, moved to the `research` pack) live in the
+`snkrheadz/the-boris-way` marketplace.
 
 **Project Agents** (1, dotfiles repo only — real file in `.claude/agents/`):
 - `diagnose-dotfiles` - Dotfiles troubleshooting (specific to this repo)
@@ -156,15 +154,15 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - **eng** (8 agents): `code-architect`, `architecture-reviewer`, `verify-shell`,
   `migration-assistant`, `oncall-guide`, `state-machine-diagram`,
   `aws-best-practices-advisor`, `gcp-best-practices-advisor`
-- **research**: `arxiv-ai-researcher`, `gemini-api-researcher`, `huggingface-spaces-researcher`
+- **research**: `arxiv-ai-researcher`, `gemini-api-researcher`, `huggingface-spaces-researcher`, `verify-subagent-result`
 
 Packs in `snkrheadz/the-boris-way` (declared in `settings.json`, installed via `scripts/sync-claude-plugins.sh`, namespaced as `/<pack>:<skill>`):
-`core` | `pm` | `eng` | `research` | `strategy` | `writing` | `spec`
+`core` | `pm` | `eng` | `research` | `strategy` | `spec` (the marketplace also ships `writing`, not enabled here)
 
-**Commands** (1) - Custom slash commands in `claude/commands/`, symlinked to `~/.claude/commands/`:
-- `implement-with-notes` - Implement a spec while keeping running implementation notes (decisions, tradeoffs, deltas)
+The spec pipeline is provided by `spec@the-boris-way` (`/spec:scan` → … → `/spec:review`);
+the former `claude/commands/spec-*.md` + `implement-with-notes` copies were removed.
 
-**Local Skills** (14) - Project-specific, in `.claude/skills/`:
+**Local Skills** (13) - Project-specific, in `.claude/skills/`:
 
 These skills are **only available in this repository** (not symlinked to `~/.claude/`):
 - `brew-manage` - Homebrew package management
@@ -174,7 +172,6 @@ These skills are **only available in this repository** (not symlinked to `~/.cla
 - `git-config` - Git configuration files
 - `health-check` - Dotfiles health check
 - `hf-spaces` - HuggingFace Spaces search
-- `launchd-manage` - (非推奨/廃止) launchd auto-sync は廃止。手動同期は `scripts/auto-sync.sh` を直接実行
 - `mise-runtime` - Runtime management (mise)
 - `new-machine-setup` - New machine setup guide
 - `security-check` - Security scanning
