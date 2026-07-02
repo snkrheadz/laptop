@@ -79,6 +79,7 @@
     "defaultMode": "auto",
     "allowUnsandboxedCommands": false
   },
+  "model": "claude-fable-5[1m]",
   "hooks": {
     "PostToolUse": [
       {
@@ -153,10 +154,16 @@
         "repo": "phuryn/pm-skills"
       },
       "autoUpdate": true
+    },
+    "medii-agent-plugins": {
+      "source": {
+        "source": "directory",
+        "path": "/Users/snkrheadz/ghq/github.com/medii-jp/medii-agent-plugins"
+      }
     }
   },
   "language": "japanese",
-  "effortLevel": "high",
+  "effortLevel": "xhigh",
   "fastMode": true,
   "voice": {
     "enabled": true,
