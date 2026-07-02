@@ -7,6 +7,9 @@
 #   2. pre-commit   — `pre-commit run --all-files` (incl. gitleaks)
 #   3. symlink      — no broken symlinks pointing into this repo
 #   4. shell-init   — ~/.zshrc loads (local) / zsh syntax check (CI)
+#   5. gitleaks     — standalone secret scan (also runs inside pre-commit)
+#   6. install-tests — install.sh / rollback.sh behavior tests (isolated HOME)
+#   7. docs-drift   — every .claude/skills/ skill appears in README.md's table
 #
 # Same command in CI and locally; the environment is detected and inapplicable
 # checks are reported as SKIP (with a reason) — never silently treated as pass.
@@ -199,6 +202,28 @@ check_install_tests() {
     fi
 }
 
+# 7. Docs drift — every local skill on disk must appear in README.md's skill
+#    table. Hand-maintained enumerations rot silently (a stale count survived
+#    two releases before PR #116 caught it by hand); this makes the drift a
+#    FAIL instead of trusting memory. Disk → docs direction only.
+check_docs_drift() {
+    hr "docs-drift"
+    local missing=0 n
+    for s in .claude/skills/*/; do
+        [[ -d "$s" ]] || continue
+        n="$(basename "$s")"
+        if ! grep -qF "\`$n\`" README.md; then
+            echo "  skill '$n' is not documented in README.md"
+            missing=$((missing + 1))
+        fi
+    done
+    if [[ $missing -eq 0 ]]; then
+        record "docs-drift" "PASS" ""
+    else
+        record "docs-drift" "FAIL" "README.md に載っていない skill が ${missing} 件"
+    fi
+}
+
 echo "verify: env=$ENV  root=$DOTFILES_DIR"
 check_shellcheck
 check_precommit
@@ -206,6 +231,7 @@ check_gitleaks
 check_symlinks
 check_install_tests
 check_shell_init
+check_docs_drift
 
 echo
 echo "════ verify summary ════"

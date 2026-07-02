@@ -79,7 +79,7 @@ codegraph status                          # インデックスの状態確認
 │
 ├── .claude/            # Project-local config (NOT symlinked to ~/.claude/)
 │   ├── agents/         # Project agents (1): diagnose-dotfiles (real file, dotfiles-specific)
-│   └── skills/         # Local skills (13): brew-manage, health-check, zsh-config, etc.
+│   └── skills/         # Local skills — source of truth is the directory (ls .claude/skills/)
 │
 ├── .github/
 │   └── workflows/main.yml  # CI/CD (gitleaks + shellcheck)
@@ -162,19 +162,9 @@ Packs in `snkrheadz/the-boris-way` (declared in `settings.json`, installed via `
 The spec pipeline is provided by `spec@the-boris-way` (`/spec:scan` → … → `/spec:review`);
 the former `claude/commands/spec-*.md` + `implement-with-notes` copies were removed.
 
-**Local Skills** (13) - Project-specific, in `.claude/skills/`:
-
-These skills are **only available in this repository** (not symlinked to `~/.claude/`):
-- `brew-manage` - Homebrew package management
-- `claude-config` - Claude Code configuration management
-- `dotfiles-rollback` - Backup and rollback
-- `dotfiles-sync` - Manual dotfiles sync
-- `git-config` - Git configuration files
-- `health-check` - Dotfiles health check
-- `hf-spaces` - HuggingFace Spaces search
-- `mise-runtime` - Runtime management (mise)
-- `new-machine-setup` - New machine setup guide
-- `security-check` - Security scanning
-- `symlink-manage` - Symlink management
-- `tmux-config` - tmux configuration
-- `zsh-config` - zsh configuration
+**Local Skills** - Project-specific, in `.claude/skills/` (only available in this
+repository, not symlinked to `~/.claude/`). The directory is the source of truth:
+list them with `ls .claude/skills/`; each `SKILL.md`'s `description:` frontmatter
+carries its purpose and triggers. The human-readable table lives in README.md and
+`scripts/verify.sh` fails when a skill is missing from it — no hand-maintained
+count to rot here.

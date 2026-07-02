@@ -23,7 +23,8 @@ agent_ready: yes
 | C 標準化・一貫性 | 4 | shebang は10本すべて `#!/bin/bash` で統一。ディレクトリ構成は CLAUDE.md に明文化、symlink は `safe_ln()` に集約。一貫性は高い。 |
 
 ## ROI順 仕様バックログ
-各行はそのまま `/spec-requirement "<intent>"` に流せる一言。
+各行はそのまま `/spec:requirement "<intent>"` に流せる一言。
+（2026-07-02 追記: 旧 `/spec-requirement` コマンドは spec@the-boris-way の `/spec:requirement` へ昇格・置換済み。）
 | # | intent（一言） | impact | effort | ROI | 由来した柱 |
 | --- | --- | --- | --- | --- |
 | 1 | CI が hooks と statusline を shellcheck しておらず、検証ハーネス自身の不備を検知できない | high | low | ★★★ | B |
@@ -35,5 +36,5 @@ agent_ready: yes
 **検証ハーネス自身が検証されていない。** CI の shellcheck 対象は `install.sh rollback.sh scripts/*.sh` に限定され、`claude/hooks/verify-git-on-stop.sh`・`claude/hooks/validate-shell.sh`・`claude/statusline.sh`・`.claude/hooks/validate-zenn-md.sh` の4本が抜けている。このうち hooks 2本は、エージェントの作業全体が依存している安全網そのもの。ここが壊れても CI は緑のまま通り、検証の検証に穴が開く — Niklas の「検証こそ最も投資不足のレバー」がこの repo にそのまま当てはまる箇所。まず #1 で CI 対象を全 .sh に広げ、#2 で verify を単一コマンドに束ねれば、エージェントが「壊れていないこと」を毎回確実に観測できるようになる。
 
 ## スコープ外で気づいた負債
-- `launchd-manage` skill は非推奨/廃止だが残存（CLAUDE.md に記載済み）。掃除候補だが今回の検証レディネスとは無関係。
+- `launchd-manage` skill は非推奨/廃止だが残存（CLAUDE.md に記載済み）。掃除候補だが今回の検証レディネスとは無関係。（2026-07-02 追記: PR #116 で削除済み。）
 - 振る舞いテスト不在(柱A)は dotfiles の性質上ある程度は許容範囲。ただし install/rollback は破壊的操作を含むため、#4 の優先度は環境次第で上がる。

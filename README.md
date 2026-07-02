@@ -85,7 +85,7 @@ laptop/
 │
 ├── .claude/                # Project-local config (NOT symlinked to ~/.claude/)
 │   ├── agents/             # Project agents (1): diagnose-dotfiles (dotfiles-specific)
-│   └── skills/             # Local skills (13)
+│   └── skills/             # Local skills (see table in Claude Code Configuration)
 │
 ├── scripts/
 │   ├── auto-sync.sh               # Manual dotfiles sync script (commit & push)
@@ -275,23 +275,14 @@ alias deploy="./scripts/deploy-work.sh"
 
 ## Spec-Driven Development
 
-The spec pipeline ships as the **`spec@the-boris-way`** marketplace pack and takes a
-change from a one-line idea to a mergeable PR, stopping at a human-approved gate at
-each phase:
-
-```text
-/spec:scan → /spec:requirement → /spec:design → /spec:tasks
-           → /spec:implement → /spec:review → /eng:create-pr
-```
-
-Each command runs a single phase, writes one artifact under `specs/<id>/`, and stops for
-your review. Approval is just editing a `status:` line in the generated file. The design
-favors observable acceptance criteria, per-task verification, and an isolated-context
+The spec pipeline ships as the **`spec@the-boris-way`** marketplace pack: it takes a
+change from a one-line idea to a mergeable PR through human-approved gates, one phase
+per command, favoring observable acceptance criteria and an isolated-context
 adversarial review before any PR.
 
-See the pack's guide (`spec/README.md` in **snkrheadz/the-boris-way**) for each command,
-the gates, worked examples, and the artifact layout. This repo's `specs/` directory
-holds the generated artifacts.
+See **[specs/README.md](specs/README.md)** for the flow diagram and this repo's
+artifact layout, and the pack's guide (`spec/README.md` in **snkrheadz/the-boris-way**)
+for full usage.
 
 ## Development Notes
 
@@ -329,12 +320,12 @@ claude/
 └── hooks/              # Lifecycle hooks (2)
     ├── validate-shell.sh           # PostToolUse: shellcheck validation
     └── verify-git-on-stop.sh       # Stop: surfaces ground-truth git/PR state vs self-report
-    # side-job-researcher is personal → kept machine-local in ~/.claude/agents/ (not here)
-    # Shareable skills AND agents (incl. verify-subagent-result, research pack) live in
-    # the snkrheadz/the-boris-way marketplace (core/pm/eng/research/strategy/writing/spec
-    # packs); invoked as /<pack>:<skill> or enabled per role via
-    # `/plugin install <pack>@the-boris-way`.
 ```
+
+> `side-job-researcher` is personal → kept machine-local in `~/.claude/agents/` (not here).
+> Shareable skills AND agents (incl. `verify-subagent-result`, research pack) live in the
+> **snkrheadz/the-boris-way** marketplace (core/pm/eng/research/strategy/writing/spec packs);
+> invoked as `/<pack>:<skill>` or enabled per role via `/plugin install <pack>@the-boris-way`.
 
 ### Managed Components
 
@@ -400,7 +391,7 @@ All shareable skills migrated to the **snkrheadz/the-boris-way** marketplace
 
 ### Local Skills (Project-specific)
 
-The `.claude/skills/` directory contains 13 project-specific skills that are **only available in this repository** (not symlinked to `~/.claude/`). These skills are tailored for managing this dotfiles repository.
+The `.claude/skills/` directory contains the project-specific skills listed below, **only available in this repository** (not symlinked to `~/.claude/`). They are tailored for managing this dotfiles repository; `scripts/verify.sh` fails when a skill on disk is missing from this table.
 
 | Skill | Description |
 |-------|-------------|
