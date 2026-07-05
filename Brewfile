@@ -77,6 +77,8 @@ brew "ghostscript"
 brew "ghq"
 # Distributed revision control system
 brew "git"
+# Git extension for versioning large files
+brew "git-lfs"
 # Prevents you from committing sensitive information to a git repo
 brew "git-secrets"
 # Audit git repos for secrets
@@ -272,6 +274,8 @@ cask "maczip4win"
 cask "neohtop"
 # App to write, plan, collaborate, and get organised
 cask "notion"
+# Knowledge base that works on top of a local folder of plain text Markdown files
+cask "obsidian"
 # Menu bar app to find and kill processes running on open ports
 cask "productdevbook/tap/portkiller"
 # Command-line shell and scripting language
