@@ -1,12 +1,16 @@
 #!/bin/bash
 # Claude Code Status Line Script
-# Displays: Model | Dir+Branch | Duration | Cost(session/daily) | Lines | ctx bar | 5h/7d rate-limit bars | Vim | Agent
+# Displays: Model | Dir+Branch | Duration | ctx bar | 5h/7d rate-limit bars | Vim | Agent
 #   Braille dots (⠀–⣿) show fill level; TrueColor gradient green→yellow→red by %
 #   ctx = current session's live context-window fill, computed by Claude Code itself (input-token-only,
 #   resets on /compact). 5h/7d = Claude.ai subscription account rate limits (blank under API-key auth).
 #   Neither is directly comparable to external usage monitors (e.g. CodexBar), which poll account-level
 #   rate limits on their own schedule and have no equivalent to ctx at all — differences vs. such tools
 #   are expected, not a bug here.
+#   Cost and lines-changed are intentionally NOT shown here — they aren't signals for whether to keep
+#   trusting the agent's autonomous run, just after-the-fact totals `/cost`/`git diff` already answer.
+#   Cost crossing a threshold instead fires a one-shot native notification via hooks/cost-alert.sh
+#   (Stop hook), which shares this script's daily-cost usage file.
 #
 # Installation:
 #   1. Symlink to ~/.claude/statusline.sh
@@ -70,8 +74,6 @@ eval "$(echo "$input" | jq -r '
   "COST=" + (.cost.total_cost_usd // 0 | tostring | @sh),
   "SESSION_ID=" + (.session_id // "unknown" | @sh),
   "DURATION_MS=" + (.cost.total_duration_ms // 0 | tostring | @sh),
-  "LINES_ADDED=" + (.cost.total_lines_added // 0 | tostring | @sh),
-  "LINES_REMOVED=" + (.cost.total_lines_removed // 0 | tostring | @sh),
   "USED_PCT=" + (.context_window.used_percentage // 0 | tostring | @sh),
   "CTX_SIZE=" + (.context_window.context_window_size // 0 | tostring | @sh),
   "EXCEEDS_200K=" + (.exceeds_200k_tokens // false | tostring | @sh),
@@ -90,7 +92,7 @@ eval "$(echo "$input" | jq -r '
 
 # Fallback defaults if jq parsing failed
 : "${MODEL:=Unknown}" "${CURRENT_DIR:=.}" "${COST:=0}" "${SESSION_ID:=unknown}"
-: "${DURATION_MS:=0}" "${LINES_ADDED:=0}" "${LINES_REMOVED:=0}"
+: "${DURATION_MS:=0}"
 : "${USED_PCT:=0}" "${CTX_SIZE:=0}" "${EXCEEDS_200K:=false}"
 : "${INPUT_TOKENS:=0}" "${CACHE_READ:=0}" "${CACHE_CREATE:=0}"
 : "${OUTPUT_TOKENS:=0}" "${TOTAL_INPUT_TOKENS:=0}" "${TOTAL_OUTPUT_TOKENS:=0}" "${REMAINING_PCT:=0}"
@@ -143,7 +145,7 @@ format_tokens() {
     fi
 }
 
-# === Daily cumulative cost tracking ===
+# === Daily cumulative cost tracking (feeds hooks/cost-alert.sh, not displayed here) ===
 TODAY=$(date +%Y-%m-%d)
 USAGE_DIR="$HOME/.claude/usage"
 USAGE_FILE="$USAGE_DIR/$TODAY.json"
@@ -163,8 +165,6 @@ jq --arg sid "$SESSION_ID" --argjson cost "$COST" \
     "$USAGE_FILE" > "$USAGE_FILE.tmp" 2>/dev/null \
     && mv "$USAGE_FILE.tmp" "$USAGE_FILE"
 
-DAILY_TOTAL=$(jq '[.sessions | to_entries[] | .value] | add // 0' "$USAGE_FILE" 2>/dev/null || echo "0")
-
 exec 200>&-
 
 # === Build output segments ===
@@ -179,15 +179,7 @@ SEGMENTS+=("${DIR_NAME}${BRANCH_DISPLAY}")
 # [3] Session duration
 SEGMENTS+=("⏱ $(format_duration "$DURATION_MS")")
 
-# [4] Cost: session / daily
-SEGMENTS+=("💰$(printf '$%.2f/$%.2f' "$COST" "$DAILY_TOTAL")")
-
-# [5] Lines changed (skip if zero)
-if [ "$LINES_ADDED" -gt 0 ] || [ "$LINES_REMOVED" -gt 0 ]; then
-    SEGMENTS+=("+${LINES_ADDED}-${LINES_REMOVED}")
-fi
-
-# [6] Braille context bar — matches Python fmt(): {DIM}label{R} {gradient_bar} {pct}%
+# [4] Braille context bar — matches Python fmt(): {DIM}label{R} {gradient_bar} {pct}%
 if [ "$CTX_SIZE" -gt 0 ]; then
     PCT=${USED_PCT%%.*}
     PCT=${PCT:-0}
@@ -196,7 +188,7 @@ if [ "$CTX_SIZE" -gt 0 ]; then
     SEGMENTS+=("${DIM}ctx${RESET} ${CTX_COLOR}${CTX_BAR}${RESET} ${PCT}%")
 fi
 
-# [7] 5h rate limit bar (only if data exists)
+# [5] 5h rate limit bar (only if data exists)
 if [ "$FIVE_HOUR_PCT" -ge 0 ] 2>/dev/null; then
     FH_PCT=${FIVE_HOUR_PCT%%.*}
     FH_COLOR=$(gradient "$FH_PCT")
@@ -204,7 +196,7 @@ if [ "$FIVE_HOUR_PCT" -ge 0 ] 2>/dev/null; then
     SEGMENTS+=("${DIM}5h*${RESET} ${FH_COLOR}${FH_BAR}${RESET} ${FH_PCT}%")
 fi
 
-# [8] 7d rate limit bar (only if data exists)
+# [6] 7d rate limit bar (only if data exists)
 if [ "$SEVEN_DAY_PCT" -ge 0 ] 2>/dev/null; then
     SD_PCT=${SEVEN_DAY_PCT%%.*}
     SD_COLOR=$(gradient "$SD_PCT")
@@ -212,12 +204,12 @@ if [ "$SEVEN_DAY_PCT" -ge 0 ] 2>/dev/null; then
     SEGMENTS+=("${DIM}7d*${RESET} ${SD_COLOR}${SD_BAR}${RESET} ${SD_PCT}%")
 fi
 
-# [9] Vim mode (if active)
+# [7] Vim mode (if active)
 if [ -n "$VIM_MODE" ]; then
     SEGMENTS+=("$VIM_MODE")
 fi
 
-# [10] Agent name (if running as subagent)
+# [8] Agent name (if running as subagent)
 if [ -n "$AGENT_NAME" ]; then
     SEGMENTS+=("🤖${AGENT_NAME}")
 fi

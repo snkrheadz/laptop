@@ -81,7 +81,7 @@ laptop/
 │   ├── settings.json       # Hooks, plugins, permissions
 │   ├── statusline.sh       # Custom status line script
 │   ├── loop.md             # Default no-arg /loop maintenance routine
-│   └── hooks/              # Lifecycle hooks (2)
+│   └── hooks/              # Lifecycle hooks (3)
 │
 ├── .claude/                # Project-local config (NOT symlinked to ~/.claude/)
 │   ├── agents/             # Project agents (1): diagnose-dotfiles (dotfiles-specific)
@@ -317,9 +317,10 @@ claude/
 ├── settings.json       # Hooks, plugins, permissions
 ├── statusline.sh       # Custom status line script
 ├── loop.md             # Default no-arg /loop maintenance routine
-└── hooks/              # Lifecycle hooks (2)
+└── hooks/              # Lifecycle hooks (3)
     ├── validate-shell.sh           # PostToolUse: shellcheck validation
-    └── verify-git-on-stop.sh       # Stop: surfaces ground-truth git/PR state vs self-report
+    ├── verify-git-on-stop.sh       # Stop: surfaces ground-truth git/PR state vs self-report
+    └── cost-alert.sh               # Stop: native notification when session/daily cost crosses a threshold
 ```
 
 > `side-job-researcher` is personal → kept machine-local in `~/.claude/agents/` (not here).
@@ -333,8 +334,8 @@ claude/
 |-----------|-------------|
 | `CLAUDE.md` | User global instructions (Workflow Orchestration, §1–5 + model routing) |
 | `settings.json` | Hooks, plugins, permissions |
-| `statusline.sh` | Status line: model, dir+branch, duration, cost (session/daily), lines, braille bars (ctx/5h*/7d*) |
-| `hooks/` | 2 lifecycle hooks (PostToolUse, Stop) |
+| `statusline.sh` | Status line: model, dir+branch, duration, braille bars (ctx/5h*/7d*) — cost/lines moved to `cost-alert.sh` |
+| `hooks/` | 3 lifecycle hooks (PostToolUse, Stop ×2) |
 | shareable agents | eng/research packs in the snkrheadz/the-boris-way marketplace |
 
 ### Status Line
@@ -342,7 +343,7 @@ claude/
 Displays in Claude Code CLI (segments joined by ` | `, conditional ones shown only when data exists):
 
 ```
-Opus 4.8 | laptop 🌿main | ⏱ 5m | 💰$0.50/$5.20 | +120-45 | ctx ⣿⣿⣄ 45% | 5h* ⣄⠀⠀ 12% | 7d* ⣶⠀⠀ 18%
+Opus 4.8 | laptop 🌿main | ⏱ 5m | ctx ⣿⣿⣄ 45% | 5h* ⣄⠀⠀ 12% | 7d* ⣶⠀⠀ 18%
 ```
 
 | Segment | Meaning |
@@ -350,11 +351,13 @@ Opus 4.8 | laptop 🌿main | ⏱ 5m | 💰$0.50/$5.20 | +120-45 | ctx ⣿⣿⣄ 
 | `Opus 4.8` | Model display name |
 | `laptop 🌿main` | Current directory + git branch |
 | `⏱ 5m` | Session duration |
-| `💰$0.50/$5.20` | Cost: this session / today's cumulative total |
-| `+120-45` | Lines added/removed (hidden when zero) |
 | `ctx ⣿⣿⣄ 45%` | Context window usage (braille bar, green→yellow→red gradient) |
 | `5h* ⣄⠀⠀ 12%` | 5-hour rate limit usage — all models combined (`*` = not Sonnet-only; shown if available) |
 | `7d* ⣶⠀⠀ 18%` | 7-day rate limit usage — all models combined (`*` = not Sonnet-only; shown if available) |
+
+Cost and lines-changed are not shown — they aren't signals for whether to keep trusting the
+agent's autonomous run. `hooks/cost-alert.sh` fires a native notification instead, once per
+session, when cost crosses a threshold (defaults: $5 session / $20 daily; see below).
 
 Vim mode and `🤖<agent>` (subagent name) segments are appended when active.
 
@@ -364,6 +367,7 @@ Vim mode and `🤖<agent>` (subagent name) segments are appended when active.
 |------|----------------|-------------|
 | `validate-shell.sh` | PostToolUse | Runs shellcheck on `.sh` files after Write/Edit |
 | `verify-git-on-stop.sh` | Stop | Surfaces ground-truth git/PR state when the last reply claims a commit/push/PR/merge |
+| `cost-alert.sh` | Stop | Native notification, once per session, when session/daily cost crosses a threshold (env-overridable, default $5/$20) |
 
 ### Agents
 
