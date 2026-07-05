@@ -1,8 +1,12 @@
 #!/bin/bash
 # Claude Code Status Line Script
-# Displays: Model | Dir+Branch | Duration | Cost(session/daily) | Lines | Braille Token Bar
-# Token bar: 🧠 ⣿⣿⡇⠀⠀ PCT% IN:⣿⡇ CR:⣿⣿ OUT:⡀⠀ Nk left
-#   Braille dots (⠀–⣿) show fill level; TrueColor gradient green→yellow→red by context %
+# Displays: Model | Dir+Branch | Duration | Cost(session/daily) | Lines | ctx bar | 5h/7d rate-limit bars | Vim | Agent
+#   Braille dots (⠀–⣿) show fill level; TrueColor gradient green→yellow→red by %
+#   ctx = current session's live context-window fill, computed by Claude Code itself (input-token-only,
+#   resets on /compact). 5h/7d = Claude.ai subscription account rate limits (blank under API-key auth).
+#   Neither is directly comparable to external usage monitors (e.g. CodexBar), which poll account-level
+#   rate limits on their own schedule and have no equivalent to ctx at all — differences vs. such tools
+#   are expected, not a bug here.
 #
 # Installation:
 #   1. Symlink to ~/.claude/statusline.sh
@@ -213,7 +217,7 @@ if [ -n "$VIM_MODE" ]; then
     SEGMENTS+=("$VIM_MODE")
 fi
 
-# [9] Agent name (if running as subagent)
+# [10] Agent name (if running as subagent)
 if [ -n "$AGENT_NAME" ]; then
     SEGMENTS+=("🤖${AGENT_NAME}")
 fi
