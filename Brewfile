@@ -237,6 +237,8 @@ cask "arc"
 cask "brave-browser"
 # Ghostty-based terminal with vertical tabs and notifications for AI coding agents
 cask "cmux"
+# Menu bar usage monitor for Codex and Claude
+cask "steipete/tap/codexbar", trusted: true
 # Write, edit, and chat about your code with AI
 cask "cursor"
 # Server and cloud storage browser
@@ -302,5 +304,14 @@ cask "wkhtmltopdf"
 cask "zed"
 # Video communication and virtual meeting platform
 cask "zoom"
-npm "pnpm"
-npm "yarn"
+go "cmd/go"
+go "cmd/gofmt"
+go "github.com/golangci/golangci-lint/v2/cmd/golangci-lint"
+go "golang.org/x/tools/gopls"
+go "go.uber.org/mock/mockgen"
+go "honnef.co/go/tools/cmd/staticcheck"
+npm "@colbymchenry/codegraph"
+npm "@google/clasp"
+npm "agent-browser"
+npm "typescript-language-server"
+npm "typescript"
