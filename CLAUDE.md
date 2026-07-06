@@ -72,7 +72,7 @@ codegraph status                          # インデックスの状態確認
 ├── claude/             # Claude Code config → ~/.claude/
 │   ├── settings.json   # Claude Code settings (hooks, plugins, permissions)
 │   ├── statusline.sh   # Status line display script
-│   ├── CLAUDE.md       # User global instructions (Workflow Orchestration)
+│   ├── CLAUDE.md       # User global instructions (Workflow Orchestration §1–6)
 │   ├── loop.md         # Default no-arg `/loop` maintenance routine (project-agnostic)
 │   └── hooks/          # Lifecycle hooks (3): validate-shell.sh,
 │                       #   verify-git-on-stop.sh, cost-alert.sh
@@ -102,6 +102,16 @@ codegraph status                          # インデックスの状態確認
 
 ## Development Notes
 
+### Closing Gate (run before declaring work done)
+
+- `source ~/.zshrc` loads clean
+- `shellcheck` passes on changed scripts
+- `pre-commit run --all-files` is green
+- the `/health-check` skill reports no broken symlinks
+
+Tools for running the gate: the `verify-shell` agent (from `eng@the-boris-way`),
+the official `/verify` skill, and `/eng:test-and-fix` for repair loops.
+
 ### zsh Loading Order
 
 The `.zshrc` loads configuration in this order:
@@ -128,7 +138,7 @@ The `claude/` directory contains Claude Code settings managed by this repository
 **Managed files** (symlinked to `~/.claude/`):
 - `settings.json` - Hooks, plugins, permissions, statusLine config
 - `statusline.sh` - Status line display script
-- `CLAUDE.md` - User global instructions (Workflow Orchestration §1–§5)
+- `CLAUDE.md` - User global instructions (Workflow Orchestration §1–6)
 - `loop.md` - Default no-arg `/loop` maintenance routine
 
 **Hooks** (3):
@@ -156,9 +166,11 @@ The `claude/` directory contains Claude Code settings managed by this repository
   `migration-assistant`, `oncall-guide`, `state-machine-diagram`,
   `aws-best-practices-advisor`, `gcp-best-practices-advisor`
 - **research**: `arxiv-ai-researcher`, `gemini-api-researcher`, `huggingface-spaces-researcher`, `verify-subagent-result`
+- **craft** (2 agents): `verifier` (`model: sonnet`, fresh-eyes sweep judge), `taste-judge`
+  (`model: opus`, final-gate 3-lens taste panel + DISTILL) — used by `/craft:produce`
 
 Packs in `snkrheadz/the-boris-way` (declared in `settings.json`, installed via `scripts/sync-claude-plugins.sh`, namespaced as `/<pack>:<skill>`):
-`core` | `pm` | `eng` | `research` | `strategy` | `spec` (the marketplace also ships `writing`, not enabled here)
+`core` | `pm` | `eng` | `research` | `strategy` | `spec` | `craft` (the marketplace also ships `writing`, not enabled here)
 
 The spec pipeline is provided by `spec@the-boris-way` (`/spec:scan` → … → `/spec:review`);
 the former `claude/commands/spec-*.md` + `implement-with-notes` copies were removed.

@@ -78,7 +78,7 @@
     "defaultMode": "auto",
     "allowUnsandboxedCommands": false
   },
-  "model": "claude-fable-5[1m]",
+  "model": "sonnet",
   "hooks": {
     "PostToolUse": [
       {
@@ -141,7 +141,8 @@
     "eng@the-boris-way": true,
     "research@the-boris-way": true,
     "strategy@the-boris-way": true,
-    "spec@the-boris-way": true
+    "spec@the-boris-way": true,
+    "craft@the-boris-way": true
   },
   "extraKnownMarketplaces": {
     "the-boris-way": {

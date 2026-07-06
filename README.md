@@ -77,7 +77,7 @@ laptop/
 ├── bin/                    # Executable scripts (tat)
 ├── raycast/                # Raycast settings export
 ├── claude/                 # Claude Code configuration → ~/.claude/
-│   ├── CLAUDE.md           # User global instructions (Workflow Orchestration, §1–5)
+│   ├── CLAUDE.md           # User global instructions (Workflow Orchestration, §1–6)
 │   ├── settings.json       # Hooks, plugins, permissions
 │   ├── statusline.sh       # Custom status line script
 │   ├── loop.md             # Default no-arg /loop maintenance routine
@@ -313,7 +313,7 @@ This repository manages Claude Code settings via symlinks to `~/.claude/`:
 
 ```text
 claude/
-├── CLAUDE.md           # User global instructions (Workflow Orchestration, §1–5)
+├── CLAUDE.md           # User global instructions (Workflow Orchestration, §1–6)
 ├── settings.json       # Hooks, plugins, permissions
 ├── statusline.sh       # Custom status line script
 ├── loop.md             # Default no-arg /loop maintenance routine
@@ -325,14 +325,14 @@ claude/
 
 > `side-job-researcher` is personal → kept machine-local in `~/.claude/agents/` (not here).
 > Shareable skills AND agents (incl. `verify-subagent-result`, research pack) live in the
-> **snkrheadz/the-boris-way** marketplace (core/pm/eng/research/strategy/writing/spec packs);
+> **snkrheadz/the-boris-way** marketplace (core/pm/eng/research/strategy/writing/spec/craft packs);
 > invoked as `/<pack>:<skill>` or enabled per role via `/plugin install <pack>@the-boris-way`.
 
 ### Managed Components
 
 | Component | Description |
 |-----------|-------------|
-| `CLAUDE.md` | User global instructions (Workflow Orchestration, §1–5 + model routing) |
+| `CLAUDE.md` | User global instructions (Workflow Orchestration, §1–6) |
 | `settings.json` | Hooks, plugins, permissions |
 | `statusline.sh` | Status line: model, dir+branch, duration, braille bars (ctx/5h*/7d*) — cost/lines moved to `cost-alert.sh` |
 | `hooks/` | 3 lifecycle hooks (PostToolUse, Stop ×2) |
@@ -389,7 +389,7 @@ in every project — e.g. `eng` provides `code-architect`, `architecture-reviewe
 ### Available Skills
 
 All shareable skills migrated to the **snkrheadz/the-boris-way** marketplace
-(core / pm / eng / research / strategy / writing / spec packs) and are invoked as `/<pack>:<skill>` after
+(core / pm / eng / research / strategy / writing / spec / craft packs) and are invoked as `/<pack>:<skill>` after
 `/plugin install <pack>@the-boris-way` — e.g. `/eng:test-and-fix`,
 `/eng:refactor-swarm`, `/core:first-principles`.
 
