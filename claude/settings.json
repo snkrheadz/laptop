@@ -78,7 +78,7 @@
     "defaultMode": "auto",
     "allowUnsandboxedCommands": false
   },
-  "model": "claude-fable-5[1m]",
+  "model": "sonnet",
   "hooks": {
     "PostToolUse": [
       {
