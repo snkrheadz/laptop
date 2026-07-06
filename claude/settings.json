@@ -169,7 +169,8 @@
       "source": {
         "source": "github",
         "repo": "apoorvjain25/frontier"
-      }
+      },
+      "autoUpdate": false
     }
   },
   "language": "japanese",
