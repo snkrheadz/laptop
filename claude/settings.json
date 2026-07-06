@@ -168,7 +168,8 @@
     "apoorvjain25": {
       "source": {
         "source": "github",
-        "repo": "apoorvjain25/frontier"
+        "repo": "apoorvjain25/frontier",
+        "ref": "v1.1.1"
       },
       "autoUpdate": false
     }
