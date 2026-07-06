@@ -317,9 +317,8 @@ claude/
 ├── settings.json       # Hooks, plugins, permissions
 ├── statusline.sh       # Custom status line script
 ├── loop.md             # Default no-arg /loop maintenance routine
-└── hooks/              # Lifecycle hooks (3)
+└── hooks/              # Lifecycle hooks (2)
     ├── validate-shell.sh           # PostToolUse: shellcheck validation
-    ├── verify-git-on-stop.sh       # Stop: surfaces ground-truth git/PR state vs self-report
     └── cost-alert.sh               # Stop: native notification when session/daily cost crosses a threshold
 ```
 
@@ -366,7 +365,6 @@ Vim mode and `🤖<agent>` (subagent name) segments are appended when active.
 | Hook | Lifecycle Event | Description |
 |------|----------------|-------------|
 | `validate-shell.sh` | PostToolUse | Runs shellcheck on `.sh` files after Write/Edit |
-| `verify-git-on-stop.sh` | Stop | Surfaces ground-truth git/PR state when the last reply claims a commit/push/PR/merge |
 | `cost-alert.sh` | Stop | Native notification, once per session, when session/daily cost crosses a threshold (env-overridable, default $5/$20) |
 
 ### Agents

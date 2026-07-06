@@ -171,8 +171,8 @@ setup_claude_core() {
     rm -f "$HOME/.claude/hooks/session-context.sh"            # cleanup removed hook (redundant with harness-provided git status)
     rm -f "$HOME/.claude/hooks/post-failure-proposal.sh"      # cleanup removed hook (proposals never consumed by governance-review)
     rm -f "$HOME/.claude/hooks/pre-tool-guard.sh"             # cleanup removed local copy (settings.json deny rules + the core@the-boris-way plugin hook cover it)
+    rm -f "$HOME/.claude/hooks/verify-git-on-stop.sh"         # cleanup removed hook (unwanted git-state interjection on Stop)
     safe_ln "$DOTFILES_DIR/claude/hooks/validate-shell.sh" "$HOME/.claude/hooks/validate-shell.sh"
-    safe_ln "$DOTFILES_DIR/claude/hooks/verify-git-on-stop.sh" "$HOME/.claude/hooks/verify-git-on-stop.sh"
     safe_ln "$DOTFILES_DIR/claude/hooks/cost-alert.sh" "$HOME/.claude/hooks/cost-alert.sh"
 
     # claude CLAUDE.md (user global)

@@ -74,8 +74,7 @@ codegraph status                          # インデックスの状態確認
 │   ├── statusline.sh   # Status line display script
 │   ├── CLAUDE.md       # User global instructions (Workflow Orchestration §1–6)
 │   ├── loop.md         # Default no-arg `/loop` maintenance routine (project-agnostic)
-│   └── hooks/          # Lifecycle hooks (3): validate-shell.sh,
-│                       #   verify-git-on-stop.sh, cost-alert.sh
+│   └── hooks/          # Lifecycle hooks (2): validate-shell.sh, cost-alert.sh
 │
 ├── .claude/            # Project-local config (NOT symlinked to ~/.claude/)
 │   ├── agents/         # Project agents (1): diagnose-dotfiles (real file, dotfiles-specific)
@@ -141,9 +140,8 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `CLAUDE.md` - User global instructions (Workflow Orchestration §1–6)
 - `loop.md` - Default no-arg `/loop` maintenance routine
 
-**Hooks** (3):
+**Hooks** (2):
 - `hooks/validate-shell.sh` - PostToolUse hook for shellcheck
-- `hooks/verify-git-on-stop.sh` - Stop hook: when the last reply claims a commit/push/PR/merge, injects actual `git`/`gh pr` state so false-success reports get caught against reality (near-silent otherwise; `stop_hook_active`-guarded)
 - `hooks/cost-alert.sh` - Stop hook: fires a native notification, once per session, when session/daily cost crosses a threshold (default $5/$20, env-overridable) — replaces statusline.sh's old always-on cost segment
 
 > Note: sensitive-file access is guarded by two accident-prevention layers: `settings.json` `deny` rules (harness-native) and the `pre-tool-guard.sh` PreToolUse hook shipped by `core@the-boris-way` (the local copy in `claude/hooks/` was removed; the plugin one still runs on every Bash call). Neither is a security boundary — they catch mistakes, not adversaries. `gh pr create` base-sync is handled by the `/eng:create-pr` skill.
