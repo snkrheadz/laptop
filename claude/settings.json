@@ -141,7 +141,8 @@
     "eng@the-boris-way": true,
     "research@the-boris-way": true,
     "strategy@the-boris-way": true,
-    "spec@the-boris-way": true
+    "spec@the-boris-way": true,
+    "frontier@apoorvjain25": true
   },
   "extraKnownMarketplaces": {
     "the-boris-way": {
@@ -163,10 +164,16 @@
         "source": "directory",
         "path": "/Users/snkrheadz/ghq/github.com/medii-jp/medii-agent-plugins"
       }
+    },
+    "apoorvjain25": {
+      "source": {
+        "source": "github",
+        "repo": "apoorvjain25/frontier"
+      }
     }
   },
   "language": "japanese",
-  "effortLevel": "xhigh",
+  "effortLevel": "high",
   "fastMode": true,
   "voice": {
     "enabled": true,
