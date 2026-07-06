@@ -166,9 +166,11 @@ The `claude/` directory contains Claude Code settings managed by this repository
   `migration-assistant`, `oncall-guide`, `state-machine-diagram`,
   `aws-best-practices-advisor`, `gcp-best-practices-advisor`
 - **research**: `arxiv-ai-researcher`, `gemini-api-researcher`, `huggingface-spaces-researcher`, `verify-subagent-result`
+- **craft** (2 agents): `verifier` (`model: sonnet`, fresh-eyes sweep judge), `taste-judge`
+  (`model: opus`, final-gate 3-lens taste panel + DISTILL) — used by `/craft:produce`
 
 Packs in `snkrheadz/the-boris-way` (declared in `settings.json`, installed via `scripts/sync-claude-plugins.sh`, namespaced as `/<pack>:<skill>`):
-`core` | `pm` | `eng` | `research` | `strategy` | `spec` (the marketplace also ships `writing`, not enabled here)
+`core` | `pm` | `eng` | `research` | `strategy` | `spec` | `craft` (the marketplace also ships `writing`, not enabled here)
 
 The spec pipeline is provided by `spec@the-boris-way` (`/spec:scan` → … → `/spec:review`);
 the former `claude/commands/spec-*.md` + `implement-with-notes` copies were removed.
