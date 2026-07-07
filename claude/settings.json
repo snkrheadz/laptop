@@ -179,14 +179,6 @@
         "serve",
         "--mcp"
       ]
-    },
-    "codex": {
-      "type": "stdio",
-      "command": "codex",
-      "args": [
-        "mcp-server"
-      ],
-      "env": {}
     }
   }
 }
