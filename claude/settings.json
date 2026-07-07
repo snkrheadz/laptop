@@ -158,7 +158,6 @@
   },
   "language": "japanese",
   "effortLevel": "xhigh",
-  "fastMode": true,
   "voice": {
     "enabled": true,
     "mode": "hold"
@@ -180,6 +179,14 @@
         "serve",
         "--mcp"
       ]
+    },
+    "codex": {
+      "type": "stdio",
+      "command": "codex",
+      "args": [
+        "mcp-server"
+      ],
+      "env": {}
     }
   }
 }
