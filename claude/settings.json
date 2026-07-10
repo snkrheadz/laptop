@@ -138,7 +138,9 @@
     "research@the-boris-way": true,
     "strategy@the-boris-way": true,
     "spec@the-boris-way": true,
-    "craft@the-boris-way": true
+    "craft@the-boris-way": true,
+    "codex@openai-codex": true,
+    "datadog@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "the-boris-way": {
@@ -154,10 +156,17 @@
         "repo": "phuryn/pm-skills"
       },
       "autoUpdate": true
+    },
+    "openai-codex": {
+      "source": {
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
+      }
     }
   },
   "language": "japanese",
   "effortLevel": "xhigh",
+  "advisorModel": "opus",
   "voice": {
     "enabled": true,
     "mode": "hold"
