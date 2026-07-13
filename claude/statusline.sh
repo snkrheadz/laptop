@@ -1,12 +1,17 @@
 #!/bin/bash
 # Claude Code Status Line Script
-# Displays: Model | Dir+Branch | Duration | ctx bar | 5h/7d rate-limit bars | Vim | Agent
+# Displays: Model | Dir+Branch | Duration | ctx bar | 5h/7d rate-limit bars | 7d(Fable) | Vim | Agent
 #   Braille dots (⠀–⣿) show fill level; TrueColor gradient green→yellow→red by %
 #   ctx = current session's live context-window fill, computed by Claude Code itself (input-token-only,
 #   resets on /compact). 5h/7d = Claude.ai subscription account rate limits (blank under API-key auth).
 #   Neither is directly comparable to external usage monitors (e.g. CodexBar), which poll account-level
 #   rate limits on their own schedule and have no equivalent to ctx at all — differences vs. such tools
 #   are expected, not a bug here.
+#   7d(Fable) = Fable-specific weekly quota, shown only while the active model is Fable. Pulled from
+#   an UNDOCUMENTED Anthropic endpoint (api.anthropic.com/api/oauth/usage → .limits[] where
+#   kind:"weekly_scoped" and scope.model.display_name:"Fable") via the macOS Keychain OAuth token,
+#   5-minute cached in /tmp/statusline-fable-weekly. Can vanish/change without notice; degrades to
+#   silently omitting the segment if the token, endpoint, or field disappears.
 #   Cost and lines-changed are intentionally NOT shown here — they aren't signals for whether to keep
 #   trusting the agent's autonomous run, just after-the-fact totals `/cost`/`git diff` already answer.
 #   Cost crossing a threshold instead fires a one-shot native notification via hooks/cost-alert.sh
@@ -145,6 +150,28 @@ format_tokens() {
     fi
 }
 
+# === Fable weekly limit (undocumented Anthropic usage endpoint, best-effort, 5min cache) ===
+# scope.model.display_name:"Fable" inside .limits[] (kind:"weekly_scoped") is the only
+# self-describing per-model field found for Fable — other candidate keys on this endpoint
+# (seven_day_opus, seven_day_sonnet, and several internal codenames) were empty/unrelated.
+FABLE_WEEKLY_PCT=""
+if [[ "$MODEL" == *Fable* ]] && command -v security &>/dev/null; then
+    FABLE_CACHE="/tmp/statusline-fable-weekly"
+    if [ -f "$FABLE_CACHE" ] && [ $(($(date +%s) - $(stat -f%m "$FABLE_CACHE" 2>/dev/null || echo 0))) -lt 300 ]; then
+        FABLE_WEEKLY_PCT=$(<"$FABLE_CACHE")
+    else
+        FABLE_TOKEN=$(security find-generic-password -s "Claude Code-credentials" -w 2>/dev/null | jq -r '.claudeAiOauth.accessToken // empty' 2>/dev/null)
+        if [ -n "$FABLE_TOKEN" ]; then
+            FABLE_WEEKLY_PCT=$(curl -s --max-time 3 "https://api.anthropic.com/api/oauth/usage" \
+                -H "Authorization: Bearer $FABLE_TOKEN" \
+                -H "anthropic-beta: oauth-2025-04-20" \
+                -H "Content-Type: application/json" 2>/dev/null \
+                | jq -r '[.limits[]? | select(.kind=="weekly_scoped" and ((.scope.model.display_name // "") | test("Fable"; "i")))][0].percent // empty' 2>/dev/null)
+        fi
+        printf '%s' "$FABLE_WEEKLY_PCT" > "$FABLE_CACHE"
+    fi
+fi
+
 # === Daily cumulative cost tracking (feeds hooks/cost-alert.sh, not displayed here) ===
 TODAY=$(date +%Y-%m-%d)
 USAGE_DIR="$HOME/.claude/usage"
@@ -202,6 +229,14 @@ if [ "$SEVEN_DAY_PCT" -ge 0 ] 2>/dev/null; then
     SD_COLOR=$(gradient "$SD_PCT")
     SD_BAR=$(braille_bar "$SD_PCT" 8)
     SEGMENTS+=("${DIM}7d*${RESET} ${SD_COLOR}${SD_BAR}${RESET} ${SD_PCT}%")
+fi
+
+# [6b] Fable weekly limit bar (model-scoped, only if data exists)
+if [ -n "$FABLE_WEEKLY_PCT" ]; then
+    FW_PCT=${FABLE_WEEKLY_PCT%%.*}
+    FW_COLOR=$(gradient "$FW_PCT")
+    FW_BAR=$(braille_bar "$FW_PCT" 8)
+    SEGMENTS+=("${DIM}7d(Fable)${RESET} ${FW_COLOR}${FW_BAR}${RESET} ${FW_PCT}%")
 fi
 
 # [7] Vim mode (if active)
