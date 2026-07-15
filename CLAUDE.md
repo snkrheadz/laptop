@@ -84,7 +84,8 @@ codegraph status                          # インデックスの状態確認
 │   └── workflows/main.yml  # CI/CD (gitleaks + shellcheck)
 │
 ├── docs/
-│   └── fable5-vs-opus48.html # Model comparison report (evidence base for model routing)
+│   ├── fable5-vs-opus48.html # Model comparison report (evidence base for model routing)
+│   └── evals-for-ai-agents.md # Evals reference (basis for claude/CLAUDE.md §4 evals rule)
 │
 ├── .codegraph/               # CodeGraph index (SQLite 知識グラフ、MCP デーモンが FS ウォッチで自動更新)
 │

@@ -106,6 +106,12 @@ Exit 0, green lint, and passing types close nothing on their own.
   none exists, build it before starting the run.
 - **Per-repo closing gates:** when the repo's project CLAUDE.md defines one, run it
   before declaring work done.
+- **Evals are the new-model lever.** Agent/product behavior worth keeping gets a
+  small eval suite: 20–50 tasks sourced from real failures; grade outcomes, not
+  paths; capability evals may start near 0%, regression evals stay ~100%. When a
+  new model ships, run the suite before rewriting prompts — adopt on measured
+  wins, and never trust a grader whose failing transcripts you haven't read.
+  Full context: laptop repo `docs/evals-for-ai-agents.md`.
 
 
 ## 5. Loop & routine primitives: pick by what triggers the next turn
