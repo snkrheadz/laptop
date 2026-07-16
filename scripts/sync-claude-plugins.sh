@@ -91,7 +91,20 @@ installed="$(claude plugin list || true)"
 while IFS= read -r plugin; do
     [[ -z "$plugin" ]] && continue
     if printf '%s\n' "$installed" | grep -qF "$plugin"; then
-        log_info "  $plugin: already installed — skipping"
+        # Installed is NOT enough: an already-present pack must still be
+        # version-checked, or a marketplace release silently never lands
+        # (core sat at 0.7.0 after 0.8.0 shipped until a manual update —
+        # 2026-07). Update failure is a warning, not a sync failure: the
+        # installed version keeps working, we just could not check for new.
+        if out="$(claude plugin update "$plugin" 2>&1)"; then
+            if printf '%s\n' "$out" | grep -q "updated from"; then
+                log_success "  $plugin: $(printf '%s\n' "$out" | grep -o 'updated from [^"]*' | head -1)"
+            else
+                log_info "  $plugin: already up to date"
+            fi
+        else
+            log_warning "  $plugin: update check failed (kept current version)"
+        fi
         continue
     fi
     if claude plugin install "$plugin" >/dev/null 2>&1; then
