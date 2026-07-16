@@ -242,6 +242,37 @@ check_hook_tests() {
     fi
 }
 
+# 9. Hook wiring parity: every ~/.claude/hooks/*.sh referenced in
+#    claude/settings.json must exist in claude/hooks/ (and not be a test file).
+#    install.sh links hooks by glob, so a repo file present here is guaranteed
+#    to be linked; a wired-but-missing file means the hook is dead on install.
+check_hook_wiring() {
+    hr "hook-wiring"
+    local missing=0 wired
+    # shellcheck disable=SC2088  # matching the literal '~/...' string in JSON, not expanding it
+    wired=$(grep -oE '~/.claude/hooks/[A-Za-z0-9._-]+\.sh' claude/settings.json | sort -u)
+    if [[ -z "$wired" ]]; then
+        record "hook-wiring" "SKIP" "settings.json に hooks 配線なし"
+        return
+    fi
+    while IFS= read -r w; do
+        local n
+        n="$(basename "$w")"
+        if [[ "$n" == *_test.sh ]]; then
+            echo "  wired hook is a test file: $n"
+            missing=$((missing + 1))
+        elif [[ ! -f "claude/hooks/$n" ]]; then
+            echo "  wired hook has no repo file: claude/hooks/$n"
+            missing=$((missing + 1))
+        fi
+    done <<< "$wired"
+    if [[ $missing -eq 0 ]]; then
+        record "hook-wiring" "PASS" ""
+    else
+        record "hook-wiring" "FAIL" "配線と実ファイルの不一致 ${missing} 件"
+    fi
+}
+
 echo "verify: env=$ENV  root=$DOTFILES_DIR"
 check_shellcheck
 check_precommit
@@ -251,6 +282,7 @@ check_install_tests
 check_shell_init
 check_docs_drift
 check_hook_tests
+check_hook_wiring
 
 echo
 echo "════ verify summary ════"

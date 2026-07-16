@@ -15,19 +15,41 @@
 # Exit codes: 0 = allow (the common path and every fail-open branch);
 #             2 = block, with the reason on stderr (base confirmed stale).
 
-input=$(cat)
+# Builtin read (no `cat` fork): this hook fires on EVERY Bash call, so the
+# non-matching fast path must spawn zero processes. read -d '' consumes stdin
+# to EOF and returns non-zero there — that is its success mode, hence || true.
+IFS= read -r -d '' input || true
 
-# Cheap pure-builtin pre-filter: the literal substring survives JSON encoding,
-# so if the raw payload can't contain `gh pr create` there is nothing to guard
-# and we skip spawning jq on every Bash call.
-[[ "$input" == *"gh pr create"* ]] || exit 0
+# Cheap pure-builtin pre-filter: any guarded invocation must contain the
+# literal `pr create` (it survives JSON encoding). `gh` is NOT required here —
+# flags may sit between (`gh -R owner/repo pr create`); the regex below does
+# the precise match. No substring → nothing to guard, zero processes spawned.
+[[ "$input" == *"pr create"* ]] || exit 0
 
 # jq parses the tool_input JSON; without it we cannot read the command → allow.
 command -v jq &> /dev/null || exit 0
-cmd=$(echo "$input" | jq -r '.tool_input.command // empty' 2>/dev/null)
+cmd=$(jq -r '.tool_input.command // empty' <<< "$input" 2>/dev/null)
+[[ -n "$cmd" ]] || exit 0
 
-# Confirm the actual command (not just some other field) invokes gh pr create.
-[[ "$cmd" == *"gh pr create"* ]] || exit 0
+# Precision match, two steps. The asymmetry is deliberate: a missed match
+# fails open (acceptable — this is a mistake guardrail, not a security
+# boundary), while a false match blocks unrelated work (never acceptable).
+#  1. Strip quoted spans, so `gh pr create` appearing as DATA (a commit
+#     message, an echo, a doc line) cannot trigger the guard.
+#  2. Require an actual invocation: `gh` at a command position with
+#     `pr create` in the same pipeline segment (flags like -R may intervene).
+stripped=$(sed -E "s/'[^']*'//g; s/\"[^\"]*\"//g" <<< "$cmd" 2>/dev/null) || stripped="$cmd"
+grep -Eq '(^|[;&|[:space:]])gh[[:space:]]+([^;&|]*[[:space:]])?pr[[:space:]]+create([[:space:]]|$|[;&|)])' \
+    <<< "$stripped" || exit 0
+
+# A command that performs its own base sync before creating the PR — the
+# documented /eng:create-pr flow runs fetch→merge→push→create as ONE Bash
+# block — must not be blocked: PreToolUse inspects the pre-merge HEAD, but the
+# block itself establishes the invariant before `gh pr create` runs. Trust it.
+if grep -Eq 'git[[:space:]]+fetch' <<< "$stripped" \
+    && grep -Eq 'git[[:space:]]+(merge|rebase|pull)' <<< "$stripped"; then
+    exit 0
+fi
 
 # From here we inspect git state; any failure means we cannot prove staleness → allow.
 git rev-parse --git-dir &> /dev/null || exit 0        # not a git repo

@@ -5,6 +5,9 @@
 # an isolated mktemp dir OUTSIDE this repository, feeds the hook a PreToolUse
 # stdin payload, and asserts the exit code:
 #   red        — HEAD behind origin/main            → 2 (block)
+#   red-flags  — `gh -R <repo> pr create`, stale     → 2 (block; flags between gh/pr)
+#   compose    — self-syncing /eng:create-pr block   → 0 (allow; block syncs itself)
+#   data       — `gh pr create` as quoted data       → 0 (allow; not an invocation)
 #   green      — HEAD in sync with origin/main       → 0 (allow)
 #   skip       — command is not `gh pr create`       → 0 (allow, pre-filter)
 #   non-git    — cwd is not a git repo               → 0 (fail-open)
@@ -81,6 +84,48 @@ if [[ "$red_err" == *"Base branch is stale"* && "$red_err" == *"/eng:create-pr"*
     pass "red: stderr names the stale base and /eng:create-pr"
 else
     fail "red: stderr missing expected message (got: ${red_err:-<empty>})"
+fi
+
+# --- red-flags: `gh -R owner/repo pr create` (flags between gh and pr) -----
+# The guard must catch flag-bearing invocations, not only the bare form.
+RFLAG_JSON='{"tool_name":"Bash","tool_input":{"command":"gh -R snkrheadz/laptop pr create --fill"}}'
+rflag_rc=$( cd "$WORK" && echo "$RFLAG_JSON" | "$HOOK" > /dev/null 2>&1; echo $? )
+if [[ "$rflag_rc" == "2" ]]; then
+    pass "red: gh -R <repo> pr create on stale base blocks with exit 2"
+else
+    fail "red: gh -R form expected exit 2, got $rflag_rc"
+fi
+
+# --- compose: the /eng:create-pr single-block flow on a STALE base ---------
+# The skill runs fetch→merge→push→create as ONE Bash block; PreToolUse sees the
+# pre-merge HEAD, so the sync steps inside the same command must grant passage
+# (the block establishes the invariant itself). This is the deadlock guard.
+FLOW_JSON=$(python3 - <<'PYEOF'
+import json
+flow = '''set -euo pipefail
+base=main
+cur=$(git rev-parse --abbrev-ref HEAD)
+git fetch origin "$base"
+git merge --no-edit "origin/$base"
+git push --set-upstream origin "$cur"
+gh pr create --base "$base" --fill'''
+print(json.dumps({"tool_name": "Bash", "tool_input": {"command": flow}}))
+PYEOF
+)
+flow_rc=$( cd "$WORK" && echo "$FLOW_JSON" | "$HOOK" > /dev/null 2>&1; echo $? )
+if [[ "$flow_rc" == "0" ]]; then
+    pass "compose: self-syncing /eng:create-pr block allows with exit 0 even when stale"
+else
+    fail "compose: self-syncing block expected exit 0, got $flow_rc"
+fi
+
+# --- data: `gh pr create` as quoted data must never block ------------------
+DATA_JSON='{"tool_name":"Bash","tool_input":{"command":"git commit -m \"docs: explain the gh pr create workflow\""}}'
+data_rc=$( cd "$WORK" && echo "$DATA_JSON" | "$HOOK" > /dev/null 2>&1; echo $? )
+if [[ "$data_rc" == "0" ]]; then
+    pass "data: quoted mention of gh pr create allows with exit 0"
+else
+    fail "data: quoted mention expected exit 0, got $data_rc"
 fi
 
 # --- green: fresh clone in sync with origin/main --------------------------
