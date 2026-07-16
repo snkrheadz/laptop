@@ -10,6 +10,7 @@
 #   5. gitleaks     — standalone secret scan (also runs inside pre-commit)
 #   6. install-tests — install.sh / rollback.sh behavior tests (isolated HOME)
 #   7. docs-drift   — every .claude/skills/ skill appears in README.md's table
+#   8. hook-tests   — check-pr-base.sh PR-base guard behavior (red/green + fail-open)
 #
 # Same command in CI and locally; the environment is detected and inapplicable
 # checks are reported as SKIP (with a reason) — never silently treated as pass.
@@ -224,6 +225,54 @@ check_docs_drift() {
     fi
 }
 
+# 8. Behavior tests for the PreToolUse PR-base guard (claude/hooks/check-pr-base.sh).
+#    Builds throwaway git fixtures (a local bare repo as origin) and asserts the
+#    hook blocks a stale base (exit 2) while failing open (exit 0) on every anomaly.
+check_hook_tests() {
+    hr "hook-tests"
+    if [[ ! -f claude/hooks/check-pr-base_test.sh ]]; then
+        echo "  claude/hooks/check-pr-base_test.sh not found"
+        record "hook-tests" "SKIP" "テスト未配置"
+        return
+    fi
+    if bash claude/hooks/check-pr-base_test.sh; then
+        record "hook-tests" "PASS" ""
+    else
+        record "hook-tests" "FAIL" "フックの振る舞いテスト失敗"
+    fi
+}
+
+# 9. Hook wiring parity: every ~/.claude/hooks/*.sh referenced in
+#    claude/settings.json must exist in claude/hooks/ (and not be a test file).
+#    install.sh links hooks by glob, so a repo file present here is guaranteed
+#    to be linked; a wired-but-missing file means the hook is dead on install.
+check_hook_wiring() {
+    hr "hook-wiring"
+    local missing=0 wired
+    # shellcheck disable=SC2088  # matching the literal '~/...' string in JSON, not expanding it
+    wired=$(grep -oE '~/.claude/hooks/[A-Za-z0-9._-]+\.sh' claude/settings.json | sort -u)
+    if [[ -z "$wired" ]]; then
+        record "hook-wiring" "SKIP" "settings.json に hooks 配線なし"
+        return
+    fi
+    while IFS= read -r w; do
+        local n
+        n="$(basename "$w")"
+        if [[ "$n" == *_test.sh ]]; then
+            echo "  wired hook is a test file: $n"
+            missing=$((missing + 1))
+        elif [[ ! -f "claude/hooks/$n" ]]; then
+            echo "  wired hook has no repo file: claude/hooks/$n"
+            missing=$((missing + 1))
+        fi
+    done <<< "$wired"
+    if [[ $missing -eq 0 ]]; then
+        record "hook-wiring" "PASS" ""
+    else
+        record "hook-wiring" "FAIL" "配線と実ファイルの不一致 ${missing} 件"
+    fi
+}
+
 echo "verify: env=$ENV  root=$DOTFILES_DIR"
 check_shellcheck
 check_precommit
@@ -232,6 +281,8 @@ check_symlinks
 check_install_tests
 check_shell_init
 check_docs_drift
+check_hook_tests
+check_hook_wiring
 
 echo
 echo "════ verify summary ════"

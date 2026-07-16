@@ -172,8 +172,13 @@ setup_claude_core() {
     rm -f "$HOME/.claude/hooks/post-failure-proposal.sh"      # cleanup removed hook (proposals never consumed by governance-review)
     rm -f "$HOME/.claude/hooks/pre-tool-guard.sh"             # cleanup removed local copy (settings.json deny rules + the core@the-boris-way plugin hook cover it)
     rm -f "$HOME/.claude/hooks/verify-git-on-stop.sh"         # cleanup removed hook (unwanted git-state interjection on Stop)
-    safe_ln "$DOTFILES_DIR/claude/hooks/validate-shell.sh" "$HOME/.claude/hooks/validate-shell.sh"
-    safe_ln "$DOTFILES_DIR/claude/hooks/cost-alert.sh" "$HOME/.claude/hooks/cost-alert.sh"
+    # Link EVERY hook by glob, not a hand-maintained list — a new hook wired in
+    # settings.json can otherwise be forgotten here and arrive dead on install.
+    # *_test.sh files are tests, not hooks; they stay repo-only.
+    for hook in "$DOTFILES_DIR"/claude/hooks/*.sh; do
+        [[ "$hook" == *_test.sh ]] && continue
+        safe_ln "$hook" "$HOME/.claude/hooks/$(basename "$hook")"
+    done
 
     # claude CLAUDE.md (user global)
     safe_ln "$DOTFILES_DIR/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
