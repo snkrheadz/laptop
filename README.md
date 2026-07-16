@@ -317,9 +317,10 @@ claude/
 ├── settings.json       # Hooks, plugins, permissions
 ├── statusline.sh       # Custom status line script
 ├── loop.md             # Default no-arg /loop maintenance routine
-└── hooks/              # Lifecycle hooks (2)
+└── hooks/              # Lifecycle hooks (3)
     ├── validate-shell.sh           # PostToolUse: shellcheck validation
-    └── cost-alert.sh               # Stop: native notification when session/daily cost crosses a threshold
+    ├── cost-alert.sh               # Stop: native notification when session/daily cost crosses a threshold
+    └── check-pr-base.sh            # PreToolUse (Bash): block gh pr create on a stale base
 ```
 
 > `side-job-researcher` is personal → kept machine-local in `~/.claude/agents/` (not here).
@@ -334,7 +335,7 @@ claude/
 | `CLAUDE.md` | User global instructions (Workflow Orchestration, §1–6) |
 | `settings.json` | Hooks, plugins, permissions |
 | `statusline.sh` | Status line: model, dir+branch, duration, braille bars (ctx/5h*/7d*) — cost/lines moved to `cost-alert.sh` |
-| `hooks/` | 3 lifecycle hooks (PostToolUse, Stop ×2) |
+| `hooks/` | 3 lifecycle hooks (PreToolUse, PostToolUse, Stop) |
 | shareable agents | eng/research packs in the snkrheadz/the-boris-way marketplace |
 
 ### Status Line
@@ -366,6 +367,7 @@ Vim mode and `🤖<agent>` (subagent name) segments are appended when active.
 |------|----------------|-------------|
 | `validate-shell.sh` | PostToolUse | Runs shellcheck on `.sh` files after Write/Edit |
 | `cost-alert.sh` | Stop | Native notification, once per session, when session/daily cost crosses a threshold (env-overridable, default $5/$20) |
+| `check-pr-base.sh` | PreToolUse (Bash) | Blocks `gh pr create` when `origin/<default-branch>` is not an ancestor of HEAD (stale base); fails open on any anomaly. Run `/eng:create-pr` to sync first |
 
 ### Agents
 

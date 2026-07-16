@@ -12,8 +12,6 @@ model and keep this file minimal.
   pack's `pre-tool-guard` hook — guardrails against mistakes, not a security boundary)
   catch sensitive-file access. So act, don't ask; narrating yes/no just hides the
   calls that matter.
-- **PR creation goes through `/eng:create-pr`.** It syncs the base branch before
-  `gh pr create`, so PRs never open against a stale base.
 - **Skip plan mode for ordinary work.** Reach for `EnterPlanMode` only when a choice
   is hard to reverse (schema/data migrations, public-facing or destructive changes,
   multi-service refactors) or you cannot yet state the acceptance check in one line.

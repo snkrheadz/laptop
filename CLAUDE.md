@@ -74,7 +74,7 @@ codegraph status                          # インデックスの状態確認
 │   ├── statusline.sh   # Status line display script
 │   ├── CLAUDE.md       # User global instructions (Workflow Orchestration §1–6)
 │   ├── loop.md         # Default no-arg `/loop` maintenance routine (project-agnostic)
-│   └── hooks/          # Lifecycle hooks (2): validate-shell.sh, cost-alert.sh
+│   └── hooks/          # Lifecycle hooks (3): validate-shell.sh, cost-alert.sh, check-pr-base.sh
 │
 ├── .claude/            # Project-local config (NOT symlinked to ~/.claude/)
 │   ├── agents/         # Project agents (1): diagnose-dotfiles (real file, dotfiles-specific)
@@ -141,11 +141,12 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `CLAUDE.md` - User global instructions (Workflow Orchestration §1–6)
 - `loop.md` - Default no-arg `/loop` maintenance routine
 
-**Hooks** (2):
+**Hooks** (3):
 - `hooks/validate-shell.sh` - PostToolUse hook for shellcheck
 - `hooks/cost-alert.sh` - Stop hook: fires a native notification, once per session, when session/daily cost crosses a threshold (default $5/$20, env-overridable) — replaces statusline.sh's old always-on cost segment
+- `hooks/check-pr-base.sh` - PreToolUse (Bash) hook: blocks `gh pr create` when `origin/<default-branch>` is not an ancestor of HEAD (base is stale). Fails open on every anomaly (non-git / no origin / jq missing / fetch failure). Behavior tests in `hooks/check-pr-base_test.sh`, run by `scripts/verify.sh`
 
-> Note: sensitive-file access is guarded by two accident-prevention layers: `settings.json` `deny` rules (harness-native) and the `pre-tool-guard.sh` PreToolUse hook shipped by `core@the-boris-way` (the local copy in `claude/hooks/` was removed; the plugin one still runs on every Bash call). Neither is a security boundary — they catch mistakes, not adversaries. `gh pr create` base-sync is handled by the `/eng:create-pr` skill.
+> Note: sensitive-file access is guarded by two accident-prevention layers: `settings.json` `deny` rules (harness-native) and the `pre-tool-guard.sh` PreToolUse hook shipped by `core@the-boris-way` (the local copy in `claude/hooks/` was removed; the plugin one still runs on every Bash call). Neither is a security boundary — they catch mistakes, not adversaries. Fresh-PR-base is enforced by the `check-pr-base.sh` PreToolUse hook, which blocks `gh pr create` when `origin/<default-branch>` is not an ancestor of HEAD; run `/eng:create-pr` (it syncs the base first) to satisfy it.
 
 **Global Agents** (0 in this repo): `claude/agents/` is empty — all shareable agents
 (including `verify-subagent-result`, moved to the `research` pack) live in the
