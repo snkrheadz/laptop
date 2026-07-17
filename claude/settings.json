@@ -87,6 +87,10 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/check-pr-base.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/check-pr-reviewed.sh"
           }
         ]
       }
@@ -98,6 +102,17 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/validate-shell.sh"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/weekly-maintenance.sh"
           }
         ]
       }
@@ -128,7 +143,7 @@
   "worktree": {
     "baseRef": "fresh"
   },
-  "enableWorkflows": false,
+  "enableWorkflows": true,
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh",
