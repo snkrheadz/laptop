@@ -78,7 +78,7 @@
     "defaultMode": "auto",
     "allowUnsandboxedCommands": false
   },
-  "model": "sonnet",
+  "model": "claude-fable-5[1m]",
   "hooks": {
     "PreToolUse": [
       {
@@ -176,7 +176,7 @@
     }
   },
   "language": "japanese",
-  "effortLevel": "xhigh",
+  "effortLevel": "high",
   "advisorModel": "opus",
   "voice": {
     "enabled": true,
