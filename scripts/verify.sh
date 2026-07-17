@@ -228,10 +228,20 @@ check_docs_drift() {
 # 8. Behavior tests for the lifecycle hooks. The test set is DERIVED (every
 #    claude/hooks/*_test.sh runs) so adding a hook test never requires touching
 #    this file — same no-drift principle as the symlink and docs-drift checks.
+#    The parity pass keeps the glob honest: a hook whose test was deleted or
+#    renamed FAILS here instead of silently vanishing from coverage.
 check_hook_tests() {
     hr "hook-tests"
-    local ran=0 failed=0 t
+    local ran=0 failed=0 t h
     shopt -s nullglob
+    # Parity: every hook must have a matching test suite.
+    for h in claude/hooks/*.sh; do
+        [[ "$h" == *_test.sh ]] && continue
+        if [[ ! -f "${h%.sh}_test.sh" ]]; then
+            echo "  hook without a test suite: $h"
+            failed=$((failed + 1))
+        fi
+    done
     for t in claude/hooks/*_test.sh; do
         ran=$((ran + 1))
         echo "  → $t"

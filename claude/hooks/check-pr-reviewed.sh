@@ -47,12 +47,39 @@ grep -Eq '(^|[;&|[:space:]])gh[[:space:]]+([^;&|]*[[:space:]])?pr[[:space:]]+cre
 transcript=$(jq -r '.transcript_path // empty' <<< "$input" 2>/dev/null)
 [[ -n "$transcript" && -f "$transcript" ]] || exit 0
 
-# Review evidence: a ReportFindings tool call, or a code-review /
-# security-review skill invocation, anywhere in this session. grep -q
-# short-circuits on first match, so large transcripts stay cheap.
-if grep -Eq '"name"[[:space:]]*:[[:space:]]*"ReportFindings"|"skill"[[:space:]]*:[[:space:]]*"[^"]*(code-review|security-review)' \
-    "$transcript" 2>/dev/null; then
-    exit 0
+# Review evidence: a ReportFindings tool call, a code-review / security-review
+# Skill invocation, or the harness's attributionSkill stamp. Three INDEPENDENT
+# transcript shapes (verified against a real session 2026-07-17: `"skill":
+# "code-review"` and `"attributionSkill":"code-review"` both occur;
+# ReportFindings is emitted by /code-review's typed-findings path) so a single
+# harness format change cannot silently rot the gate.
+#
+# LC_ALL=C + -a: real transcripts contain invalid-UTF8/NUL bytes, on which BSD
+# grep otherwise errors (exit 2) or takes the binary shortcut — measured to
+# fail-CLOSE this gate on a genuinely reviewed session. Byte-mode scanning
+# sidesteps both. grep -q short-circuits on first match, so multi-MB
+# transcripts stay cheap.
+PATTERN='"name"[[:space:]]*:[[:space:]]*"ReportFindings"|"(skill|attributionSkill)"[[:space:]]*:[[:space:]]*"[^"]*(code-review|security-review)'
+evidence() {
+    LC_ALL=C grep -a -Eq "$PATTERN" "$1" 2>/dev/null
+}
+
+evidence "$transcript"
+rc=$?
+[[ $rc -eq 0 ]] && exit 0
+# grep error (≥2): we cannot prove absence of a review → fail open, per the
+# governing principle. Only a clean no-match (rc 1) may block.
+[[ $rc -ge 2 ]] && exit 0
+
+# A delegated review (/code-review at high effort runs in a subagent) records
+# its evidence in the session's sidecar subagent transcripts, not the main
+# file — scan those too before concluding no review happened.
+subdir="${transcript%.jsonl}/subagents"
+if [[ -d "$subdir" ]]; then
+    for f in "$subdir"/*.jsonl; do
+        [[ -f "$f" ]] || continue
+        evidence "$f" && exit 0
+    done
 fi
 
 echo "No code review found in this session. Run /code-review (or /security-review) on the diff first, then create the PR." >&2

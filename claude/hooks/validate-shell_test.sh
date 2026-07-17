@@ -55,8 +55,9 @@ else
 fi
 
 # --- dirty: shellcheck findings block ------------------------------------------
+# Single invocation: the substitution's $? is the hook's exit code.
 dirty_err=$( "$HOOK" <<< "$(payload "$DIRTY")" 2>&1 >/dev/null )
-rc=$( "$HOOK" <<< "$(payload "$DIRTY")" > /dev/null 2>&1; echo $? )
+rc=$?
 if [[ "$rc" == "2" ]]; then
     pass "dirty: shellcheck findings block with exit 2"
 else
@@ -100,7 +101,7 @@ mkdir -p "$NOSCBIN"
 ln -s "$(command -v cat)" "$NOSCBIN/cat"
 ln -s "$(command -v jq)"  "$NOSCBIN/jq"
 notool_out=$( PATH="$NOSCBIN" "$HOOK" <<< "$(payload "$DIRTY")" 2>&1 >/dev/null )
-notool_rc=$( PATH="$NOSCBIN" "$HOOK" <<< "$(payload "$DIRTY")" > /dev/null 2>&1; echo $? )
+notool_rc=$?
 if [[ "$notool_rc" == "0" && "$notool_out" == *"shellcheck is not installed"* ]]; then
     pass "no-tool: missing shellcheck warns and exits 0"
 else

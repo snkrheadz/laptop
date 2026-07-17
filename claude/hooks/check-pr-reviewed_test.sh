@@ -7,6 +7,9 @@
 #   green-report — transcript contains a ReportFindings tool call → 0 (allow)
 #   green-skill  — transcript contains a code-review skill call   → 0 (allow)
 #   green-sec    — transcript contains security-review skill call → 0 (allow)
+#   green-attrib — transcript contains an attributionSkill stamp  → 0 (allow)
+#   green-binary — evidence embedded among invalid-UTF8/NUL bytes → 0 (allow)
+#   green-subagent — evidence only in sidecar subagent transcript → 0 (allow)
 #   bypass       — CLAUDE_SKIP_REVIEW=1 in the environment        → 0 (allow)
 #   data         — `gh pr create` as quoted data                  → 0 (allow)
 #   skip         — command is not `gh pr create`                  → 0 (allow, pre-filter)
@@ -60,6 +63,32 @@ printf '%s\n' \
     '{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Skill","input":{"skill":"security-review"}}]}}' \
     > "$SECREV"
 
+ATTRIB="$TMP/attrib.jsonl"
+printf '%s\n' \
+    '{"type":"assistant","message":{"content":[{"type":"text","text":"..."}],"attributionSkill":"code-review"}}' \
+    > "$ATTRIB"
+
+# Real transcripts carry invalid-UTF8/NUL bytes; evidence must still be found
+# (BSD grep would otherwise error or take the binary shortcut — the measured
+# fail-closed bug this fixture pins down).
+BINARY="$TMP/binary.jsonl"
+{
+    printf '\x00\xff\xfe garbage \x80\x81\n'
+    printf '%s\n' '{"type":"assistant","message":{"content":[{"type":"tool_use","name":"ReportFindings","input":{}}]}}'
+    printf '\x00\xc3\x28 more garbage\n'
+} > "$BINARY"
+
+# Delegated reviews record evidence only in the session's sidecar subagent
+# transcripts (<transcript-stem>/subagents/agent-*.jsonl), not the main file.
+SUBMAIN="$TMP/submain.jsonl"
+printf '%s\n' \
+    '{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Bash","input":{"command":"git log"}}]}}' \
+    > "$SUBMAIN"
+mkdir -p "$TMP/submain/subagents"
+printf '%s\n' \
+    '{"type":"assistant","message":{"content":[{"type":"tool_use","name":"ReportFindings","input":{"findings":[]}}]}}' \
+    > "$TMP/submain/subagents/agent-abc123.jsonl"
+
 # Payload builder: gh-pr-create PreToolUse JSON pointing at a given transcript.
 payload() {
     local transcript="$1"
@@ -73,8 +102,9 @@ run_hook() {  # run_hook <payload> [env VAR=VAL ...] → echoes exit code
 }
 
 # --- red: pr create with no review evidence --------------------------------
+# Single invocation: the substitution's $? is the hook's exit code.
 red_err="$( "$HOOK" <<< "$(payload "$NOREVIEW")" 2>&1 >/dev/null )"
-red_rc=$(run_hook "$(payload "$NOREVIEW")")
+red_rc=$?
 if [[ "$red_rc" == "2" ]]; then
     pass "red: no review evidence blocks with exit 2"
 else
@@ -108,6 +138,30 @@ if [[ "$rc" == "0" ]]; then
     pass "green-sec: security-review skill evidence allows with exit 0"
 else
     fail "green-sec: expected exit 0, got $rc"
+fi
+
+# --- green: attributionSkill stamp (the harness's other real shape) -----------
+rc=$(run_hook "$(payload "$ATTRIB")")
+if [[ "$rc" == "0" ]]; then
+    pass "green-attrib: attributionSkill evidence allows with exit 0"
+else
+    fail "green-attrib: expected exit 0, got $rc"
+fi
+
+# --- green: evidence inside a transcript with binary garbage ------------------
+rc=$(run_hook "$(payload "$BINARY")")
+if [[ "$rc" == "0" ]]; then
+    pass "green-binary: evidence found despite invalid-UTF8/NUL bytes"
+else
+    fail "green-binary: expected exit 0, got $rc"
+fi
+
+# --- green: evidence only in a sidecar subagent transcript --------------------
+rc=$(run_hook "$(payload "$SUBMAIN")")
+if [[ "$rc" == "0" ]]; then
+    pass "green-subagent: sidecar subagent evidence allows with exit 0"
+else
+    fail "green-subagent: expected exit 0, got $rc"
 fi
 
 # --- bypass: CLAUDE_SKIP_REVIEW=1 -------------------------------------------

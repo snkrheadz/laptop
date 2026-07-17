@@ -21,34 +21,49 @@
 MARKER="$HOME/.claude/cache/weekly-maintenance.last"
 WEEK_SECONDS=$((7 * 24 * 3600))
 
-now=$(date +%s)
+now=$(date +%s)   # one unavoidable fork (bash 3.2 has no %(%s)T / EPOCHSECONDS)
 if [[ -f "$MARKER" ]]; then
-    last=$(cat "$MARKER" 2>/dev/null)
+    # read exits non-zero at EOF-without-newline but still fills $last — do
+    # NOT reset it on that "failure" (the marker is written without a newline).
+    last=""
+    IFS= read -r last < "$MARKER" 2>/dev/null || :
     [[ "$last" =~ ^[0-9]+$ ]] && (( now - last < WEEK_SECONDS )) && exit 0
 fi
 
-# Resolve the dotfiles repo through the settings.json symlink; a non-symlink
-# means dotfiles are not installed on this machine → nothing to maintain.
-[[ -L "$HOME/.claude/settings.json" ]] || exit 0
-target=$(readlink "$HOME/.claude/settings.json") || exit 0
+# Resolve the dotfiles repo through any of the installed symlinks. Probing a
+# LIST matters: the harness itself rewrites settings.json (config changes are
+# atomic write+rename, which turns the symlink into a real file), and a single
+# probe would then silently disable this hook forever. No probe is a symlink →
+# dotfiles are not installed on this machine → nothing to maintain.
+target=""
+for probe in settings.json CLAUDE.md loop.md statusline.sh; do
+    if [[ -L "$HOME/.claude/$probe" ]]; then
+        target=$(readlink "$HOME/.claude/$probe") && break
+        target=""
+    fi
+done
+[[ -n "$target" ]] || exit 0
 DOTFILES_DIR=$(cd "$(dirname "$target")/.." 2>/dev/null && pwd) || exit 0
 [[ -d "$DOTFILES_DIR/.git" ]] || exit 0
 
 issues=""
 
-# 1. Broken symlinks pointing into the repo (bounded scan, never ~/Library).
-broken=""
+# 1. Broken symlinks pointing into the repo. Depth-bounded everywhere: this
+#    runs at session START, and an unbounded find under ~/.claude walks the
+#    entire plugins tree (~29k entries measured) — install.sh only ever links
+#    at depth ≤2 under these roots (e.g. .config/ghostty/config, .claude/hooks/x).
+broken=()
 while IFS= read -r link; do
     [[ -n "$link" ]] || continue
     case "$(readlink "$link")" in
-        "$DOTFILES_DIR"/*) [[ -e "$link" ]] || broken="$broken $link" ;;
+        "$DOTFILES_DIR"/*) [[ -e "$link" ]] || broken+=("$link") ;;
     esac
 done <<< "$( {
     find "$HOME" -maxdepth 1 -type l
-    [[ -d "$HOME/.config" ]] && find "$HOME/.config" -type l
-    [[ -d "$HOME/.claude" ]] && find "$HOME/.claude" -type l
+    [[ -d "$HOME/.config" ]] && find "$HOME/.config" -maxdepth 2 -type l
+    [[ -d "$HOME/.claude" ]] && find "$HOME/.claude" -maxdepth 2 -type l
 } 2>/dev/null )"
-[[ -n "$broken" ]] && issues="${issues}- broken symlinks:${broken}\n"
+[[ ${#broken[@]} -gt 0 ]] && issues="${issues}- broken symlinks: ${broken[*]}\n"
 
 # 2. Repo drift: uncommitted files and unpushed commits (upstream optional).
 uncommitted=$(git -C "$DOTFILES_DIR" status --porcelain 2>/dev/null | wc -l | tr -d ' ')
