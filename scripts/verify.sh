@@ -10,7 +10,7 @@
 #   5. gitleaks     — standalone secret scan (also runs inside pre-commit)
 #   6. install-tests — install.sh / rollback.sh behavior tests (isolated HOME)
 #   7. docs-drift   — every .claude/skills/ skill appears in README.md's table
-#   8. hook-tests   — check-pr-base.sh PR-base guard behavior (red/green + fail-open)
+#   8. hook-tests   — every claude/hooks/*_test.sh suite (red/green + fail-open)
 #
 # Same command in CI and locally; the environment is detected and inapplicable
 # checks are reported as SKIP (with a reason) — never silently treated as pass.
@@ -225,20 +225,38 @@ check_docs_drift() {
     fi
 }
 
-# 8. Behavior tests for the PreToolUse PR-base guard (claude/hooks/check-pr-base.sh).
-#    Builds throwaway git fixtures (a local bare repo as origin) and asserts the
-#    hook blocks a stale base (exit 2) while failing open (exit 0) on every anomaly.
+# 8. Behavior tests for the lifecycle hooks. The test set is DERIVED (every
+#    claude/hooks/*_test.sh runs) so adding a hook test never requires touching
+#    this file — same no-drift principle as the symlink and docs-drift checks.
+#    The parity pass keeps the glob honest: a hook whose test was deleted or
+#    renamed FAILS here instead of silently vanishing from coverage.
 check_hook_tests() {
     hr "hook-tests"
-    if [[ ! -f claude/hooks/check-pr-base_test.sh ]]; then
-        echo "  claude/hooks/check-pr-base_test.sh not found"
+    local ran=0 failed=0 t h
+    shopt -s nullglob
+    # Parity: every hook must have a matching test suite.
+    for h in claude/hooks/*.sh; do
+        [[ "$h" == *_test.sh ]] && continue
+        if [[ ! -f "${h%.sh}_test.sh" ]]; then
+            echo "  hook without a test suite: $h"
+            failed=$((failed + 1))
+        fi
+    done
+    for t in claude/hooks/*_test.sh; do
+        ran=$((ran + 1))
+        echo "  → $t"
+        if ! bash "$t"; then
+            failed=$((failed + 1))
+        fi
+    done
+    shopt -u nullglob
+    if [[ $ran -eq 0 ]]; then
+        echo "  no claude/hooks/*_test.sh found"
         record "hook-tests" "SKIP" "テスト未配置"
-        return
-    fi
-    if bash claude/hooks/check-pr-base_test.sh; then
-        record "hook-tests" "PASS" ""
+    elif [[ $failed -eq 0 ]]; then
+        record "hook-tests" "PASS" "${ran} スイート"
     else
-        record "hook-tests" "FAIL" "フックの振る舞いテスト失敗"
+        record "hook-tests" "FAIL" "${failed}/${ran} スイート失敗"
     fi
 }
 
