@@ -74,11 +74,14 @@ codegraph status                          # インデックスの状態確認
 │   ├── statusline.sh   # Status line display script
 │   ├── CLAUDE.md       # User global instructions (Workflow Orchestration §1–6)
 │   ├── loop.md         # Default no-arg `/loop` maintenance routine (project-agnostic)
-│   └── hooks/          # Lifecycle hooks (3): validate-shell.sh, cost-alert.sh, check-pr-base.sh
+│   ├── skills/         # Global personal skills → ~/.claude/skills/ (available in every repo)
+│   └── hooks/          # Lifecycle hooks (5), each with a *_test.sh behavior suite
 │
 ├── .claude/            # Project-local config (NOT symlinked to ~/.claude/)
 │   ├── agents/         # Project agents (1): diagnose-dotfiles (real file, dotfiles-specific)
 │   └── skills/         # Local skills — source of truth is the directory (ls .claude/skills/)
+│
+├── evals/              # Behavioral eval suite (tasks sourced from tasks/lessons.md; evals/run.sh)
 │
 ├── .github/
 │   └── workflows/main.yml  # CI/CD (gitleaks + shellcheck)
@@ -140,11 +143,14 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `statusline.sh` - Status line display script
 - `CLAUDE.md` - User global instructions (Workflow Orchestration §1–6)
 - `loop.md` - Default no-arg `/loop` maintenance routine
+- `skills/*` - Global personal skills (each dir → `~/.claude/skills/<name>`; available in every repo, unlike `.claude/skills/`)
 
-**Hooks** (3):
+**Hooks** (5 — every hook has a `*_test.sh` behavior suite next to it; `scripts/verify.sh` discovers and runs all of them via the `claude/hooks/*_test.sh` glob):
 - `hooks/validate-shell.sh` - PostToolUse hook for shellcheck
 - `hooks/cost-alert.sh` - Stop hook: fires a native notification, once per session, when session/daily cost crosses a threshold (default $5/$20, env-overridable) — replaces statusline.sh's old always-on cost segment
-- `hooks/check-pr-base.sh` - PreToolUse (Bash) hook: blocks a `gh … pr create` invocation when `origin/<default-branch>` is not an ancestor of HEAD (base is stale). A command that syncs the base itself in the same block (fetch + merge/rebase/pull, e.g. the `/eng:create-pr` flow) is allowed; quoted mentions of the string are ignored. Guards Bash-tool calls only; fails open on every anomaly (non-git / no origin / jq missing / fetch failure). Behavior tests in `hooks/check-pr-base_test.sh`, run by `scripts/verify.sh`
+- `hooks/check-pr-base.sh` - PreToolUse (Bash) hook: blocks a `gh … pr create` invocation when `origin/<default-branch>` is not an ancestor of HEAD (base is stale). A command that syncs the base itself in the same block (fetch + merge/rebase/pull, e.g. the `/eng:create-pr` flow) is allowed; quoted mentions of the string are ignored. Guards Bash-tool calls only; fails open on every anomaly (non-git / no origin / jq missing / fetch failure)
+- `hooks/check-pr-reviewed.sh` - PreToolUse (Bash) hook: blocks a `gh … pr create` invocation when the session transcript holds no review evidence (a `ReportFindings` tool call or a code-review / security-review skill invocation) — "code review on by default". Fails open on every anomaly; deliberate skip for review-pointless PRs via `CLAUDE_SKIP_REVIEW=1`
+- `hooks/weekly-maintenance.sh` - SessionStart (startup) hook: weekly-throttled sweep for broken dotfiles symlinks and repo drift (uncommitted/unpushed). Detection only — reports into the session as context, never mutates (daemon-free replacement for the removed launchd agent)
 
 > Note: sensitive-file access is guarded by two accident-prevention layers: `settings.json` `deny` rules (harness-native) and the `pre-tool-guard.sh` PreToolUse hook shipped by `core@the-boris-way` (the local copy in `claude/hooks/` was removed; the plugin one still runs on every Bash call). Neither is a security boundary — they catch mistakes, not adversaries. Fresh-PR-base is enforced by the `check-pr-base.sh` PreToolUse hook, which blocks a `gh … pr create` invocation when `origin/<default-branch>` is not an ancestor of HEAD; `/eng:create-pr` passes because its single block syncs the base before creating the PR.
 

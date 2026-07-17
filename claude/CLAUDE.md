@@ -43,6 +43,8 @@ Escalate only as far as the work demands; each rung differs in who holds the pla
 - otherwise, a plan of 3 steps or fewer → delegate per model routing below
 - longer single-role work → main session, planned per §6, delegating spec-complete
   chunks as they emerge
+- decomposable many-unit changes (5–30 independent units, one PR each) →
+  `/batch` (bundled skill: worktree-isolated subagent per unit)
 - coordinated multi-role → Team
 - wide fan-out + verify/synthesize → Workflow (wins over Team when both match);
   long autonomous runs encode their fan-out in a Workflow instead of hand-spawning
