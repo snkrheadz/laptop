@@ -47,7 +47,10 @@ codegraph status                          # インデックスの状態確認
 ├── scripts/
 │   ├── auto-sync.sh           # Manual dotfiles sync (commit & push)
 │   ├── sync-claude.sh         # Claude symlink sync (sources install.sh) + plugin sync
-│   └── sync-claude-plugins.sh # Materialize marketplaces/plugins declared in settings.json (headless, idempotent)
+│   ├── sync-claude-plugins.sh # Materialize marketplaces/plugins declared in settings.json (headless, idempotent)
+│   ├── verify.sh              # Unified check entrypoint (the Closing Gate: shellcheck/pre-commit/symlink/hook-tests)
+│   ├── lint-shell.sh          # shellcheck wrapper over every git-tracked shell script
+│   └── dream.sh               # "Dreaming" dry-run: session transcripts → tasks/lessons.candidate.md (read-only, no apply)
 ├── Brewfile            # Homebrew packages, casks, VSCode extensions
 │
 ├── zsh/                # Shell config → ~/.zshrc, ~/.aliases, ~/.zsh/
@@ -154,7 +157,7 @@ The `claude/` directory contains Claude Code settings managed by this repository
 
 > Note: sensitive-file access is guarded by two accident-prevention layers: `settings.json` `deny` rules (harness-native) and the `pre-tool-guard.sh` PreToolUse hook shipped by `core@the-boris-way` (the local copy in `claude/hooks/` was removed; the plugin one still runs on every Bash call). Neither is a security boundary — they catch mistakes, not adversaries. Fresh-PR-base is enforced by the `check-pr-base.sh` PreToolUse hook, which blocks a `gh … pr create` invocation when `origin/<default-branch>` is not an ancestor of HEAD; `/eng:create-pr` passes because its single block syncs the base before creating the PR. A SECOND gate, `check-pr-reviewed.sh`, independently blocks any `gh … pr create` (including the `/eng:create-pr` flow) until a `/code-review` or `/security-review` has run in the session — so the PR sequence is: review first, then create.
 
-**Global Agents** (0 in this repo): `claude/agents/` is empty — all shareable agents
+**Global Agents** (0 in this repo): `claude/agents/` does not exist — all shareable agents
 (including `verify-subagent-result`, moved to the `research` pack) live in the
 `snkrheadz/the-boris-way` marketplace.
 

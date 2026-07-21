@@ -93,7 +93,10 @@ laptop/
 ├── scripts/
 │   ├── auto-sync.sh               # Manual dotfiles sync script (commit & push)
 │   ├── sync-claude.sh             # Claude symlink sync + plugin sync
-│   └── sync-claude-plugins.sh     # Materialize marketplaces/plugins declared in settings.json
+│   ├── sync-claude-plugins.sh     # Materialize marketplaces/plugins declared in settings.json
+│   ├── verify.sh                  # Unified check entrypoint (the Closing Gate: shellcheck/pre-commit/symlink/hook-tests)
+│   ├── lint-shell.sh              # shellcheck wrapper over every git-tracked shell script
+│   └── dream.sh                   # "Dreaming" dry-run: reads session transcripts → lessons.candidate.md (read-only, no apply)
 │
 ├── docs/
 │   └── fable5-vs-opus48.html  # Model comparison report (evidence for model routing)
