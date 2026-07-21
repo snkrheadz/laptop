@@ -91,6 +91,10 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/check-pr-reviewed.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/check-pr-verify-warn.sh"
           }
         ]
       }
