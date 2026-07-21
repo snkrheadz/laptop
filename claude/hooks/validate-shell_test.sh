@@ -5,6 +5,8 @@
 # under an isolated mktemp dir and asserts the exit code:
 #   clean      — well-formed .sh file              → 0 (allow)
 #   dirty      — .sh file with shellcheck findings → 2 (block, findings on stderr)
+#                (SKIPPED when shellcheck is not on PATH — the hook's fail-open
+#                 path then legitimately returns 0; covered by no-tool below)
 #   non-sh     — a .txt file                       → 0 (not in scope)
 #   missing    — path that does not exist          → 0 (nothing to check)
 #   no-path    — payload without file_path         → 0 (nothing to check)
@@ -19,6 +21,7 @@ HOOK="$(pwd)/claude/hooks/validate-shell.sh"
 
 PASS=0
 FAIL=0
+SKIP=0
 pass() {
     echo "  [pass] $1"
     PASS=$((PASS + 1))
@@ -26,6 +29,13 @@ pass() {
 fail() {
     echo "  [FAIL] $1"
     FAIL=$((FAIL + 1))
+}
+# skip: an inapplicable case (a missing external tool), reported distinctly and
+# NOT counted as a failure — mirrors scripts/verify.sh's SKIP discipline
+# ("inapplicable checks → SKIP, never silently treated as pass/fail").
+skip() {
+    echo "  [skip] $1"
+    SKIP=$((SKIP + 1))
 }
 
 TMP="$(mktemp -d)"
@@ -55,18 +65,28 @@ else
 fi
 
 # --- dirty: shellcheck findings block ------------------------------------------
-# Single invocation: the substitution's $? is the hook's exit code.
-dirty_err=$( "$HOOK" <<< "$(payload "$DIRTY")" 2>&1 >/dev/null )
-rc=$?
-if [[ "$rc" == "2" ]]; then
-    pass "dirty: shellcheck findings block with exit 2"
+# This case needs shellcheck on PATH. When it is absent, validate-shell.sh
+# legitimately takes its warn-only fail-open path (exit 0, "shellcheck is not
+# installed"), so asserting exit 2 here would be a false FAIL — the exact bug
+# #121 recorded from a shellcheck-less audit container. Guard with `command -v`
+# and SKIP instead, matching scripts/verify.sh's check_shellcheck; the
+# fail-open path stays covered unconditionally by the "no-tool" case below.
+if ! command -v shellcheck &> /dev/null; then
+    skip "dirty: shellcheck absent — fail-open path covered by no-tool case"
 else
-    fail "dirty: expected exit 2, got $rc"
-fi
-if [[ "$dirty_err" == *"shellcheck found issues"* && "$dirty_err" == *"SC"* ]]; then
-    pass "dirty: stderr carries the findings"
-else
-    fail "dirty: stderr missing findings (got: ${dirty_err:-<empty>})"
+    # Single invocation: the substitution's $? is the hook's exit code.
+    dirty_err=$( "$HOOK" <<< "$(payload "$DIRTY")" 2>&1 >/dev/null )
+    rc=$?
+    if [[ "$rc" == "2" ]]; then
+        pass "dirty: shellcheck findings block with exit 2"
+    else
+        fail "dirty: expected exit 2, got $rc"
+    fi
+    if [[ "$dirty_err" == *"shellcheck found issues"* && "$dirty_err" == *"SC"* ]]; then
+        pass "dirty: stderr carries the findings"
+    else
+        fail "dirty: stderr missing findings (got: ${dirty_err:-<empty>})"
+    fi
 fi
 
 # --- non-sh: out of scope -------------------------------------------------------
@@ -109,5 +129,5 @@ else
 fi
 
 echo
-echo "validate-shell: $PASS passed, $FAIL failed"
+echo "validate-shell: $PASS passed, $FAIL failed, $SKIP skipped"
 [[ $FAIL -eq 0 ]]
