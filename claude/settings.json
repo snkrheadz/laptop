@@ -176,13 +176,6 @@
       },
       "autoUpdate": true
     },
-    "pm-skills": {
-      "source": {
-        "source": "github",
-        "repo": "phuryn/pm-skills"
-      },
-      "autoUpdate": true
-    },
     "openai-codex": {
       "source": {
         "source": "github",
