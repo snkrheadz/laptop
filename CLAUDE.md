@@ -76,13 +76,10 @@ itself (`ls <dir>`) plus each file's header comment.
 
 ### Closing Gate (run before declaring work done)
 
-- `source ~/.zshrc` loads clean
-- `shellcheck` passes on changed scripts
-- `pre-commit run --all-files` is green
-- the `/health-check` skill reports no broken symlinks
-
-Tools for running the gate: the `verify-shell` agent (from `eng@the-boris-way`),
-the official `/verify` skill, and `/eng:test-and-fix` for repair loops.
+Run `/eng:verify-work` (eng@the-boris-way): it executes `scripts/verify.sh`
+(all gates) and reads the diff to confirm no test or gate was weakened to
+reach green. Green gates + unweakened diff = done. The `core` pack's
+`stop-verify-gate` hook nudges once at stop time if the gate never ran.
 
 ### zsh Loading Order
 
