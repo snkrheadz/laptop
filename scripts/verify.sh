@@ -16,6 +16,12 @@
 # checks are reported as SKIP (with a reason) — never silently treated as pass.
 # Each underlying check is still runnable on its own; this only orchestrates.
 #
+# Weakening watch-list for reviewers of a green run (read by /eng:verify-work):
+# claude/hooks/*_test.sh assertions removed or relaxed; checks removed from
+# this script or its SKIP conditions widened; exclusions added to
+# .pre-commit-config.yaml / .gitleaks.toml; a hook's fail-open scope expanded
+# beyond its header spec.
+#
 # Exit 0 when no check FAILs (SKIP does not fail the run); non-zero otherwise.
 
 set -uo pipefail
