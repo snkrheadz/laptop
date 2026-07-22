@@ -41,63 +41,29 @@ codegraph status                          # インデックスの状態確認
 
 ## Architecture
 
+Top-level map only — for any directory below, the source of truth is the directory
+itself (`ls <dir>`) plus each file's header comment.
+
 ```text
-├── install.sh          # Main installer (creates backup, symlinks, installs packages)
+├── install.sh          # Main installer (backup → symlinks → brew packages → security)
 ├── rollback.sh         # Restore from backup
-├── scripts/
-│   ├── auto-sync.sh           # Manual dotfiles sync (commit & push)
-│   ├── sync-claude.sh         # Claude symlink sync (sources install.sh) + plugin sync
-│   ├── sync-claude-plugins.sh # Materialize marketplaces/plugins declared in settings.json (headless, idempotent)
-│   ├── verify.sh              # Unified check entrypoint (the Closing Gate: shellcheck/pre-commit/symlink/hook-tests)
-│   ├── lint-shell.sh          # shellcheck wrapper over every git-tracked shell script
-│   └── dream.sh               # "Dreaming" dry-run: session transcripts → tasks/lessons.candidate.md (read-only, no apply)
+├── scripts/            # Maintenance scripts (ls scripts/ + each header)
+│   └── verify.sh       #   the Closing Gate entrypoint (also runs claude/hooks/*_test.sh)
 ├── Brewfile            # Homebrew packages, casks, VSCode extensions
-│
-├── zsh/                # Shell config → ~/.zshrc, ~/.aliases, ~/.zsh/
-│   ├── .zshrc          # Main zsh config (loads functions → configs → aliases → oh-my-zsh)
-│   ├── .aliases        # Shell aliases
-│   ├── functions/      # Custom zsh functions: _git_delete_branch, change-extension,
-│   │                   #   envup, mcd, pr-merge
-│   └── configs/        # Modular zsh configs
-│       ├── *.zsh       # Main configs (color, editor, history, etc.)
-│       └── post/       # Loaded last (path.zsh, completion.zsh, mise.zsh)
-│
-├── git/                # Git config → ~/.gitconfig, ~/.gitmessage, ~/.gitignore
-├── tmux/               # Tmux config → ~/.tmux.conf
-├── tig/                # Tig config → ~/.tigrc
-├── fzf/                # FZF config → ~/.fzf.zsh, ~/.fzf.bash
-├── ghostty/            # Ghostty config → ~/.config/ghostty/config
-├── iterm2/             # iTerm2 config (com.googlecode.iterm2.plist)
-├── mise/               # mise config → ~/.config/mise/config.toml
-├── bin/                # Executable scripts (tat - tmux utility)
-├── raycast/            # Raycast settings export (*.rayconfig)
-│
-├── claude/             # Claude Code config → ~/.claude/
-│   ├── settings.json   # Claude Code settings (hooks, plugins, permissions)
-│   ├── statusline.sh   # Status line display script
-│   ├── CLAUDE.md       # User global instructions (Workflow Orchestration §1–6)
-│   ├── loop.md         # Default no-arg `/loop` maintenance routine (project-agnostic)
-│   ├── skills/         # Global personal skills → ~/.claude/skills/ (available in every repo)
-│   └── hooks/          # Lifecycle hooks (6), each with a *_test.sh behavior suite
-│
-├── .claude/            # Project-local config (NOT symlinked to ~/.claude/)
-│   ├── agents/         # Project agents (1): diagnose-dotfiles (real file, dotfiles-specific)
-│   └── skills/         # Local skills — source of truth is the directory (ls .claude/skills/)
-│
+├── zsh/ git/ tmux/ tig/ fzf/ ghostty/ iterm2/ mise/ bin/ raycast/
+│                       # One dir per tool; install.sh symlinks them into $HOME, except:
+│                       #   iterm2/ & raycast/ are manual-import settings exports, and
+│                       #   bin/ joins PATH via zsh/configs/post/path.zsh (no symlink)
+├── claude/             # Claude Code global config → ~/.claude/ (settings.json, CLAUDE.md,
+│                       #   loop.md, statusline.sh, hooks/, skills/)
+├── .claude/            # Project-local config (NOT symlinked to ~/.claude/): agents/, skills/
 ├── evals/              # Behavioral eval suite (tasks sourced from tasks/lessons.md; evals/run.sh)
-│
-├── .github/
-│   └── workflows/main.yml  # CI/CD (gitleaks + shellcheck)
-│
-├── docs/
-│   ├── fable5-vs-opus48.html # Model comparison report (evidence base for model routing)
-│   └── evals-for-ai-agents.md # Evals reference (basis for claude/CLAUDE.md §4 evals rule)
-│
-├── .codegraph/               # CodeGraph index (SQLite 知識グラフ、MCP デーモンが FS ウォッチで自動更新)
-│
-├── .pre-commit-config.yaml   # Pre-commit hooks config
-├── .gitleaks.toml            # Gitleaks secret scanning config
-└── .gitignore                # Enhanced security-focused gitignore
+├── docs/               # Reference docs (e.g. evals-for-ai-agents.md — basis for claude/CLAUDE.md §4)
+├── .github/workflows/main.yml  # CI/CD (gitleaks + shellcheck)
+├── .codegraph/         # CodeGraph index (SQLite; auto-synced by the MCP daemon's FS watcher)
+├── .pre-commit-config.yaml     # Pre-commit hooks config
+├── .gitleaks.toml              # Gitleaks secret scanning config
+└── .gitignore                  # Enhanced security-focused gitignore
 ```
 
 ## Key Features
@@ -148,42 +114,30 @@ The `claude/` directory contains Claude Code settings managed by this repository
 - `loop.md` - Default no-arg `/loop` maintenance routine
 - `skills/*` - Global personal skills (each dir → `~/.claude/skills/<name>`; available in every repo, unlike `.claude/skills/`)
 
-**Hooks** (6 — every hook has a `*_test.sh` behavior suite next to it; `scripts/verify.sh` discovers and runs all of them via the `claude/hooks/*_test.sh` glob):
-- `hooks/validate-shell.sh` - PostToolUse hook for shellcheck
-- `hooks/cost-alert.sh` - Stop hook: fires a native notification, once per session, when session/daily cost crosses a threshold (default $5/$20, env-overridable) — replaces statusline.sh's old always-on cost segment
-- `hooks/check-pr-base.sh` - PreToolUse (Bash) hook: blocks a `gh … pr create` invocation when `origin/<default-branch>` is not an ancestor of HEAD (base is stale). A command that syncs the base itself in the same block (fetch + merge/rebase/pull, e.g. the `/eng:create-pr` flow) is allowed; quoted mentions of the string are ignored. Guards Bash-tool calls only; fails open on every anomaly (non-git / no origin / jq missing / fetch failure)
-- `hooks/check-pr-reviewed.sh` - PreToolUse (Bash) hook: blocks a `gh … pr create` invocation when the session transcript holds no review evidence (a `ReportFindings` tool call or a code-review / security-review skill invocation) — "code review on by default". Fails open on every anomaly. Run `/code-review` before creating a PR (also before `/eng:create-pr`); a human-only escape hatch for review-pointless PRs is documented in README.md and the hook header
-- `hooks/check-pr-verify-warn.sh` - PreToolUse (Bash) hook: WARNS (never blocks — always exits 0) at `gh … pr create` when the session transcript shows no `scripts/verify.sh` run. Same command-match + transcript-scan machinery as check-pr-reviewed.sh, but warning-only by deliberate design (#120): verify.sh's "clean" verdict is environment-dependent — it SKIPs tool-dependent checks when those tools are absent — so a hard gate would false-block legitimate PRs. Fails open silently (no warning) on every anomaly
-- `hooks/weekly-maintenance.sh` - SessionStart (startup) hook: weekly-throttled sweep for broken dotfiles symlinks and repo drift (uncommitted/unpushed). Detection only — reports into the session as context, never mutates (daemon-free replacement for the removed launchd agent)
+**Hooks** — source of truth is `claude/hooks/`: each hook's header comment carries its
+full spec, and each has a `*_test.sh` behavior suite that `scripts/verify.sh` discovers
+via the `claude/hooks/*_test.sh` glob. One-line map:
 
-> Note: sensitive-file access is guarded by two accident-prevention layers: `settings.json` `deny` rules (harness-native) and the `pre-tool-guard.sh` PreToolUse hook shipped by `core@the-boris-way` (the local copy in `claude/hooks/` was removed; the plugin one still runs on every Bash call). Neither is a security boundary — they catch mistakes, not adversaries. Fresh-PR-base is enforced by the `check-pr-base.sh` PreToolUse hook, which blocks a `gh … pr create` invocation when `origin/<default-branch>` is not an ancestor of HEAD; `/eng:create-pr` passes because its single block syncs the base before creating the PR. A SECOND gate, `check-pr-reviewed.sh`, independently blocks any `gh … pr create` (including the `/eng:create-pr` flow) until a `/code-review` or `/security-review` has run in the session — so the PR sequence is: review first, then create. A THIRD hook, `check-pr-verify-warn.sh`, only WARNS (never blocks) at the same `gh … pr create` moment when `scripts/verify.sh` hasn't been run this session — a nudge toward the Closing Gate, kept warning-only because verify.sh's verdict is environment-dependent and a hard gate would false-block.
+- `validate-shell.sh` — PostToolUse: shellcheck on edited shell scripts
+- `cost-alert.sh` — Stop: native notification, once per session, when session/daily cost crosses a threshold (default $5/$20, env-overridable)
+- `check-pr-base.sh` — PreToolUse (Bash): blocks `gh … pr create` when `origin/<default-branch>` is not an ancestor of HEAD; a command that syncs the base in the same block (the `/eng:create-pr` flow) passes
+- `check-pr-reviewed.sh` — PreToolUse (Bash): blocks `gh … pr create` until a `/code-review` or `/security-review` ran this session ("code review on by default"; human-only escape hatch documented in README.md)
+- `check-pr-verify-warn.sh` — PreToolUse (Bash): WARNS (never blocks) when `scripts/verify.sh` hasn't run this session — warning-only by design (#120) because verify.sh's verdict is environment-dependent (it SKIPs tool-dependent checks), so a hard gate would false-block
+- `weekly-maintenance.sh` — SessionStart: weekly-throttled symlink/repo-drift sweep; detection only, never mutates
 
-**Global Agents** (0 in this repo): `claude/agents/` does not exist — all shareable agents
-(including `verify-subagent-result`, moved to the `research` pack) live in the
-`snkrheadz/the-boris-way` marketplace.
+All three PR-gate hooks guard Bash-tool `gh … pr create` calls only and fail open on
+every anomaly. PR sequence: review first, then create. Sensitive-file access is guarded
+by `settings.json` deny rules + the `pre-tool-guard.sh` hook shipped by
+`core@the-boris-way` — accident guardrails, not a security boundary.
 
-**Project Agents** (1, dotfiles repo only — real file in `.claude/agents/`):
-- `diagnose-dotfiles` - Dotfiles troubleshooting (specific to this repo)
-
-> `side-job-researcher` is personal and kept **machine-local** (a real file in
-> `~/.claude/agents/`, not dotfiles-managed), mirroring its machine-local
-> `side-job-search` skill — so it is not synced or published to the marketplace.
-
-**Shareable agents** now live in the **`snkrheadz/the-boris-way`** marketplace
-(single source of truth) alongside the skills, enabled per role via
-`/plugin install <pack>@the-boris-way`:
-- **eng** (8 agents): `code-architect`, `architecture-reviewer`, `verify-shell`,
-  `migration-assistant`, `oncall-guide`, `state-machine-diagram`,
-  `aws-best-practices-advisor`, `gcp-best-practices-advisor`
-- **research**: `arxiv-ai-researcher`, `gemini-api-researcher`, `huggingface-spaces-researcher`, `verify-subagent-result`
-- **craft** (2 agents): `verifier` (`model: sonnet`, fresh-eyes sweep judge), `taste-judge`
-  (`model: opus`, final-gate 3-lens taste panel + DISTILL) — used by `/craft:produce`
-
-Packs in `snkrheadz/the-boris-way` (declared in `settings.json`, installed via `scripts/sync-claude-plugins.sh`, namespaced as `/<pack>:<skill>`):
-`core` | `pm` | `eng` | `research` | `strategy` | `spec` | `craft` (the marketplace also ships `writing`, not enabled here)
-
-The spec pipeline is provided by `spec@the-boris-way` (`/spec:scan` → … → `/spec:review`);
-the former `claude/commands/spec-*.md` + `implement-with-notes` copies were removed.
+**Agents & packs** — single source of truth is the `snkrheadz/the-boris-way`
+marketplace (per-pack agent/skill contents live in its repo); the packs enabled here
+are declared in `settings.json` and materialized by `scripts/sync-claude-plugins.sh`
+(namespaced `/<pack>:<skill>`). Project-local agents: `ls .claude/agents/`
+(dotfiles-specific only). `side-job-researcher` stays machine-local in
+`~/.claude/agents/` by design (mirrors its machine-local `side-job-search` skill) —
+never synced or published. The spec pipeline is provided by `spec@the-boris-way`; the
+former `claude/commands/spec-*.md` copies were removed — don't recreate them.
 
 **Local Skills** - Project-specific, in `.claude/skills/` (only available in this
 repository, not symlinked to `~/.claude/`). The directory is the source of truth:
