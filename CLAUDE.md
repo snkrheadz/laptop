@@ -119,6 +119,7 @@ via the `claude/hooks/*_test.sh` glob. One-line map:
 
 - `validate-shell.sh` — PostToolUse: shellcheck on edited shell scripts
 - `cost-alert.sh` — Stop: native notification, once per session, when session/daily cost crosses a threshold (default $5/$20, env-overridable)
+- `notify.sh` — Notification: voice cue branched on `notification_type` (`agent_completed` → finish cue, `auth_success` → silent, default → "Claude needs input")
 - `check-pr-base.sh` — PreToolUse (Bash): blocks `gh … pr create` when `origin/<default-branch>` is not an ancestor of HEAD; a command that syncs the base in the same block (the `/eng:create-pr` flow) passes
 - `check-pr-reviewed.sh` — PreToolUse (Bash): blocks `gh … pr create` until a `/code-review` or `/security-review` ran this session ("code review on by default"; human-only escape hatch documented in README.md)
 - `check-pr-verify-warn.sh` — PreToolUse (Bash): WARNS (never blocks) when `scripts/verify.sh` hasn't run this session — warning-only by design (#120) because verify.sh's verdict is environment-dependent (it SKIPs tool-dependent checks), so a hard gate would false-block
