@@ -82,7 +82,7 @@ laptop/
 │   ├── statusline.sh       # Custom status line script
 │   ├── loop.md             # Default no-arg /loop maintenance routine
 │   ├── skills/             # Global personal skills → ~/.claude/skills/
-│   └── hooks/              # Lifecycle hooks (6)
+│   └── hooks/              # Lifecycle hooks (7)
 │
 ├── .claude/                # Project-local config (NOT symlinked to ~/.claude/)
 │   ├── agents/             # Project agents (1): diagnose-dotfiles (dotfiles-specific)
@@ -324,9 +324,10 @@ claude/
 ├── statusline.sh       # Custom status line script
 ├── loop.md             # Default no-arg /loop maintenance routine
 ├── skills/             # Global personal skills → ~/.claude/skills/ (gcp-cost, memory-vault-sync, unknowns)
-└── hooks/              # Lifecycle hooks (6) — each has a *_test.sh suite run by scripts/verify.sh
+└── hooks/              # Lifecycle hooks (7) — each has a *_test.sh suite run by scripts/verify.sh
     ├── validate-shell.sh           # PostToolUse: shellcheck validation
     ├── cost-alert.sh               # Stop: native notification when session/daily cost crosses a threshold
+    ├── notify.sh                   # Notification: voice cue branched on notification_type (finish vs needs-input)
     ├── check-pr-base.sh            # PreToolUse (Bash): block gh pr create on a stale base
     ├── check-pr-reviewed.sh        # PreToolUse (Bash): block gh pr create without a session code review
     ├── check-pr-verify-warn.sh     # PreToolUse (Bash): warn (never block) if verify.sh wasn't run before gh pr create
@@ -345,7 +346,7 @@ claude/
 | `CLAUDE.md` | User global instructions (Workflow Orchestration, §1–6) |
 | `settings.json` | Hooks, plugins, permissions |
 | `statusline.sh` | Status line: model, dir+branch, duration, braille bars (ctx/5h*/7d*) — cost/lines moved to `cost-alert.sh` |
-| `hooks/` | 6 lifecycle hooks (PreToolUse ×3, PostToolUse, Stop, SessionStart), each with a behavior-test suite |
+| `hooks/` | 7 lifecycle hooks (PreToolUse ×3, PostToolUse, Stop, SessionStart, Notification), each with a behavior-test suite |
 | `skills/` | Global personal skills symlinked to `~/.claude/skills/` (gcp-cost, memory-vault-sync, unknowns) |
 | shareable agents | eng/research packs in the snkrheadz/the-boris-way marketplace |
 
@@ -378,6 +379,7 @@ Vim mode and `🤖<agent>` (subagent name) segments are appended when active.
 |------|----------------|-------------|
 | `validate-shell.sh` | PostToolUse | Runs shellcheck on `.sh` files after Write/Edit |
 | `cost-alert.sh` | Stop | Native notification, once per session, when session/daily cost crosses a threshold (env-overridable, default $5/$20) |
+| `notify.sh` | Notification | Voice cue (`say`) branched on `notification_type`: `agent_completed` announces a finish, `auth_success` stays silent, everything else keeps "Claude needs input". Fails open (missing jq/say, bad JSON) and always exits 0 |
 | `check-pr-base.sh` | PreToolUse (Bash) | Blocks a `gh … pr create` invocation on a stale base (`origin/<default-branch>` not an ancestor of HEAD). Self-syncing blocks like `/eng:create-pr` pass; Bash-tool calls only; fails open on any anomaly |
 | `check-pr-reviewed.sh` | PreToolUse (Bash) | Blocks a `gh … pr create` invocation when the session transcript holds no review evidence (`ReportFindings` / code-review / security-review). Fails open on any anomaly; deliberate skip via `CLAUDE_SKIP_REVIEW=1` |
 | `check-pr-verify-warn.sh` | PreToolUse (Bash) | Warns (never blocks — always exits 0) at `gh … pr create` when the session transcript shows no `scripts/verify.sh` run. Warning-only by design: verify.sh's "clean" verdict is environment-dependent, so a hard gate would false-block. Fails open silently on any anomaly |
