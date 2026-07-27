@@ -58,6 +58,8 @@ itself (`ls <dir>`) plus each file's header comment.
 │                       #   loop.md, statusline.sh, hooks/, skills/)
 ├── .claude/            # Project-local config (NOT symlinked to ~/.claude/): agents/, skills/
 ├── evals/              # Behavioral eval suite (tasks sourced from tasks/lessons.md; evals/run.sh)
+├── tests/              # Install behavior tests (test-install.sh — run by verify.sh's install-tests gate)
+├── specs/              # Spec-pipeline artifacts (one dir per spec; see specs/README.md)
 ├── docs/               # Reference docs (e.g. evals-for-ai-agents.md — basis for claude/CLAUDE.md §4)
 ├── .github/workflows/main.yml  # CI/CD (gitleaks + shellcheck)
 ├── .codegraph/         # CodeGraph index (SQLite; auto-synced by the MCP daemon's FS watcher)

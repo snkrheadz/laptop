@@ -90,6 +90,11 @@ laptop/
 │
 ├── evals/                  # Behavioral eval suite (lessons.md-sourced; see evals/README.md)
 │
+├── tests/
+│   └── test-install.sh     # Install behavior tests (run by scripts/verify.sh's install-tests gate)
+│
+├── specs/                  # Spec-pipeline artifacts (one dir per spec; see specs/README.md)
+│
 ├── scripts/
 │   ├── auto-sync.sh               # Manual dotfiles sync script (commit & push)
 │   ├── sync-claude.sh             # Claude symlink sync + plugin sync
@@ -99,7 +104,12 @@ laptop/
 │   └── dream.sh                   # "Dreaming" dry-run: reads session transcripts → lessons.candidate.md (read-only, no apply)
 │
 ├── docs/
-│   └── fable5-vs-opus48.html  # Model comparison report (evidence for model routing)
+│   ├── evals-for-ai-agents.md                       # Eval methodology — basis for claude/CLAUDE.md §4
+│   ├── fable5-vs-opus48.html                        # Model comparison report (evidence for model routing)
+│   ├── claude-code-context-supply-the-boris-way.md  # Boris Cherny: context supply notes
+│   ├── claude-code-daily-workflow-the-boris-way.md  # Boris Cherny: daily workflow notes
+│   ├── claude-code-practical-tips-boris-cherny.md   # Boris Cherny: practical tips notes
+│   └── TODO-routine-plugin-skill-verification.md    # TODO: routine/plugin skill verification
 │
 ├── .codegraph/             # CodeGraph index (code intelligence, auto-maintained)
 │

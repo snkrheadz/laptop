@@ -1,6 +1,7 @@
 #!/bin/bash
-# Auto-sync script for dotfiles
-# Runs periodically via launchd to keep dotfiles synced
+# Manual dotfiles sync script: commit & push local changes
+# Invoked by hand (./scripts/auto-sync.sh); no longer runs via launchd
+# (the com.dotfiles.autosync agent was removed)
 
 set -e
 
