@@ -55,6 +55,8 @@ brew "delve"
 brew "editorconfig"
 # Play, record, convert, and stream select audio and video codecs
 brew "ffmpeg"
+# Image format providing lossless and lossy compression for web images
+brew "webp"
 # Command-line outline and bitmap font editor/converter
 brew "fontforge"
 # Command-line fuzzy finder written in Go
@@ -65,8 +67,6 @@ brew "fzy"
 brew "jpeg-xl"
 # Library for encoding and decoding .avif files
 brew "libavif"
-# Image format providing lossless and lossy compression for web images
-brew "webp"
 # Interact with Google Gemini AI models from the command-line
 brew "gemini-cli"
 # GitHub command-line tool
@@ -85,10 +85,10 @@ brew "git-secrets"
 brew "gitleaks"
 # GNU Transport Layer Security (TLS) Library
 brew "gnutls"
-# Validating, recursive, caching DNS resolver
-brew "unbound"
 # GNU Privacy Guard (OpenPGP)
 brew "gnupg"
+# Validating, recursive, caching DNS resolver
+brew "unbound"
 # Library to render SVG files using Cairo
 brew "librsvg"
 # Graph visualization software from AT&T and Bell Labs
@@ -194,7 +194,7 @@ brew "uv"
 # HTTP load testing tool and library
 brew "vegeta"
 # Command-line interface for Vercel
-brew "vercel-cli"
+brew "vercel"
 # Vi 'workalike' with many additional features
 brew "vim"
 # Internet file retriever
@@ -239,8 +239,10 @@ cask "arc"
 cask "brave-browser"
 # Ghostty-based terminal with vertical tabs and notifications for AI coding agents
 cask "cmux"
-# Menu bar usage monitor for Codex and Claude
-cask "steipete/tap/codexbar", trusted: true
+# OpenAI's coding agent that runs in your terminal
+cask "codex"
+# OpenAI's Codex desktop app for managing coding agents
+cask "codex-app"
 # Write, edit, and chat about your code with AI
 cask "cursor"
 # Server and cloud storage browser
@@ -256,7 +258,6 @@ cask "flutter"
 cask "font-hack-nerd-font"
 # Terminal emulator that uses platform-native UI and GPU acceleration
 cask "ghostty"
-# Utility to provide quick look previews for files that aren't natively supported
 cask "glance"
 # Web browser
 cask "google-chrome"
@@ -264,11 +265,11 @@ cask "google-chrome"
 cask "iterm2"
 # Keyboard customiser
 cask "karabiner-elements"
-# Interface for reading and syncing eBooks
 cask "kindle"
+# Discover, download, and run local LLMs
+cask "lm-studio"
 # Zip archiver
 cask "macwinzipper"
-# Create zip files for use on Windows
 cask "maczip4win"
 # Htop on steroids
 cask "neohtop"
@@ -276,11 +277,10 @@ cask "neohtop"
 cask "notion"
 # Knowledge base that works on top of a local folder of plain text Markdown files
 cask "obsidian"
-# Menu bar app to find and kill processes running on open ports
-cask "productdevbook/tap/portkiller"
-# Command-line shell and scripting language
+# Get up and running with large language models locally
+cask "ollama-app"
+cask "portkiller"
 cask "powershell"
-# Display image info and preview unsupported formats in QuickLook
 cask "qlimagesize"
 # Thumbnails, static previews, cover art and metadata for video files
 cask "quicklook-video"
@@ -302,7 +302,6 @@ cask "temurin"
 cask "temurin@8"
 # Configurable document editor that supports Markdown
 cask "typora"
-# HTML to PDF renderer
 cask "wkhtmltopdf"
 # Multiplayer code editor
 cask "zed"
@@ -313,6 +312,7 @@ go "cmd/gofmt"
 go "github.com/golangci/golangci-lint/v2/cmd/golangci-lint"
 go "golang.org/x/tools/gopls"
 go "go.uber.org/mock/mockgen"
+go "github.com/rubenv/sql-migrate/sql-migrate"
 go "honnef.co/go/tools/cmd/staticcheck"
 npm "@colbymchenry/codegraph"
 npm "@google/clasp"
