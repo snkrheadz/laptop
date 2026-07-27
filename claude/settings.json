@@ -78,7 +78,6 @@
     "defaultMode": "auto",
     "allowUnsandboxedCommands": false
   },
-  "model": "claude-fable-5[1m]",
   "hooks": {
     "PreToolUse": [
       {
@@ -170,7 +169,9 @@
     "spec@the-boris-way": true,
     "craft@the-boris-way": true,
     "codex@openai-codex": true,
-    "datadog@claude-plugins-official": true
+    "datadog@claude-plugins-official": true,
+    "langsmith-tracing@langsmith-claude-code-plugins": true,
+    "claude-security@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "the-boris-way": {
@@ -185,11 +186,31 @@
         "source": "github",
         "repo": "openai/codex-plugin-cc"
       }
+    },
+    "langsmith-claude-code-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "langchain-ai/langsmith-claude-code-plugins"
+      }
+    },
+    "langfuse-observability": {
+      "source": {
+        "source": "github",
+        "repo": "langfuse/Claude-Observability-Plugin"
+      }
     }
   },
   "language": "japanese",
   "effortLevel": "high",
   "advisorModel": "opus",
+  "pluginConfigs": {
+    "langfuse-observability@langfuse-observability": {
+      "options": {
+        "LANGFUSE_PUBLIC_KEY": "pk-lf-ea64b269-3ef7-4661-9341-23e879b870d8",
+        "LANGFUSE_BASE_URL": "http://localhost:3860"
+      }
+    }
+  },
   "voice": {
     "enabled": true,
     "mode": "hold"
@@ -212,5 +233,6 @@
         "--mcp"
       ]
     }
-  }
+  },
+  "model": "claude-fable-5[1m]"
 }

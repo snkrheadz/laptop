@@ -14,3 +14,9 @@ paths = [
     '''\.gitleaks\.toml''',
     '''Brewfile''',
 ]
+# Langfuse PUBLIC keys (pk-lf-…) are publishable by design — auth requires the
+# pk/sk pair, and the pk alone grants nothing. Secret keys (sk-lf-…) stay
+# detected; this regex deliberately matches the pk- prefix only.
+regexes = [
+    '''pk-lf-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}''',
+]
