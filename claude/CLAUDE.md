@@ -62,7 +62,7 @@ a `Workflow` `pipeline()` — its concurrency is auto-capped.
 
 ### Model routing
 Subagents **inherit the main-session model unless `model` is set explicitly** — on a
-Fable 5 session (2× Opus 4.8 cost, no fast mode) an untagged delegation buys
+Fable 5 session (2× Opus 5 cost, no fast mode) an untagged delegation buys
 Fable-tier reasoning for work that doesn't need it:
 - **Fable 5 (main) holds** design, decomposition, and the review and integration of
   everything delegated — plus implementation while its spec cannot yet be written.
@@ -76,13 +76,14 @@ Fable-tier reasoning for work that doesn't need it:
   `model: "sonnet"`; raise to `model: "opus"` when weighing evidence is the task
   itself.
 - **Delegatable work not routed above** defaults to `model: "opus"`.
-- **On an Opus 4.8 main session** the cost asymmetry disappears — inherit freely
-  there.
-- **Security work that would run on Fable 5 routes to Opus 4.8 instead.** Security
-  audits, red-teaming, and exploit-reproduction debugging can trip Fable 5's safety
-  classifiers (`stop_reason: refusal`) even when benign — switch the main session or
-  use a `model: "opus"` subagent. Delegations that never touch Fable (security
-  fact-finding on sonnet) follow their own rules.
+- **On an Opus-tier main session (Opus 5 / 4.8)** the cost asymmetry disappears —
+  inherit freely there.
+- **Security work that would run on Fable 5 or Opus 5 routes to Opus 4.8 instead.**
+  Security audits, red-teaming, and exploit-reproduction debugging can trip the cyber
+  safety classifiers both models carry (`stop_reason: refusal`) even when benign —
+  switch the main session to Opus 4.8. A `model: "opus"` subagent resolves to Opus 5
+  (same classifiers), so it is no longer a safe route. Delegations that never touch a
+  classifier-carrying model (security fact-finding on sonnet) follow their own rules.
 - **Dispatch async, don't block.** Fire independent subtasks with `run_in_background`
   (web research excepted — serial rule above) and keep working; reuse a long-lived
   agent via `SendMessage` instead of respawning — context carries over and cache
